@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Ecuador Turismo - Descubre lo Extraordinario{% endblock %}</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- AOS Animation Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    
+    <style>
+        /* Paleta de colores profesional - Azul Corporativo */
+        :root {
+            --primary: #0284c7;      /* Sky blue 600 */
+            --primary-dark: #0369a1; /* Sky blue 700 */
+            --primary-light: #38bdf8; /* Sky blue 400 */
+            --secondary: #0891b2;     /* Cyan 600 */
+            --accent: #0ea5e9;        /* Sky blue 500 */
+            --dark: #0c4a6e;          /* Sky blue 900 */
+            --light: #e0f2fe;         /* Sky blue 100 */
+        }
+        
+        /* Gradientes profesionales */
+        .gradient-bg {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(2, 132, 199, 0.3);
+        }
+        
+        /* Card effects */
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Animaciones sutiles */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .slide-down {
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        /* Backdrop blur */
+        .backdrop-blur-custom {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        
+        /* Custom scrollbar profesional */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0369a1;
+        }
+        
+        /* Message styles profesionales */
+        .message-success {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        }
+        
+        .message-error {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        }
+        
+        .message-warning {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+        }
+        
+        .message-info {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+        }
+        
+        /* Mobile menu animation */
+        .mobile-menu-enter {
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        /* Badge styles */
+        .badge {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid rgba(2, 132, 199, 0.2);
+            border-radius: 50%;
+            border-top-color: #0284c7;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen">
+    
+    <!-- Header / Navbar -->
+    <header class="bg-white shadow-md sticky top-0 z-50 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo -->
+                <a href="{% url 'home' %}" class="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition">
+                    <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center text-white text-xl font-bold">
+                        ET
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">Ecuador Turismo</h1>
+                        <p class="text-xs text-gray-500">Plataforma Oficial de Turismo</p>
+                    </div>
+                </a>
+                
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center space-x-1">
+                    <a href="{% url 'home' %}" class="text-gray-700 hover:text-sky-600 hover:bg-sky-50 transition font-medium px-4 py-2 rounded-lg">
+                        <i class="fas fa-home mr-2"></i>Inicio
+                    </a>
+                    <a href="#" class="text-gray-700 hover:text-sky-600 hover:bg-sky-50 transition font-medium px-4 py-2 rounded-lg">
+                        <i class="fas fa-map-marked-alt mr-2"></i>Destinos
+                    </a>
+                    <a href="#" class="text-gray-700 hover:text-sky-600 hover:bg-sky-50 transition font-medium px-4 py-2 rounded-lg">
+                        <i class="fas fa-route mr-2"></i>Rutas
+                    </a>
+                    
+                    {% if user.is_authenticated %}
+                        <!-- Usuario autenticado -->
+                        <a href="#" class="text-gray-700 hover:text-sky-600 hover:bg-sky-50 transition font-medium px-4 py-2 rounded-lg">
+                            <i class="fas fa-calendar-check mr-2"></i>Reservas
+                        </a>
+                        
+                        <!-- Dropdown de usuario -->
+                        <div class="relative ml-3" x-data="{ open: false }">
+                            <button @click="open = !open" class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
+                                <div class="w-8 h-8 gradient-bg rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                                    {{ user.nombre|slice:":1"|upper }}
+                                </div>
+                                <span class="text-gray-700 font-medium text-sm">{{ user.nombre|truncatewords:2 }}</span>
+                                <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                            </button>
+                            
+                            <div x-show="open" 
+                                 @click.away="open = false"
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 scale-95"
+                                 x-transition:enter-end="opacity-100 scale-100"
+                                 class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-1 slide-down">
+                                
+                                <div class="px-4 py-3 border-b border-gray-100">
+                                    <p class="text-sm font-semibold text-gray-900">{{ user.nombre }}</p>
+                                    <p class="text-xs text-gray-500 mt-1">{{ user.correo }}</p>
+                                    {% if user.rol %}
+                                        <span class="inline-block mt-2 px-3 py-1 text-xs font-semibold rounded-full bg-sky-100 text-sky-700">
+                                            {{ user.rol.get_nombre_display }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                
+                                <a href="{% url 'usuarios:perfil' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                    <i class="fas fa-user-circle mr-3 text-sky-600 w-4"></i>
+                                    Mi Perfil
+                                </a>
+                                
+                                {% if user.es_administrador %}
+                                    <a href="{% url 'usuarios:listar_usuarios' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                        <i class="fas fa-users-cog mr-3 text-sky-600 w-4"></i>
+                                        Gestión de Usuarios
+                                    </a>
+                                    <a href="/admin/" target="_blank" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                        <i class="fas fa-cog mr-3 text-gray-600 w-4"></i>
+                                        Panel Django
+                                    </a>
+                                {% endif %}
+                                
+                                <div class="border-t border-gray-100 my-1"></div>
+                                
+                                <a href="{% url 'usuarios:logout' %}" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
+                                    <i class="fas fa-sign-out-alt mr-3 w-4"></i>
+                                    Cerrar Sesión
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Carrito -->
+                        <a href="#" class="relative p-2 hover:bg-gray-100 rounded-lg transition ml-2">
+                            <i class="fas fa-shopping-cart text-gray-700 text-lg"></i>
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+                                0
+                            </span>
+                        </a>
+                    {% else %}
+                        <!-- Usuario no autenticado -->
+                        <a href="{% url 'usuarios:login' %}" class="ml-4 px-4 py-2 text-sky-600 border border-sky-600 rounded-lg hover:bg-sky-50 transition font-medium">
+                            Iniciar Sesión
+                        </a>
+                        <a href="{% url 'usuarios:register' %}" class="px-4 py-2 btn-primary text-white rounded-lg font-medium shadow-sm">
+                            Registrarse
+                        </a>
+                    {% endif %}
+                </nav>
+                
+                <!-- Mobile menu button -->
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-gray-200 mobile-menu-enter">
+            <div class="px-4 py-3 space-y-1">
+                <a href="{% url 'home' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+                    <i class="fas fa-home mr-2"></i>Inicio
+                </a>
+                <a href="#" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+                    <i class="fas fa-map-marked-alt mr-2"></i>Destinos
+                </a>
+                <a href="#" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+                    <i class="fas fa-route mr-2"></i>Rutas
+                </a>
+                
+                {% if user.is_authenticated %}
+                    <a href="#" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+                        <i class="fas fa-calendar-check mr-2"></i>Reservas
+                    </a>
+                    <a href="{% url 'usuarios:perfil' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+                        <i class="fas fa-user-circle mr-2"></i>Mi Perfil
+                    </a>
+                    {% if user.es_administrador %}
+                        <a href="{% url 'usuarios:listar_usuarios' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+                            <i class="fas fa-users-cog mr-2"></i>Gestión de Usuarios
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'usuarios:logout' %}" class="block py-2 text-red-600 hover:bg-red-50 rounded-lg px-3 transition">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
+                    </a>
+                {% else %}
+                    <a href="{% url 'usuarios:login' %}" class="block py-2 text-sky-600 hover:bg-sky-50 rounded-lg px-3 transition font-medium">
+                        Iniciar Sesión
+                    </a>
+                    <a href="{% url 'usuarios:register' %}" class="block py-2 gradient-bg text-white rounded-lg px-3 font-medium">
+                        Registrarse
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+    
+    <!-- Messages / Notifications -->
+    {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            {% for message in messages %}
+                <div class="{% if message.tags == 'error' %}message-error{% elif message.tags == 'success' %}message-success{% elif message.tags == 'warning' %}message-warning{% else %}message-info{% endif %} text-white px-6 py-4 rounded-lg shadow-lg mb-3 fade-in flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-shrink-0">
+                            {% if message.tags == 'error' %}
+                                <i class="fas fa-exclamation-circle text-xl"></i>
+                            {% elif message.tags == 'success' %}
+                                <i class="fas fa-check-circle text-xl"></i>
+                            {% elif message.tags == 'warning' %}
+                                <i class="fas fa-exclamation-triangle text-xl"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle text-xl"></i>
+                            {% endif %}
+                        </div>
+                        <p class="font-medium">{{ message }}</p>
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="text-white hover:text-gray-200 transition ml-4">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <!-- Main Content -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- About -->
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center text-white font-bold">
+                            ET
+                        </div>
+                        <h3 class="text-lg font-bold">Ecuador Turismo</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Plataforma oficial para descubrir y reservar experiencias turísticas en las cuatro regiones naturales de Ecuador.
+                    </p>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="font-semibold mb-4 text-white">Enlaces Rápidos</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-sky-400 transition">Destinos</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-sky-400 transition">Rutas Turísticas</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-sky-400 transition">Reservas</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-sky-400 transition">Contacto</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Regions -->
+                <div>
+                    <h4 class="font-semibold mb-4 text-white">Regiones</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-sky-400 transition">Costa</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-sky-400 transition">Sierra</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-sky-400 transition">Oriente</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-sky-400 transition">Galápagos</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact -->
+                <div>
+                    <h4 class="font-semibold mb-4 text-white">Contacto</h4>
+                    <ul class="space-y-3 text-sm text-gray-400">
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-2 text-sky-400"></i>
+                            info@ecuadorturismo.ec
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone mr-2 text-sky-400"></i>
+                            +593 2 123 4567
+                        </li>
+                        <li class="flex space-x-3 pt-2">
+                            <a href="#" class="w-9 h-9 bg-sky-600 rounded-lg flex items-center justify-center hover:bg-sky-700 transition">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="w-9 h-9 bg-sky-600 rounded-lg flex items-center justify-center hover:bg-sky-700 transition">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="w-9 h-9 bg-sky-600 rounded-lg flex items-center justify-center hover:bg-sky-700 transition">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-10 pt-8 text-center text-sm text-gray-400">
+                <p>&copy; 2025 Ecuador Turismo. Todos los derechos reservados.</p>
+                <p class="mt-2">Sistema desarrollado con Django Framework</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Alpine.js para dropdowns -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Scripts -->
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 600,
+            once: true,
+            offset: 80,
+            easing: 'ease-out'
+        });
+        
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+        
+        // Auto-hide messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const messages = document.querySelectorAll('[class*="message-"]');
+                messages.forEach(function(message) {
+                    message.style.transition = 'opacity 0.4s ease';
+                    message.style.opacity = '0';
+                    setTimeout(() => message.remove(), 400);
+                });
+            }, 5000);
+        });
+        
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

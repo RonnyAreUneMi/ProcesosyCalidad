@@ -1,0 +1,360 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    
+    <!-- Hero Section - Mejorado -->
+    <div class="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700" data-aos="fade-down">
+        <!-- Patrón de fondo -->
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="white" fill-opacity="1"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
+            <div class="text-center text-white">
+                <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight" data-aos="fade-up">
+                    Descubre el <span class="text-yellow-300">Ecuador</span> auténtico
+                </h1>
+                <p class="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+                    Explora 4 regiones únicas, vive experiencias inolvidables y crea recuerdos que durarán toda la vida
+                </p>
+                
+                <!-- Badges -->
+                <div class="flex flex-wrap justify-center gap-4 mb-12" data-aos="fade-up" data-aos-delay="200">
+                    <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-full px-6 py-3 border border-white border-opacity-30">
+                        <i class="fas fa-certificate text-yellow-300 mr-2"></i>
+                        <span class="font-semibold">Sistema Certificado</span>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-full px-6 py-3 border border-white border-opacity-30">
+                        <i class="fas fa-lock text-green-300 mr-2"></i>
+                        <span class="font-semibold">Pagos Seguros</span>
+                    </div>
+                    <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-full px-6 py-3 border border-white border-opacity-30">
+                        <i class="fas fa-headset text-blue-300 mr-2"></i>
+                        <span class="font-semibold">Soporte 24/7</span>
+                    </div>
+                </div>
+
+                {% if not user.is_authenticated %}
+                <div class="flex flex-col sm:flex-row gap-4 justify-center" data-aos="fade-up" data-aos-delay="300">
+                    <a href="{% url 'usuarios:register' %}" class="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-purple-700 bg-white rounded-xl overflow-hidden shadow-2xl transition-all duration-300 hover:shadow-yellow-500/50 hover:scale-105">
+                        <span class="absolute inset-0 w-full h-full bg-gradient-to-br from-yellow-300 to-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                        <span class="relative flex items-center">
+                            <i class="fas fa-rocket mr-2"></i>
+                            Comenzar Ahora
+                        </span>
+                    </a>
+                    <a href="{% url 'usuarios:login' %}" class="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white border-2 border-white rounded-xl hover:bg-white hover:text-purple-700 transition-all duration-300">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Iniciar Sesión
+                    </a>
+                </div>
+                {% else %}
+                <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl p-8 max-w-2xl mx-auto border border-white border-opacity-20" data-aos="fade-up" data-aos-delay="300">
+                    <h2 class="text-3xl font-bold mb-3">¡Hola, {{ user.nombre }}! 👋</h2>
+                    <p class="text-blue-100 mb-6 text-lg">Tu próxima aventura te está esperando</p>
+                    <div class="flex flex-wrap gap-4 justify-center">
+                        <a href="#regiones" class="inline-flex items-center px-6 py-3 bg-white text-purple-700 rounded-xl font-bold hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                            <i class="fas fa-compass mr-2"></i>
+                            Explorar Destinos
+                        </a>
+                        <a href="#" class="inline-flex items-center px-6 py-3 bg-white bg-opacity-20 text-white rounded-xl font-bold hover:bg-white hover:text-purple-700 transition-all duration-300">
+                            <i class="fas fa-suitcase mr-2"></i>
+                            Mis Reservas
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Wave divider -->
+        <div class="absolute bottom-0 left-0 right-0">
+            <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="#F9FAFB"/>
+            </svg>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-20">
+        
+        <!-- Search Bar Premium -->
+        <div class="bg-white rounded-3xl shadow-2xl p-8 mb-12" data-aos="fade-up">
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-4">
+                    <i class="fas fa-search text-white text-xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800">Encuentra tu destino perfecto</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="relative">
+                    <i class="fas fa-map-marker-alt absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="¿A dónde quieres ir?" class="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-100 outline-none transition-all">
+                </div>
+                
+                <div class="relative">
+                    <i class="fas fa-globe-americas absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <select class="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-100 outline-none transition-all appearance-none bg-white">
+                        <option value="">Todas las regiones</option>
+                        <option value="costa">🏖️ Costa</option>
+                        <option value="sierra">⛰️ Sierra</option>
+                        <option value="oriente">🌴 Oriente</option>
+                        <option value="galapagos">🐢 Galápagos</option>
+                    </select>
+                </div>
+
+                <div class="relative">
+                    <i class="fas fa-calendar-alt absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input type="date" class="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-4 focus:ring-purple-100 outline-none transition-all">
+                </div>
+
+                <button class="py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold hover:shadow-2xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2">
+                    <i class="fas fa-search"></i>
+                    <span>Buscar Ahora</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Statistics Dashboard -->
+        {% if user.is_authenticated %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12" data-aos="fade-up">
+            <div class="bg-white rounded-2xl p-6 shadow-lg border-l-4 border-blue-500 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-calendar-check text-blue-600 text-2xl"></i>
+                    </div>
+                    <span class="text-3xl font-bold text-gray-800">0</span>
+                </div>
+                <h4 class="text-gray-600 font-semibold">Reservas Activas</h4>
+                <p class="text-sm text-gray-500 mt-1">Próximas aventuras</p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-lg border-l-4 border-green-500 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-map-marked-alt text-green-600 text-2xl"></i>
+                    </div>
+                    <span class="text-3xl font-bold text-gray-800">0</span>
+                </div>
+                <h4 class="text-gray-600 font-semibold">Destinos Visitados</h4>
+                <p class="text-sm text-gray-500 mt-1">Lugares explorados</p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-lg border-l-4 border-yellow-500 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 bg-yellow-100 rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-star text-yellow-600 text-2xl"></i>
+                    </div>
+                    <span class="text-3xl font-bold text-gray-800">0</span>
+                </div>
+                <h4 class="text-gray-600 font-semibold">Reseñas</h4>
+                <p class="text-sm text-gray-500 mt-1">Opiniones compartidas</p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-lg border-l-4 border-purple-500 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-gift text-purple-600 text-2xl"></i>
+                    </div>
+                    <span class="text-3xl font-bold text-gray-800">0</span>
+                </div>
+                <h4 class="text-gray-600 font-semibold">Puntos</h4>
+                <p class="text-sm text-gray-500 mt-1">Recompensas acumuladas</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Regions Section - Diseño Premium -->
+        <div id="regiones" class="mb-16" data-aos="fade-up">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">
+                    Explora las <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">4 Regiones</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Cada región de Ecuador ofrece experiencias únicas y paisajes inolvidables
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Costa -->
+                <div class="group relative bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2" data-aos="zoom-in">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-400 to-cyan-600 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+                    
+                    <div class="relative p-8">
+                        <!-- Header -->
+                        <div class="flex items-start justify-between mb-6">
+                            <div class="w-20 h-20 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl flex items-center justify-center text-4xl shadow-lg transform group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500">
+                                🏖️
+                            </div>
+                            <span class="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">12 destinos</span>
+                        </div>
+                        
+                        <!-- Content -->
+                        <h3 class="text-3xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">Costa</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            Playas paradisíacas de arena blanca, puertos históricos, gastronomía marina exquisita y un clima tropical perfecto todo el año.
+                        </p>
+                        
+                        <!-- Features -->
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm">🌊 Playas</span>
+                            <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm">🐚 Biodiversidad</span>
+                            <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm">🍤 Gastronomía</span>
+                        </div>
+                        
+                        <!-- Button -->
+                        <button class="w-full py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold group-hover:shadow-2xl transition-all duration-300 flex items-center justify-center space-x-2">
+                            <span>Explorar Costa</span>
+                            <i class="fas fa-arrow-right transform group-hover:translate-x-2 transition-transform"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sierra -->
+                <div class="group relative bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-600 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+                    
+                    <div class="relative p-8">
+                        <div class="flex items-start justify-between mb-6">
+                            <div class="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-600 rounded-2xl flex items-center justify-center text-4xl shadow-lg transform group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500">
+                                ⛰️
+                            </div>
+                            <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-bold">18 destinos</span>
+                        </div>
+                        
+                        <h3 class="text-3xl font-bold text-gray-900 mb-3 group-hover:text-green-600 transition-colors">Sierra</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            Majestuosas montañas andinas, volcanes imponentes, ciudades coloniales llenas de historia y cultura ancestral milenaria.
+                        </p>
+                        
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            <span class="px-3 py-1 bg-green-50 text-green-700 rounded-lg text-sm">🏔️ Montañas</span>
+                            <span class="px-3 py-1 bg-green-50 text-green-700 rounded-lg text-sm">🏛️ Cultura</span>
+                            <span class="px-3 py-1 bg-green-50 text-green-700 rounded-lg text-sm">🌋 Volcanes</span>
+                        </div>
+                        
+                        <button class="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-bold group-hover:shadow-2xl transition-all duration-300 flex items-center justify-center space-x-2">
+                            <span>Explorar Sierra</span>
+                            <i class="fas fa-arrow-right transform group-hover:translate-x-2 transition-transform"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Oriente -->
+                <div class="group relative bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="absolute inset-0 bg-gradient-to-br from-emerald-500 to-green-700 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+                    
+                    <div class="relative p-8">
+                        <div class="flex items-start justify-between mb-6">
+                            <div class="w-20 h-20 bg-gradient-to-br from-emerald-500 to-green-700 rounded-2xl flex items-center justify-center text-4xl shadow-lg transform group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500">
+                                🌴
+                            </div>
+                            <span class="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-bold">8 destinos</span>
+                        </div>
+                        
+                        <h3 class="text-3xl font-bold text-gray-900 mb-3 group-hover:text-emerald-600 transition-colors">Oriente</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            La selva amazónica más biodiversa del planeta, comunidades indígenas auténticas, ríos caudalosos y aventuras extremas.
+                        </p>
+                        
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            <span class="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-sm">🦜 Fauna</span>
+                            <span class="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-sm">🌿 Selva</span>
+                            <span class="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-sm">🛶 Aventura</span>
+                        </div>
+                        
+                        <button class="w-full py-4 bg-gradient-to-r from-emerald-500 to-green-700 text-white rounded-xl font-bold group-hover:shadow-2xl transition-all duration-300 flex items-center justify-center space-x-2">
+                            <span>Explorar Oriente</span>
+                            <i class="fas fa-arrow-right transform group-hover:translate-x-2 transition-transform"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Galápagos -->
+                <div class="group relative bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="absolute inset-0 bg-gradient-to-br from-indigo-400 to-purple-600 opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+                    
+                    <div class="relative p-8">
+                        <div class="flex items-start justify-between mb-6">
+                            <div class="w-20 h-20 bg-gradient-to-br from-indigo-400 to-purple-600 rounded-2xl flex items-center justify-center text-4xl shadow-lg transform group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500">
+                                🐢
+                            </div>
+                            <span class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full text-sm font-bold">6 destinos</span>
+                        </div>
+                        
+                        <h3 class="text-3xl font-bold text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors">Galápagos</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            Islas únicas declaradas Patrimonio de la Humanidad, fauna endémica extraordinaria y paisajes volcánicos espectaculares.
+                        </p>
+                        
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            <span class="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-sm">🐢 Tortugas</span>
+                            <span class="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-sm">🏝️ Islas</span>
+                            <span class="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-sm">🤿 Buceo</span>
+                        </div>
+                        
+                        <button class="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-bold group-hover:shadow-2xl transition-all duration-300 flex items-center justify-center space-x-2">
+                            <span>Explorar Galápagos</span>
+                            <i class="fas fa-arrow-right transform group-hover:translate-x-2 transition-transform"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Featured Destinations Section -->
+        <div class="mb-16" data-aos="fade-up">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">
+                    Destinos <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Destacados</span>
+                </h2>
+                <p class="text-xl text-gray-600">Los lugares más populares y visitados</p>
+            </div>
+            
+            <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-12 text-center shadow-xl">
+                <div class="max-w-2xl mx-auto">
+                    <div class="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center text-5xl mx-auto mb-6 shadow-2xl">
+                        🗺️
+                    </div>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-4">Próximamente disponibles</h3>
+                    <p class="text-lg text-gray-600 mb-8">
+                        Estamos preparando los destinos más increíbles de Ecuador para ti. Muy pronto podrás explorarlos y reservar tu próxima aventura.
+                    </p>
+                    
+                    {% if not user.is_authenticated %}
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a href="{% url 'usuarios:register' %}" class="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                            <i class="fas fa-bell mr-2"></i>
+                            Recibir Notificaciones
+                        </a>
+                        <a href="#regiones" class="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-700 rounded-xl font-bold hover:shadow-xl transition-all duration-300 border-2 border-gray-200">
+                            <i class="fas fa-compass mr-2"></i>
+                            Ver Regiones
+                        </a>
+                    </div>
+                    {% else %}
+                    <a href="#regiones" class="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                        <i class="fas fa-compass mr-2"></i>
+                        Explorar Regiones
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action Final -->
+        {% if not user.is_authenticated %}
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 text-center text-white mb-12 shadow-2xl" data-aos="fade-up">
+            <h2 class="text-4xl font-bold mb-4">¿Listo para tu próxima aventura?</h2>
+            <p class="text-xl mb-8 text-blue-100">Únete a miles de viajeros que ya descubrieron Ecuador</p>
+            <a href="{% url 'usuarios:register' %}" class="inline-flex items-center px-10 py-5 bg-white text-purple-700 rounded-xl font-bold text-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                <i class="fas fa-rocket mr-2"></i>
+                Crear Cuenta Gratis
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

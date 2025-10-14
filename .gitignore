@@ -1,0 +1,26 @@
+# Archivo .gitignore para proyectos Django
+
+# 1. Entorno Virtual
+# Ignorar el entorno virtual completo
+venv/
+.venv/ 
+
+# 2. Archivos de Base de Datos
+# Base de datos local de desarrollo (SQLite)
+db.sqlite3
+
+# 3. Directorios de Python
+# Archivos de caché
+__pycache__/
+*.pyc
+*~$
+*.egg-info/
+.pytest_cache/
+
+# 4. Archivos de Medios y Static
+# Ignorar archivos generados automáticamente para producción
+staticfiles/
+
+# Directorio de archivos cargados por los usuarios (media)
+# (Si bien la carpeta 'media' existe, ignoramos el contenido para no subir datos grandes)
+media/
