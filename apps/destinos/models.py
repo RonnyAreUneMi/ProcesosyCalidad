@@ -82,6 +82,15 @@ class Destino(models.Model):
         verbose_name='Descripción Corta',
         help_text='Resumen breve para listados'
     )
+
+    imagen_principal = models.ImageField(
+        upload_to='destinos/',
+        blank=True,
+        null=True,
+        verbose_name='Imagen Principal',
+        help_text='Imagen principal del destino (opcional)'
+    )
+
     provincia = models.CharField(
         max_length=100,
         verbose_name='Provincia'
@@ -231,6 +240,18 @@ class Destino(models.Model):
         """Incrementar el contador de visitas"""
         self.visitas += 1
         self.save(update_fields=['visitas'])
+
+    def get_imagen_principal(self):
+        """
+        Retorna la URL de la imagen principal o una imagen por defecto
+        """
+        if self.imagen_principal and hasattr(self.imagen_principal, 'url'):
+            try:
+                return self.imagen_principal.url
+            except:
+                pass
+        # Retorna imagen por defecto
+        return '/static/images/destinos/destino_defecto.jpg'
     
 # Reemplaza el método actualizar_calificacion en tu modelo Destino con este:
 

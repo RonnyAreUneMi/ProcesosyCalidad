@@ -91,6 +91,16 @@ DATABASES = {
 # Otras variables de entorno
 SUPABASE_URL = config('SUPABASE_URL')
 SUPABASE_ANON_KEY = config('SUPABASE_ANON_KEY')
+SUPABASE_BUCKET_NAME = config('SUPABASE_BUCKET_NAME')
+DEFAULT_FILE_STORAGE = 'storages.supabase_storage.SupabaseStorage'
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.supabase_storage.SupabaseStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 # Custom User Model
 # RF-001: Modelo de usuario personalizado

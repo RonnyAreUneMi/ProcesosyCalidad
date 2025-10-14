@@ -235,7 +235,7 @@ def busqueda_ajax(request):
         'provincia': d.provincia,
         'region': d.get_region_display(),
         'slug': d.slug,
-        'imagen': d.imagenes.filter(es_principal=True).first().imagen.url if d.imagenes.filter(es_principal=True).exists() else None
+        'imagen': d.get_imagen_principal()
     } for d in destinos]
     
     return JsonResponse({'resultados': resultados})
@@ -392,14 +392,29 @@ def crear_destino(request):
                 precio_promedio_maximo=precio_max,
                 destacado=destacado,
                 activo=activo,
-                imagen_principal=imagen_principal
+                # imagen_principal=imagen_principal
             )
+            # Asignar imagen solo si se subió una (sino usa la por defecto del modelo)
+            # Subir la imagen a Supabase si se proporcionó
+            mensaje_imagen = ""
+            if imagen_principal:
+                try:
+                    # Django automáticamente usará el SupabaseStorage configurado
+                    destino.imagen_principal = imagen_principal
+                    destino.save(update_fields=['imagen_principal'])
+                    mensaje_imagen = " Imagen subida a Supabase exitosamente."
+                except Exception as e:
+                    # Si falla la subida, informar pero no cancelar la creación
+                    mensaje_imagen = f" Advertencia: Error al subir imagen: {str(e)}"
+                    print(f"Error subiendo imagen a Supabase: {str(e)}")
+            else:
+                mensaje_imagen = " Se usará la imagen por defecto."
 
-            messages.success(request, f'Destino "{nombre}" creado exitosamente')
+            messages.success(request, f'Destino "{nombre}" creado exitosamente', f'{"Imagen personalizada subida." if imagen_principal else "Se usará la imagen por defecto."}')
             return redirect('destinos:lista_destinos')
 
         except Exception as e:
-            messages.error(request, f'Error al crear el destino: {str(e)}')
+            messages.error(request, f'Error al crear2 el destino: {str(e)}')
             return redirect('destinos:crear_destino')
 
     # GET request: Renderizar formulario
@@ -467,23 +482,25 @@ def eliminar_destino(request, destino_id):
     """
     # Verificar que el usuario sea administrador
     if not request.user.es_administrador():
-        return JsonResponse({
-            'success': False,
-            'message': 'No tienes permisos para eliminar destinos'
-        }, status=403)
+        messages.error(request, 'No tienes permisos para eliminar destinos')
+        return redirect('destinos:lista_destinos')
     
     destino = get_object_or_404(Destino, id=destino_id)
     
     if request.method == 'POST':
+        nombre_destino = destino.nombre
+        
         # Desactivar el destino en lugar de eliminarlo
         destino.activo = False
         destino.save()
         
-        return JsonResponse({
-            'success': True,
-            'message': f'Destino "{destino.nombre}" eliminado exitosamente'
-        })
+        # Mensaje de éxito
+        messages.success(request, f'Destino "{nombre_destino}" eliminado exitosamente')
+        
+        # Redireccionar a la lista de destinos
+        return redirect('destinos:lista_destinos')
     
+    # GET request: mostrar confirmación
     context = {
         'destino': destino,
         'titulo': f'Eliminar {destino.nombre}'
