@@ -5,6 +5,9 @@
 venv/
 .venv/ 
 
+env/
+.env/
+
 # 2. Archivos de Base de Datos
 # Base de datos local de desarrollo (SQLite)
 db.sqlite3
