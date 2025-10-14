@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    
+    <!-- Header Section -->
+    <div class="gradient-bg py-12" data-aos="fade-down">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-4xl font-bold text-white mb-2">
+                        Mi Perfil
+                    </h1>
+                    <p class="text-sky-100">Gestiona tu información personal y preferencias</p>
+                </div>
+                <div class="hidden md:block">
+                    <div class="w-16 h-16 bg-white bg-opacity-20 backdrop-blur-custom rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-user-circle text-white text-3xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-10">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            
+            <!-- Sidebar - Información del Usuario -->
+            <div class="lg:col-span-1" data-aos="fade-right">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <!-- Avatar Section -->
+                    <div class="gradient-bg p-6 text-center">
+                        <div class="inline-block relative">
+                            <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center text-sky-600 text-4xl font-bold shadow-lg">
+                                {{ user.nombre|first|upper }}
+                            </div>
+                            <div class="absolute bottom-0 right-0 w-8 h-8 bg-green-500 rounded-full border-4 border-white"></div>
+                        </div>
+                        <h2 class="text-white font-bold text-xl mt-4">{{ user.nombre }}</h2>
+                        <p class="text-sky-100 text-sm">{{ user.correo }}</p>
+                    </div>
+                    
+                    <!-- User Info -->
+                    <div class="p-6 space-y-4">
+                        <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+                            <span class="text-sm text-gray-600">Rol</span>
+                            <span class="px-3 py-1 bg-sky-100 text-sky-700 rounded-full text-sm font-semibold">
+                                {{ user.rol.get_nombre_display }}
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+                            <span class="text-sm text-gray-600">Estado</span>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                                <span class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1.5"></span>
+                                Activo
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+                            <span class="text-sm text-gray-600">Miembro desde</span>
+                            <span class="text-sm font-semibold text-gray-900">
+                                {{ user.fecha_registro|date:"d/m/Y" }}
+                            </span>
+                        </div>
+                        
+                        {% if user.ultimo_acceso %}
+                        <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+                            <span class="text-sm text-gray-600">Último acceso</span>
+                            <span class="text-sm font-semibold text-gray-900">
+                                {{ user.ultimo_acceso|date:"d/m/Y H:i" }}
+                            </span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if user.telefono %}
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Teléfono</span>
+                            <span class="text-sm font-semibold text-gray-900">
+                                {{ user.telefono }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Permisos Card -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mt-6" data-aos="fade-right" data-aos-delay="100">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                        <i class="fas fa-shield-alt text-sky-600 mr-2"></i>
+                        Permisos
+                    </h3>
+                    <ul class="space-y-2">
+                        {% for permiso in permisos %}
+                        <li class="flex items-center text-sm text-gray-700">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            {{ permiso|title }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content - Formulario de Edición -->
+            <div class="lg:col-span-2" data-aos="fade-left">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                        <h3 class="text-lg font-bold text-gray-900 flex items-center">
+                            <i class="fas fa-edit text-sky-600 mr-2"></i>
+                            Editar Información Personal
+                        </h3>
+                    </div>
+
+                    <form method="post" class="p-6">
+                        {% csrf_token %}
+                        
+                        <div class="space-y-6">
+                            <!-- Nombre Completo -->
+                            <div>
+                                <label for="id_nombre" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-user mr-1 text-gray-400"></i>
+                                    Nombre Completo
+                                </label>
+                                <input type="text" 
+                                       name="nombre" 
+                                       id="id_nombre"
+                                       value="{{ form.nombre.value|default:user.nombre }}"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                       required>
+                                {% if form.nombre.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.nombre.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Correo Electrónico -->
+                            <div>
+                                <label for="id_correo" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-envelope mr-1 text-gray-400"></i>
+                                    Correo Electrónico
+                                </label>
+                                <input type="email" 
+                                       name="correo" 
+                                       id="id_correo"
+                                       value="{{ form.correo.value|default:user.correo }}"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                       required>
+                                {% if form.correo.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.correo.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Teléfono -->
+                            <div>
+                                <label for="id_telefono" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-phone mr-1 text-gray-400"></i>
+                                    Teléfono
+                                </label>
+                                <input type="tel" 
+                                       name="telefono" 
+                                       id="id_telefono"
+                                       value="{{ form.telefono.value|default:user.telefono|default:'' }}"
+                                       placeholder="Ej: +593 99 123 4567"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
+                                {% if form.telefono.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.telefono.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Divider -->
+                            <div class="border-t border-gray-200 pt-6">
+                                <h4 class="text-sm font-semibold text-gray-700 mb-4">
+                                    <i class="fas fa-lock mr-1 text-gray-400"></i>
+                                    Cambiar Contraseña
+                                </h4>
+                                <p class="text-sm text-gray-600 mb-4">
+                                    Deja estos campos vacíos si no deseas cambiar tu contraseña
+                                </p>
+                            </div>
+
+                            <!-- Contraseña Actual -->
+                            <div>
+                                <label for="id_password_actual" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Contraseña Actual
+                                </label>
+                                <input type="password" 
+                                       name="password_actual" 
+                                       id="id_password_actual"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                       placeholder="Ingresa tu contraseña actual">
+                            </div>
+
+                            <!-- Nueva Contraseña -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="id_password1" class="block text-sm font-semibold text-gray-700 mb-2">
+                                        Nueva Contraseña
+                                    </label>
+                                    <input type="password" 
+                                           name="password1" 
+                                           id="id_password1"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                           placeholder="Nueva contraseña">
+                                </div>
+                                <div>
+                                    <label for="id_password2" class="block text-sm font-semibold text-gray-700 mb-2">
+                                        Confirmar Contraseña
+                                    </label>
+                                    <input type="password" 
+                                           name="password2" 
+                                           id="id_password2"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                           placeholder="Confirma tu contraseña">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="flex items-center justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
+                            <a href="{% url 'home' %}" 
+                               class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all duration-200">
+                                <i class="fas fa-times mr-2"></i>
+                                Cancelar
+                            </a>
+                            <button type="submit" 
+                                    class="px-6 py-3 btn-primary text-white rounded-lg font-semibold shadow-sm flex items-center">
+                                <i class="fas fa-save mr-2"></i>
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Zona de Peligro -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden mt-6" data-aos="fade-left" data-aos-delay="100">
+                    <div class="px-6 py-4 bg-red-50 border-b border-red-200">
+                        <h3 class="text-lg font-bold text-red-800 flex items-center">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            Zona de Peligro
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-1">Eliminar Cuenta</h4>
+                                <p class="text-sm text-gray-600">
+                                    Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor, ten cuidado.
+                                </p>
+                            </div>
+                            <button type="button" 
+                                    onclick="alert('Funcionalidad de eliminación de cuenta próximamente')"
+                                    class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-all duration-200 text-sm whitespace-nowrap ml-4">
+                                <i class="fas fa-trash-alt mr-1"></i>
+                                Eliminar Cuenta
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8" data-aos="fade-up">
+            <div class="bg-white rounded-xl p-6 shadow-lg border-t-4 border-blue-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 mb-1">Reservas</p>
+                        <p class="text-2xl font-bold text-gray-900">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-calendar-check text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-6 shadow-lg border-t-4 border-green-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 mb-1">Destinos Visitados</p>
+                        <p class="text-2xl font-bold text-gray-900">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-map-marked-alt text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-6 shadow-lg border-t-4 border-yellow-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 mb-1">Reseñas</p>
+                        <p class="text-2xl font-bold text-gray-900">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-star text-yellow-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-6 shadow-lg border-t-4 border-purple-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 mb-1">Puntos</p>
+                        <p class="text-2xl font-bold text-gray-900">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-gift text-purple-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

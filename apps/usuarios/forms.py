@@ -231,3 +231,90 @@ class PerfilUsuarioForm(forms.ModelForm):
                 'class': 'w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none transition',
             }),
         }
+# usuarios/forms.py
+from django import forms
+from django.contrib.auth.forms import AuthenticationForm
+from .models import Usuario, Rol
+class PerfilUsuarioForm(forms.ModelForm):
+    """
+    Formulario para editar el perfil del usuario
+    """
+    password_actual = forms.CharField(
+        required=False,
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Contraseña actual'
+        }),
+        label='Contraseña Actual'
+    )
+    password1 = forms.CharField(
+        required=False,
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nueva contraseña'
+        }),
+        label='Nueva Contraseña'
+    )
+    password2 = forms.CharField(
+        required=False,
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Confirmar contraseña'
+        }),
+        label='Confirmar Contraseña'
+    )
+    
+    class Meta:
+        model = Usuario
+        fields = ['nombre', 'correo', 'telefono']
+        widgets = {
+            'nombre': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre completo'
+            }),
+            'correo': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'correo@ejemplo.com'
+            }),
+            'telefono': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '+593 99 123 4567'
+            }),
+        }
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        password_actual = cleaned_data.get('password_actual')
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
+        
+        # Si se quiere cambiar la contraseña
+        if password1 or password2:
+            if not password_actual:
+                raise forms.ValidationError(
+                    'Debes ingresar tu contraseña actual para cambiarla.'
+                )
+            
+            if password1 != password2:
+                raise forms.ValidationError(
+                    'Las contraseñas no coinciden.'
+                )
+            
+            if len(password1) < 8:
+                raise forms.ValidationError(
+                    'La contraseña debe tener al menos 8 caracteres.'
+                )
+        
+        return cleaned_data
+    
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        password1 = self.cleaned_data.get('password1')
+        
+        # Cambiar contraseña si se proporcionó una nueva
+        if password1:
+            user.set_password(password1)
+        
+        if commit:
+            user.save()
+        return user

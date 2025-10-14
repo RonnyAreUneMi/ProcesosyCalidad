@@ -7,7 +7,8 @@ from django.views.decorators.csrf import csrf_protect
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.utils import timezone
-from .forms import LoginForm, RegisterForm, CambioRolForm, PerfilUsuarioForm
+from django.http import JsonResponse
+from .forms import LoginForm, RegisterForm, PerfilUsuarioForm
 from .models import Usuario, Rol
 
 
@@ -187,111 +188,154 @@ def perfil_view(request):
     return render(request, 'usuarios/perfil.html', context)
 
 
-@login_required
-@user_passes_test(es_administrador, login_url='home')
-@require_http_methods(["GET", "POST"])
-def cambiar_rol_view(request, usuario_id=None):
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib import messages
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_protect
+from django.core.exceptions import PermissionDenied
+from django.db import transaction
+from django.utils import timezone
+from django.http import JsonResponse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q, Count
+from .forms import LoginForm, RegisterForm, PerfilUsuarioForm
+from .models import Usuario, Rol
+
+
+def es_administrador(user):
     """
-    Vista para cambiar el rol de un usuario
-    Solo accesible por administradores
-    RF-001: Validación para cambiar rol
+    Función helper para verificar si el usuario es administrador
     """
-    if request.method == 'POST':
-        form = CambioRolForm(request.POST)
-        if form.is_valid():
-            try:
-                with transaction.atomic():
-                    usuario = form.cleaned_data['usuario']
-                    nuevo_rol = form.cleaned_data['nuevo_rol']
-                    motivo = form.cleaned_data.get('motivo', '')
-                    
-                    # Guardar rol anterior para registro
-                    rol_anterior = usuario.rol
-                    
-                    # Cambiar rol
-                    usuario.rol = nuevo_rol
-                    usuario.save()
-                    
-                    # Registrar cambio (opcional: crear modelo de auditoría)
-                    messages.success(
-                        request,
-                        f'Rol cambiado exitosamente. '
-                        f'{usuario.nombre} ahora es {nuevo_rol.get_nombre_display()}.'
-                    )
-                    
-                    return redirect('usuarios:listar_usuarios')
-                    
-            except Exception as e:
-                messages.error(
-                    request,
-                    f'Error al cambiar el rol: {str(e)}'
-                )
-        else:
-            messages.error(
-                request,
-                'Error en el formulario. Verifica los datos.'
-            )
-    else:
-        initial = {}
-        if usuario_id:
-            try:
-                usuario = Usuario.objects.get(pk=usuario_id)
-                initial['usuario'] = usuario
-            except Usuario.DoesNotExist:
-                messages.error(request, 'Usuario no encontrado.')
-                return redirect('usuarios:listar_usuarios')
-        
-        form = CambioRolForm(initial=initial)
-    
-    context = {
-        'form': form,
-        'title': 'Cambiar Rol de Usuario',
-    }
-    return render(request, 'usuarios/cambiar_rol.html', context)
+    return user.is_authenticated and user.es_administrador()
 
 
 @login_required
 @user_passes_test(es_administrador, login_url='home')
 def listar_usuarios_view(request):
     """
-    Vista para listar todos los usuarios
+    Vista para listar todos los usuarios con paginación
     Solo accesible por administradores
-    RF-008: Panel de administración
+    RF-008: Panel de administración con cambio de rol directo
     """
     # Filtros opcionales
     rol_filtro = request.GET.get('rol', '')
     busqueda = request.GET.get('q', '')
     
-    usuarios = Usuario.objects.select_related('rol').all()
+    # Query base
+    usuarios = Usuario.objects.select_related('rol').all().order_by('-fecha_registro')
     
+    # Aplicar filtros
     if rol_filtro:
         usuarios = usuarios.filter(rol__nombre=rol_filtro)
     
     if busqueda:
         usuarios = usuarios.filter(
-            nombre__icontains=busqueda
-        ) | usuarios.filter(
-            correo__icontains=busqueda
+            Q(nombre__icontains=busqueda) | 
+            Q(correo__icontains=busqueda)
         )
     
-    # Estadísticas
+    # Paginación
+    paginator = Paginator(usuarios, 10)  # 10 usuarios por página
+    page = request.GET.get('page', 1)
+    
+    try:
+        usuarios_paginados = paginator.page(page)
+    except PageNotAnInteger:
+        usuarios_paginados = paginator.page(1)
+    except EmptyPage:
+        usuarios_paginados = paginator.page(paginator.num_pages)
+    
+    # Estadísticas generales
     total_usuarios = Usuario.objects.count()
-    usuarios_por_rol = {}
-    for rol in Rol.objects.all():
-        usuarios_por_rol[rol.get_nombre_display()] = Usuario.objects.filter(
-            rol=rol
-        ).count()
+    
+    # Contar usuarios por rol - SIEMPRE mostrar los 3 roles
+    usuarios_por_rol = {
+        'Turista': Usuario.objects.filter(rol__nombre=Rol.TURISTA).count(),
+        'Proveedor': Usuario.objects.filter(rol__nombre=Rol.PROVEEDOR).count(),
+        'Administrador': Usuario.objects.filter(rol__nombre=Rol.ADMINISTRADOR).count(),
+    }
+    
+    # Estadísticas adicionales
+    usuarios_activos = Usuario.objects.filter(is_active=True).count()
+    usuarios_inactivos = Usuario.objects.filter(is_active=False).count()
+    
+    # Usuarios nuevos del mes actual
+    from datetime import datetime
+    inicio_mes = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    usuarios_nuevos_mes = Usuario.objects.filter(
+        fecha_registro__gte=inicio_mes
+    ).count()
+    
+    # Obtener todos los roles disponibles para los selects
+    roles_disponibles = Rol.objects.filter(activo=True)
     
     context = {
         'title': 'Gestión de Usuarios',
-        'usuarios': usuarios,
+        'usuarios': usuarios_paginados,
         'roles': Rol.objects.filter(activo=True),
+        'roles_disponibles': roles_disponibles,
         'total_usuarios': total_usuarios,
         'usuarios_por_rol': usuarios_por_rol,
+        'usuarios_activos': usuarios_activos,
+        'usuarios_inactivos': usuarios_inactivos,
+        'usuarios_nuevos_mes': usuarios_nuevos_mes,
         'rol_filtro': rol_filtro,
         'busqueda': busqueda,
     }
     return render(request, 'usuarios/listar_usuarios.html', context)
+
+@login_required
+@user_passes_test(es_administrador, login_url='home')
+@require_http_methods(["POST"])
+def cambiar_rol_view(request, usuario_id):
+    """
+    Vista para cambiar el rol de un usuario directamente desde la tabla
+    Solo accesible por administradores
+    RF-001: Validación para cambiar rol
+    """
+    try:
+        usuario = Usuario.objects.get(pk=usuario_id)
+        nuevo_rol_id = request.POST.get('rol_id')
+        
+        if not nuevo_rol_id:
+            messages.error(request, 'Debe seleccionar un rol.')
+            return redirect('usuarios:listar_usuarios')
+        
+        nuevo_rol = Rol.objects.get(pk=nuevo_rol_id)
+        
+        # Evitar cambiar el rol del administrador actual
+        if usuario == request.user and nuevo_rol.nombre != Rol.ADMINISTRADOR:
+            messages.warning(
+                request,
+                'No puedes cambiar tu propio rol de administrador.'
+            )
+            return redirect('usuarios:listar_usuarios')
+        
+        with transaction.atomic():
+            # Guardar rol anterior para el mensaje
+            rol_anterior = usuario.rol.get_nombre_display() if usuario.rol else 'Sin rol'
+            
+            # Cambiar rol
+            usuario.rol = nuevo_rol
+            usuario.save()
+            
+            messages.success(
+                request,
+                f'Rol de {usuario.nombre} cambiado de {rol_anterior} a {nuevo_rol.get_nombre_display()}.'
+            )
+        
+    except Usuario.DoesNotExist:
+        messages.error(request, 'Usuario no encontrado.')
+    except Rol.DoesNotExist:
+        messages.error(request, 'Rol no encontrado.')
+    except Exception as e:
+        messages.error(request, f'Error al cambiar el rol: {str(e)}')
+    
+    return redirect('usuarios:listar_usuarios')
 
 
 @login_required
@@ -340,3 +384,52 @@ def home_view(request):
         'title': 'Ecuador Turismo - Descubre lo Extraordinario'
     }
     return render(request, 'home.html', context)
+@login_required
+@require_http_methods(["GET", "POST"])
+def perfil_view(request):
+    """
+    Vista de perfil de usuario
+    Permite editar información personal
+    """
+    if request.method == 'POST':
+        form = PerfilUsuarioForm(request.POST, instance=request.user)
+        
+        # Validar contraseña actual si se intenta cambiar
+        password_actual = request.POST.get('password_actual')
+        password1 = request.POST.get('password1')
+        
+        if password1 and password_actual:
+            if not request.user.check_password(password_actual):
+                messages.error(request, 'La contraseña actual es incorrecta.')
+                form = PerfilUsuarioForm(request.POST, instance=request.user)
+                context = {
+                    'form': form,
+                    'title': 'Mi Perfil',
+                    'user': request.user,
+                    'permisos': request.user.get_permisos()
+                }
+                return render(request, 'usuarios/perfil.html', context)
+        
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Perfil actualizado exitosamente.')
+            
+            # Si se cambió la contraseña, re-autenticar
+            if password1:
+                from django.contrib.auth import update_session_auth_hash
+                update_session_auth_hash(request, request.user)
+                messages.info(request, 'Tu contraseña ha sido actualizada.')
+            
+            return redirect('usuarios:perfil')
+        else:
+            messages.error(request, 'Error al actualizar el perfil. Verifica los datos.')
+    else:
+        form = PerfilUsuarioForm(instance=request.user)
+    
+    context = {
+        'form': form,
+        'title': 'Mi Perfil',
+        'user': request.user,
+        'permisos': request.user.get_permisos()
+    }
+    return render(request, 'usuarios/profile.html', context)
