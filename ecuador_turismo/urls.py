@@ -15,7 +15,7 @@ urlpatterns = [
     path('usuarios/', include('apps.usuarios.urls')),
     
     # TODO: Agregar URLs de otras apps cuando estén listas
-    # path('destinos/', include('apps.destinos.urls')),
+    path('destinos/', include('apps.destinos.urls')),
     # path('servicios/', include('apps.servicios.urls')),
     # path('rutas/', include('apps.rutas.urls')),
     # path('reservas/', include('apps.reservas.urls')),

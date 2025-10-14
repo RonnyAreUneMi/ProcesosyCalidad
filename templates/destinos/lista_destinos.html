@@ -1,0 +1,440 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    
+    <!-- Header Section -->
+    <div class="gradient-bg py-12" data-aos="fade-down">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-4xl font-bold text-white mb-2">
+                        Descubre Ecuador
+                    </h1>
+                    <p class="text-sky-100">Explora los mejores destinos turísticos del país</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Botón Admin para Agregar Destino -->
+                    {% if user.is_authenticated and user.rol.nombre == 'administrador' %}
+                    <a href="{% url 'destinos:crear_destino' %}" 
+                       class="inline-flex items-center px-6 py-3 bg-white text-sky-600 rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                        <i class="fas fa-plus-circle mr-2"></i>
+                        Agregar Destino
+                    </a>
+                    {% endif %}
+                    
+                    <div class="hidden md:block">
+                        <div class="w-16 h-16 bg-white bg-opacity-20 backdrop-blur-custom rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-map-marked-alt text-white text-3xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-10">
+        
+        <!-- Statistics Dashboard -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" data-aos="fade-up">
+            <!-- Total Destinos -->
+            <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 card-hover border-l-4 border-sky-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 mb-1">Total Destinos</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ page_obj.paginator.count }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-map-marker-alt text-sky-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Costa -->
+            <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 card-hover border-l-4 border-blue-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 mb-1">Costa</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ destinos_por_region.costa|default:0 }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-umbrella-beach text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sierra -->
+            <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 card-hover border-l-4 border-green-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 mb-1">Sierra</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ destinos_por_region.sierra|default:0 }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-mountain text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Oriente y Galápagos -->
+            <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 card-hover border-l-4 border-emerald-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 mb-1">Oriente & Galápagos</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ destinos_por_region.oriente|add:destinos_por_region.galapagos|default:0 }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-tree text-emerald-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8" data-aos="fade-up">
+            <div class="flex items-center mb-4">
+                <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center mr-3">
+                    <i class="fas fa-filter text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900">Filtros de búsqueda</h3>
+            </div>
+            
+            <form method="get" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Search Input -->
+                    <div class="relative md:col-span-2">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" 
+                               name="q" 
+                               value="{{ filtros_aplicados.busqueda }}" 
+                               placeholder="Buscar destino, provincia o ciudad" 
+                               class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
+                    </div>
+                    
+                    <!-- Region Select -->
+                    <div class="relative">
+                        <i class="fas fa-globe-americas absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                        <select name="region" 
+                                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all appearance-none bg-white">
+                            <option value="">Todas las regiones</option>
+                            {% for value, label in regiones %}
+                            <option value="{{ value }}" {% if filtros_aplicados.region == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Category Select -->
+                    <div class="relative">
+                        <i class="fas fa-tag absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                        <select name="categoria" 
+                                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all appearance-none bg-white">
+                            <option value="">Todas las categorías</option>
+                            {% for categoria in categorias %}
+                            <option value="{{ categoria.id }}" {% if filtros_aplicados.categoria == categoria.id|stringformat:"s" %}selected{% endif %}>
+                                {{ categoria.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <!-- Price Min -->
+                    <div class="relative">
+                        <i class="fas fa-dollar-sign absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="number" 
+                               name="precio_min" 
+                               value="{{ filtros_aplicados.precio_min }}" 
+                               placeholder="Precio mínimo" 
+                               min="0"
+                               class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
+                    </div>
+
+                    <!-- Price Max -->
+                    <div class="relative">
+                        <i class="fas fa-dollar-sign absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="number" 
+                               name="precio_max" 
+                               value="{{ filtros_aplicados.precio_max }}" 
+                               placeholder="Precio máximo" 
+                               min="0"
+                               class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
+                    </div>
+
+                    <!-- Rating -->
+                    <div class="relative">
+                        <i class="fas fa-star absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                        <select name="calificacion_min" 
+                                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all appearance-none bg-white">
+                            <option value="">Cualquier calificación</option>
+                            <option value="4" {% if filtros_aplicados.calificacion_min == "4" %}selected{% endif %}>4+ estrellas</option>
+                            <option value="3" {% if filtros_aplicados.calificacion_min == "3" %}selected{% endif %}>3+ estrellas</option>
+                            <option value="2" {% if filtros_aplicados.calificacion_min == "2" %}selected{% endif %}>2+ estrellas</option>
+                        </select>
+                    </div>
+
+                    <!-- Search Button -->
+                    <button type="submit" 
+                            class="py-3 btn-primary text-white rounded-lg font-semibold flex items-center justify-center space-x-2 shadow-sm hover:shadow-lg transition-all">
+                        <i class="fas fa-search"></i>
+                        <span>Buscar</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sort Options -->
+        <div class="flex items-center justify-between mb-6" data-aos="fade-up">
+            <p class="text-sm text-gray-600">
+                Mostrando <span class="font-semibold">{{ page_obj.start_index }}</span> - 
+                <span class="font-semibold">{{ page_obj.end_index }}</span> de 
+                <span class="font-semibold">{{ page_obj.paginator.count }}</span> destinos
+            </p>
+            
+            <div class="flex items-center space-x-2">
+                <label class="text-sm text-gray-600 mr-2">Ordenar por:</label>
+                <select onchange="window.location.href='?orden=' + this.value + '{% if filtros_aplicados.region %}&region={{ filtros_aplicados.region }}{% endif %}{% if filtros_aplicados.categoria %}&categoria={{ filtros_aplicados.categoria }}{% endif %}'" 
+                        class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none text-sm">
+                    <option value="-destacado" {% if filtros_aplicados.orden == "-destacado" %}selected{% endif %}>Destacados</option>
+                    <option value="-calificacion_promedio" {% if filtros_aplicados.orden == "-calificacion_promedio" %}selected{% endif %}>Mejor calificados</option>
+                    <option value="precio_promedio_minimo" {% if filtros_aplicados.orden == "precio_promedio_minimo" %}selected{% endif %}>Precio: menor a mayor</option>
+                    <option value="-precio_promedio_minimo" {% if filtros_aplicados.orden == "-precio_promedio_minimo" %}selected{% endif %}>Precio: mayor a menor</option>
+                    <option value="nombre" {% if filtros_aplicados.orden == "nombre" %}selected{% endif %}>Nombre A-Z</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Destinations Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {% for destino in page_obj %}
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 card-hover" data-aos="fade-up">
+                <!-- Image -->
+                <div class="relative h-56 overflow-hidden">
+                    {% if destino.imagenes.all %}
+                        <img src="{{ destino.imagenes.first.imagen.url }}" 
+                             alt="{{ destino.nombre }}" 
+                             class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                    {% else %}
+                        <div class="w-full h-full bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center">
+                            <i class="fas fa-image text-white text-4xl opacity-50"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Featured Badge -->
+                    {% if destino.destacado %}
+                    <div class="absolute top-4 right-4">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-400 text-yellow-900 shadow-lg">
+                            <i class="fas fa-star mr-1"></i>
+                            Destacado
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    <!-- Region Badge -->
+                    <div class="absolute top-4 left-4">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white bg-opacity-90 text-gray-800 shadow-lg">
+                            <i class="fas fa-map-marker-alt mr-1"></i>
+                            {{ destino.get_region_display }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6">
+                    <div class="flex items-start justify-between mb-2">
+                        <h3 class="text-xl font-bold text-gray-900 hover:text-sky-600 transition-colors">
+                            <a href="{% url 'destinos:detalle_destino' destino.slug %}">
+                                {{ destino.nombre }}
+                            </a>
+                        </h3>
+                        
+                        <!-- Admin Actions -->
+                        {% if user.is_authenticated and user.rol.nombre == 'administrador' %}
+                        <div class="flex items-center space-x-1">
+                            <a href="{% url 'destinos:editar_destino' destino.id %}" 
+                               class="p-2 text-sky-600 hover:bg-sky-50 rounded-lg transition-colors"
+                               title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button onclick="confirmarEliminacion({{ destino.id }}, '{{ destino.nombre }}')"
+                                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                    title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <p class="text-sm text-gray-600 mb-3">
+                        <i class="fas fa-location-dot mr-1 text-sky-500"></i>
+                        {{ destino.provincia }}{% if destino.ciudad %}, {{ destino.ciudad }}{% endif %}
+                    </p>
+
+                    <p class="text-gray-700 mb-4 line-clamp-2">
+                        {{ destino.descripcion_corta }}
+                    </p>
+
+                    <!-- Rating -->
+                    <div class="flex items-center mb-4">
+                        <div class="flex items-center">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= destino.calificacion_promedio %}
+                                <i class="fas fa-star text-yellow-400"></i>
+                                {% else %}
+                                <i class="far fa-star text-yellow-400"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <span class="ml-2 text-sm text-gray-600">
+                            {{ destino.calificacion_promedio|floatformat:1 }} ({{ destino.total_calificaciones }})
+                        </span>
+                    </div>
+
+                    <!-- Price and Button -->
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                        <div>
+                            <p class="text-xs text-gray-500">Desde</p>
+                            <p class="text-2xl font-bold text-sky-600">
+                                ${{ destino.precio_promedio_minimo|floatformat:0 }}
+                            </p>
+                        </div>
+                        <a href="{% url 'destinos:detalle_destino' destino.slug %}" 
+                           class="px-6 py-2 btn-primary text-white rounded-lg font-semibold hover:shadow-lg transition-all">
+                            Ver más
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full">
+                <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+                    <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-search text-gray-400 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-2">No se encontraron destinos</h3>
+                    <p class="text-gray-500 mb-4">Intenta ajustar los filtros de búsqueda</p>
+                    <a href="{% url 'destinos:lista_destinos' %}" 
+                       class="inline-flex items-center px-6 py-3 btn-primary text-white rounded-lg font-semibold">
+                        <i class="fas fa-redo mr-2"></i>
+                        Limpiar filtros
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="flex items-center justify-center mb-8" data-aos="fade-up">
+            <nav class="inline-flex rounded-lg shadow-sm" aria-label="Paginación">
+                {% if page_obj.has_previous %}
+                <a href="?page=1{% if filtros_aplicados.region %}&region={{ filtros_aplicados.region }}{% endif %}{% if filtros_aplicados.categoria %}&categoria={{ filtros_aplicados.categoria }}{% endif %}" 
+                   class="relative inline-flex items-center px-3 py-2 rounded-l-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if filtros_aplicados.region %}&region={{ filtros_aplicados.region }}{% endif %}{% if filtros_aplicados.categoria %}&categoria={{ filtros_aplicados.categoria }}{% endif %}" 
+                   class="relative inline-flex items-center px-3 py-2 border-t border-b border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+                {% else %}
+                <span class="relative inline-flex items-center px-3 py-2 rounded-l-lg border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                    <i class="fas fa-angle-double-left"></i>
+                </span>
+                <span class="relative inline-flex items-center px-3 py-2 border-t border-b border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                    <i class="fas fa-angle-left"></i>
+                </span>
+                {% endif %}
+
+                <!-- Page numbers -->
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <span class="relative inline-flex items-center px-4 py-2 border border-sky-500 bg-sky-500 text-sm font-semibold text-white">
+                        {{ num }}
+                    </span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}{% if filtros_aplicados.region %}&region={{ filtros_aplicados.region }}{% endif %}{% if filtros_aplicados.categoria %}&categoria={{ filtros_aplicados.categoria }}{% endif %}" 
+                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                        {{ num }}
+                    </a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if filtros_aplicados.region %}&region={{ filtros_aplicados.region }}{% endif %}{% if filtros_aplicados.categoria %}&categoria={{ filtros_aplicados.categoria }}{% endif %}" 
+                   class="relative inline-flex items-center px-3 py-2 border-t border-b border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if filtros_aplicados.region %}&region={{ filtros_aplicados.region }}{% endif %}{% if filtros_aplicados.categoria %}&categoria={{ filtros_aplicados.categoria }}{% endif %}" 
+                   class="relative inline-flex items-center px-3 py-2 rounded-r-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+                {% else %}
+                <span class="relative inline-flex items-center px-3 py-2 border-t border-b border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                    <i class="fas fa-angle-right"></i>
+                </span>
+                <span class="relative inline-flex items-center px-3 py-2 rounded-r-lg border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                    <i class="fas fa-angle-double-right"></i>
+                </span>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<!-- Modal de Confirmación de Eliminación -->
+<div id="modalEliminar" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6" data-aos="zoom-in">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">¿Eliminar destino?</h3>
+            <p class="text-gray-600" id="mensajeEliminar"></p>
+        </div>
+        
+        <form id="formEliminar" method="post" action="">
+            {% csrf_token %}
+            <div class="flex space-x-3">
+                <button type="button" 
+                        onclick="cerrarModalEliminar()"
+                        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit" 
+                        class="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors">
+                    Sí, eliminar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function confirmarEliminacion(id, nombre) {
+    const modal = document.getElementById('modalEliminar');
+    const form = document.getElementById('formEliminar');
+    const mensaje = document.getElementById('mensajeEliminar');
+    
+    mensaje.textContent = `¿Estás seguro de eliminar el destino "${nombre}"? Esta acción no se puede deshacer.`;
+    form.action = `/destinos/eliminar/${id}/`;
+    
+    modal.classList.remove('hidden');
+}
+
+function cerrarModalEliminar() {
+    document.getElementById('modalEliminar').classList.add('hidden');
+}
+
+// Cerrar modal al hacer clic fuera
+document.getElementById('modalEliminar').addEventListener('click', function(e) {
+    if (e.target === this) {
+        cerrarModalEliminar();
+    }
+});
+</script>
+{% endblock %}

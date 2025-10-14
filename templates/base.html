@@ -179,7 +179,7 @@
                     <a href="{% url 'home' %}" class="text-gray-700 hover:text-sky-600 hover:bg-sky-50 transition font-medium px-4 py-2 rounded-lg">
                         <i class="fas fa-home mr-2"></i>Inicio
                     </a>
-                    <a href="#" class="text-gray-700 hover:text-sky-600 hover:bg-sky-50 transition font-medium px-4 py-2 rounded-lg">
+                    <a href="{% url 'destinos:lista_destinos' %}" class="text-gray-700 hover:text-sky-600 hover:bg-sky-50 transition font-medium px-4 py-2 rounded-lg">
                         <i class="fas fa-map-marked-alt mr-2"></i>Destinos
                     </a>
                     <a href="#" class="text-gray-700 hover:text-sky-600 hover:bg-sky-50 transition font-medium px-4 py-2 rounded-lg">
@@ -275,7 +275,7 @@
                 <a href="{% url 'home' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
                     <i class="fas fa-home mr-2"></i>Inicio
                 </a>
-                <a href="#" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+                <a href="{% url 'destinos:lista_destinos' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
                     <i class="fas fa-map-marked-alt mr-2"></i>Destinos
                 </a>
                 <a href="#" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
@@ -362,7 +362,7 @@
                 <div>
                     <h4 class="font-semibold mb-4 text-white">Enlaces Rápidos</h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="text-gray-400 hover:text-sky-400 transition">Destinos</a></li>
+                        <li><a href="{% url 'destinos:lista_destinos' %}" class="text-gray-400 hover:text-sky-400 transition">Destinos</a></li>
                         <li><a href="#" class="text-gray-400 hover:text-sky-400 transition">Rutas Turísticas</a></li>
                         <li><a href="#" class="text-gray-400 hover:text-sky-400 transition">Reservas</a></li>
                         <li><a href="#" class="text-gray-400 hover:text-sky-400 transition">Contacto</a></li>
