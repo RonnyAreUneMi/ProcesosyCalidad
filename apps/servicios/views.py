@@ -38,14 +38,25 @@ def rol_requerido(roles_permitidos):
 
 def listar_servicios(request):
     """
-    Vista para listar servicios con filtros y búsqueda
+    Vista para listar servicios con filtros y búsqueda mejorados
     RF-002: Búsqueda y Filtrado por Región
     """
-    servicios = Servicio.objects.filter(activo=True, disponible=True).select_related(
-        'destino', 'categoria', 'proveedor'
-    )
+    # Query base - ANTES de aplicar filtros para estadísticas
+    servicios_base = Servicio.objects.filter(activo=True, disponible=True)
     
-    # Filtros
+    # Calcular estadísticas por tipo ANTES de filtrar
+    stats_por_tipo = {
+        'alojamiento': servicios_base.filter(tipo='alojamiento').count(),
+        'tour': servicios_base.filter(tipo='tour').count(),
+        'actividad': servicios_base.filter(tipo='actividad').count(),
+        'transporte': servicios_base.filter(tipo='transporte').count(),
+        'gastronomia': servicios_base.filter(tipo='gastronomia').count(),
+    }
+    
+    # Ahora aplicamos los filtros para la búsqueda
+    servicios = servicios_base.select_related('destino', 'categoria', 'proveedor')
+    
+    # Obtener parámetros de filtro
     tipo = request.GET.get('tipo')
     destino_id = request.GET.get('destino')
     categoria_id = request.GET.get('categoria')
@@ -55,48 +66,67 @@ def listar_servicios(request):
     calificacion_min = request.GET.get('calificacion')
     busqueda = request.GET.get('q')
     
-    # Aplicar filtros
+    # Contador de filtros aplicados
+    filtros_activos = 0
+    
+    # Aplicar filtros de manera más flexible
     if tipo:
         servicios = servicios.filter(tipo=tipo)
+        filtros_activos += 1
     
     if destino_id:
         servicios = servicios.filter(destino_id=destino_id)
+        filtros_activos += 1
     
     if categoria_id:
         servicios = servicios.filter(categoria_id=categoria_id)
+        filtros_activos += 1
     
     if region:
         servicios = servicios.filter(destino__region=region)
+        filtros_activos += 1
     
+    # Filtros de precio - permitir cualquier valor
     if precio_min:
         try:
-            servicios = servicios.filter(precio__gte=float(precio_min))
+            precio_min_val = float(precio_min)
+            servicios = servicios.filter(precio__gte=precio_min_val)
+            filtros_activos += 1
         except ValueError:
             messages.warning(request, 'Precio mínimo inválido')
+            precio_min = None
     
     if precio_max:
         try:
-            servicios = servicios.filter(precio__lte=float(precio_max))
+            precio_max_val = float(precio_max)
+            servicios = servicios.filter(precio__lte=precio_max_val)
+            filtros_activos += 1
         except ValueError:
             messages.warning(request, 'Precio máximo inválido')
+            precio_max = None
     
     if calificacion_min:
         try:
-            servicios = servicios.filter(calificacion_promedio__gte=float(calificacion_min))
+            cal_min = float(calificacion_min)
+            servicios = servicios.filter(calificacion_promedio__gte=cal_min)
+            filtros_activos += 1
         except ValueError:
             messages.warning(request, 'Calificación inválida')
+            calificacion_min = None
     
-    # Búsqueda por texto
+    # Búsqueda por texto - MÁS FLEXIBLE
     if busqueda:
         servicios = servicios.filter(
             Q(nombre__icontains=busqueda) |
             Q(descripcion__icontains=busqueda) |
             Q(destino__nombre__icontains=busqueda) |
+            Q(destino__descripcion__icontains=busqueda) |
             Q(categoria__nombre__icontains=busqueda)
         )
+        filtros_activos += 1
     
-    # Ordenamiento por relevancia
-    orden = request.GET.get('orden', '-calificacion_promedio')
+    # Ordenamiento
+    orden = request.GET.get('orden', 'calificacion')
     opciones_orden = {
         'precio_asc': 'precio',
         'precio_desc': '-precio',
@@ -123,13 +153,42 @@ def listar_servicios(request):
         ('galapagos', 'Galápagos'),
     ]
     
+    # Construir query string para paginación
+    filtros_query = ''
+    params = []
+    if busqueda:
+        params.append(f'q={busqueda}')
+    if tipo:
+        params.append(f'tipo={tipo}')
+    if destino_id:
+        params.append(f'destino={destino_id}')
+    if categoria_id:
+        params.append(f'categoria={categoria_id}')
+    if region:
+        params.append(f'region={region}')
+    if precio_min:
+        params.append(f'precio_min={precio_min}')
+    if precio_max:
+        params.append(f'precio_max={precio_max}')
+    if calificacion_min:
+        params.append(f'calificacion={calificacion_min}')
+    if orden:
+        params.append(f'orden={orden}')
+    
+    if params:
+        filtros_query = '&' + '&'.join(params)
+    
     context = {
         'page_obj': page_obj,
         'destinos': destinos,
         'categorias': categorias,
         'regiones': REGIONES,
         'tipos_servicio': Servicio.TIPO_SERVICIO_CHOICES,
-        'total_resultados': servicios.count(),
+        'total_resultados': servicios_base.count(),  # Total general
+        'resultados_filtrados': page_obj.paginator.count,  # Resultados después de filtrar
+        'stats_por_tipo': stats_por_tipo,  # Estadísticas por tipo
+        'filtros_activos': filtros_activos,
+        'filtros_query': filtros_query,
         'filtros_aplicados': {
             'tipo': tipo,
             'destino': destino_id,
@@ -144,7 +203,6 @@ def listar_servicios(request):
     }
     
     return render(request, 'servicios/listar.html', context)
-
 
 def detalle_servicio(request, servicio_id):
     """

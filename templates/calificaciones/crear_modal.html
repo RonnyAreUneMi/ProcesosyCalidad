@@ -1,0 +1,373 @@
+<!-- Modal para Crear/Editar Calificación -->
+<!-- Este componente se incluye en servicios/detalle.html -->
+
+<!-- Botón para abrir modal (incluir en detalle_servicio.html) -->
+{% if user.is_authenticated %}
+    {% if puede_calificar %}
+    <button onclick="openCalificacionModal()" 
+            class="w-full py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
+        <i class="fas fa-star"></i>
+        <span>Calificar este servicio</span>
+    </button>
+    {% elif ya_califico %}
+    <div class="bg-green-50 border-2 border-green-300 rounded-xl p-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                <i class="fas fa-check text-white"></i>
+            </div>
+            <div>
+                <p class="font-bold text-green-800">Ya calificaste este servicio</p>
+                <p class="text-sm text-green-600">Puedes editar tu calificación en cualquier momento</p>
+            </div>
+        </div>
+        <a href="{% url 'calificaciones:mis_calificaciones' %}" 
+           class="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors">
+            Ver mis calificaciones
+        </a>
+    </div>
+    {% else %}
+    <div class="bg-blue-50 border-2 border-blue-300 rounded-xl p-4 flex items-center space-x-3">
+        <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+            <i class="fas fa-info text-white"></i>
+        </div>
+        <div>
+            <p class="font-bold text-blue-800">¿Quieres calificar este servicio?</p>
+            <p class="text-sm text-blue-600">Primero debes completar una reserva de este servicio</p>
+        </div>
+    </div>
+    {% endif %}
+{% else %}
+<div class="bg-gray-50 border-2 border-gray-300 rounded-xl p-4 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-gray-400 rounded-full flex items-center justify-center">
+            <i class="fas fa-lock text-white"></i>
+        </div>
+        <p class="text-gray-700 font-semibold">Inicia sesión para calificar este servicio</p>
+    </div>
+    <a href="{% url 'usuarios:login' %}?next={{ request.path }}" 
+       class="px-6 py-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all">
+        Iniciar sesión
+    </a>
+</div>
+{% endif %}
+
+<!-- Modal de Calificación -->
+<div id="calificacionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-95" id="modalContent">
+        
+        <!-- Header del Modal -->
+        <div class="gradient-bg p-6 text-white relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10">
+                <div class="absolute -top-20 -right-20 w-40 h-40 bg-white rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-white rounded-full blur-3xl"></div>
+            </div>
+            <div class="relative z-10">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-2xl font-bold flex items-center">
+                        <i class="fas fa-star mr-3"></i>
+                        Calificar Servicio
+                    </h3>
+                    <button onclick="closeCalificacionModal()" 
+                            class="w-8 h-8 flex items-center justify-center rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-all">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <p class="text-sky-100">{{ servicio.nombre }}</p>
+            </div>
+        </div>
+
+        <!-- Formulario -->
+        <form method="POST" action="{% url 'calificaciones:crear_calificacion' servicio.id %}" class="p-6 space-y-6" id="calificacionForm">
+            {% csrf_token %}
+            
+            <!-- Selector de Estrellas -->
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-3">
+                    Puntuación <span class="text-red-500">*</span>
+                </label>
+                <div class="flex items-center justify-center space-x-2 p-6 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl border-2 border-yellow-200">
+                    <div class="flex space-x-1" id="starRating">
+                        <button type="button" class="star-btn text-5xl transition-all duration-200 transform hover:scale-110" data-rating="1">
+                            <i class="far fa-star text-gray-300"></i>
+                        </button>
+                        <button type="button" class="star-btn text-5xl transition-all duration-200 transform hover:scale-110" data-rating="2">
+                            <i class="far fa-star text-gray-300"></i>
+                        </button>
+                        <button type="button" class="star-btn text-5xl transition-all duration-200 transform hover:scale-110" data-rating="3">
+                            <i class="far fa-star text-gray-300"></i>
+                        </button>
+                        <button type="button" class="star-btn text-5xl transition-all duration-200 transform hover:scale-110" data-rating="4">
+                            <i class="far fa-star text-gray-300"></i>
+                        </button>
+                        <button type="button" class="star-btn text-5xl transition-all duration-200 transform hover:scale-110" data-rating="5">
+                            <i class="far fa-star text-gray-300"></i>
+                        </button>
+                    </div>
+                </div>
+                <input type="hidden" name="puntuacion" id="puntuacionInput" required>
+                <p class="text-center text-sm text-gray-500 mt-2" id="ratingText">Selecciona tu calificación</p>
+            </div>
+
+            <!-- Comentario -->
+            <div>
+                <label for="comentario" class="block text-sm font-bold text-gray-700 mb-2">
+                    Comentario (opcional)
+                </label>
+                <textarea name="comentario" 
+                          id="comentario" 
+                          rows="5" 
+                          maxlength="1000"
+                          placeholder="Comparte tu experiencia con otros viajeros... ¿Qué te gustó? ¿Qué mejorarías?"
+                          class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 outline-none transition-all resize-none"></textarea>
+                <div class="flex items-center justify-between mt-2">
+                    <p class="text-xs text-gray-500">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Máximo 1000 caracteres
+                    </p>
+                    <p class="text-xs text-gray-500" id="charCount">0 / 1000</p>
+                </div>
+            </div>
+
+            <!-- Guía de Calificación -->
+            <div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
+                <h4 class="font-bold text-blue-900 mb-2 flex items-center">
+                    <i class="fas fa-lightbulb mr-2"></i>
+                    Guía de Calificación
+                </h4>
+                <div class="space-y-1 text-sm text-blue-800">
+                    <p><strong>⭐ 1 estrella:</strong> Muy malo - No cumplió expectativas</p>
+                    <p><strong>⭐⭐ 2 estrellas:</strong> Malo - Necesita muchas mejoras</p>
+                    <p><strong>⭐⭐⭐ 3 estrellas:</strong> Regular - Cumplió lo básico</p>
+                    <p><strong>⭐⭐⭐⭐ 4 estrellas:</strong> Bueno - Superó expectativas</p>
+                    <p><strong>⭐⭐⭐⭐⭐ 5 estrellas:</strong> Excelente - Experiencia excepcional</p>
+                </div>
+            </div>
+
+            <!-- Advertencia de Moderación -->
+            <div class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4">
+                <p class="text-sm text-yellow-800 flex items-start">
+                    <i class="fas fa-exclamation-triangle mr-2 mt-0.5 flex-shrink-0"></i>
+                    <span>Las calificaciones con contenido ofensivo o inapropiado serán revisadas por moderación antes de publicarse.</span>
+                </p>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="flex items-center space-x-3 pt-4 border-t border-gray-200">
+                <button type="button" 
+                        onclick="closeCalificacionModal()"
+                        class="flex-1 py-3 px-4 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit" 
+                        id="submitBtn"
+                        disabled
+                        class="flex-1 py-3 px-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+                    <i class="fas fa-paper-plane mr-2"></i>
+                    Publicar Calificación
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<!-- Estilos -->
+<style>
+.gradient-bg {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #ea580c 100%);
+}
+
+.star-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.star-filled {
+    color: #fbbf24 !important;
+}
+
+.star-hover {
+    color: #fde68a !important;
+}
+
+/* Animación para el modal */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+#calificacionModal:not(.hidden) #modalContent {
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+/* Efecto de brillo en las estrellas */
+@keyframes starShine {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.3) drop-shadow(0 0 8px #fbbf24); }
+}
+
+.star-filled {
+    animation: starShine 1s ease-in-out;
+}
+</style>
+
+<!-- JavaScript -->
+<script>
+// Variables globales
+let selectedRating = 0;
+
+// Abrir modal
+function openCalificacionModal() {
+    const modal = document.getElementById('calificacionModal');
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+// Cerrar modal
+function closeCalificacionModal() {
+    const modal = document.getElementById('calificacionModal');
+    modal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+    resetForm();
+}
+
+// Cerrar modal al hacer clic fuera
+document.getElementById('calificacionModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeCalificacionModal();
+    }
+});
+
+// Cerrar con tecla Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeCalificacionModal();
+    }
+});
+
+// Sistema de calificación por estrellas
+const starButtons = document.querySelectorAll('.star-btn');
+const puntuacionInput = document.getElementById('puntuacionInput');
+const ratingText = document.getElementById('ratingText');
+const submitBtn = document.getElementById('submitBtn');
+
+const ratingTexts = {
+    1: '⭐ Muy malo - No lo recomendaría',
+    2: '⭐⭐ Malo - Necesita mejoras',
+    3: '⭐⭐⭐ Regular - Aceptable',
+    4: '⭐⭐⭐⭐ Bueno - Lo recomendaría',
+    5: '⭐⭐⭐⭐⭐ Excelente - ¡Altamente recomendado!'
+};
+
+starButtons.forEach((btn, index) => {
+    // Click en estrella
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const rating = parseInt(this.dataset.rating);
+        setRating(rating);
+    });
+
+    // Hover en estrella
+    btn.addEventListener('mouseenter', function() {
+        const rating = parseInt(this.dataset.rating);
+        highlightStars(rating);
+    });
+
+    // Salir del hover
+    btn.addEventListener('mouseleave', function() {
+        highlightStars(selectedRating);
+    });
+});
+
+function setRating(rating) {
+    selectedRating = rating;
+    puntuacionInput.value = rating;
+    ratingText.textContent = ratingTexts[rating];
+    ratingText.classList.add('font-bold', 'text-yellow-600');
+    highlightStars(rating);
+    
+    // Habilitar botón de envío
+    submitBtn.disabled = false;
+    
+    // Animación de feedback
+    ratingText.style.transform = 'scale(1.1)';
+    setTimeout(() => {
+        ratingText.style.transform = 'scale(1)';
+    }, 200);
+}
+
+function highlightStars(rating) {
+    starButtons.forEach((btn, index) => {
+        const star = btn.querySelector('i');
+        if (index < rating) {
+            star.classList.remove('far', 'text-gray-300');
+            star.classList.add('fas', 'star-filled');
+        } else {
+            star.classList.remove('fas', 'star-filled');
+            star.classList.add('far', 'text-gray-300');
+        }
+    });
+}
+
+// Contador de caracteres
+const comentarioTextarea = document.getElementById('comentario');
+const charCount = document.getElementById('charCount');
+
+if (comentarioTextarea) {
+    comentarioTextarea.addEventListener('input', function() {
+        const length = this.value.length;
+        charCount.textContent = `${length} / 1000`;
+        
+        if (length > 900) {
+            charCount.classList.add('text-red-500', 'font-bold');
+        } else {
+            charCount.classList.remove('text-red-500', 'font-bold');
+        }
+    });
+}
+
+// Validación del formulario
+const form = document.getElementById('calificacionForm');
+if (form) {
+    form.addEventListener('submit', function(e) {
+        if (!puntuacionInput.value) {
+            e.preventDefault();
+            alert('Por favor, selecciona una calificación con estrellas');
+            return false;
+        }
+        
+        // Mostrar loading en el botón
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Enviando...';
+        submitBtn.disabled = true;
+    });
+}
+
+// Resetear formulario
+function resetForm() {
+    selectedRating = 0;
+    puntuacionInput.value = '';
+    comentarioTextarea.value = '';
+    charCount.textContent = '0 / 1000';
+    ratingText.textContent = 'Selecciona tu calificación';
+    ratingText.classList.remove('font-bold', 'text-yellow-600');
+    highlightStars(0);
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Publicar Calificación';
+}
+
+// Prevenir cierre accidental con cambios
+window.addEventListener('beforeunload', function(e) {
+    if (selectedRating > 0 || comentarioTextarea?.value.length > 0) {
+        e.preventDefault();
+        e.returnValue = '';
+    }
+});
+</script>

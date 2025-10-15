@@ -38,7 +38,7 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10 pb-12">
         
-        <!-- Statistics Dashboard con Glassmorphism -->
+        <!-- Statistics Dashboard - CORREGIDO -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8" data-aos="fade-up">
             <!-- Total Servicios -->
             <div class="bg-white bg-opacity-80 backdrop-blur-lg rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 card-hover border border-white border-opacity-50">
@@ -58,7 +58,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Alojamiento</p>
-                        <p class="text-3xl font-bold text-purple-600">{{ page_obj.paginator.count }}</p>
+                        <p class="text-3xl font-bold text-purple-600">{{ stats_por_tipo.alojamiento }}</p>
                     </div>
                     <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
                         <i class="fas fa-hotel text-white text-xl"></i>
@@ -71,7 +71,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Tours</p>
-                        <p class="text-3xl font-bold text-green-600">{{ page_obj.paginator.count }}</p>
+                        <p class="text-3xl font-bold text-green-600">{{ stats_por_tipo.tour }}</p>
                     </div>
                     <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
                         <i class="fas fa-route text-white text-xl"></i>
@@ -84,7 +84,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Actividades</p>
-                        <p class="text-3xl font-bold text-orange-600">{{ page_obj.paginator.count }}</p>
+                        <p class="text-3xl font-bold text-orange-600">{{ stats_por_tipo.actividad }}</p>
                     </div>
                     <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center shadow-lg">
                         <i class="fas fa-hiking text-white text-xl"></i>
@@ -97,7 +97,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Transporte</p>
-                        <p class="text-3xl font-bold text-blue-600">{{ page_obj.paginator.count }}</p>
+                        <p class="text-3xl font-bold text-blue-600">{{ stats_por_tipo.transporte }}</p>
                     </div>
                     <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg">
                         <i class="fas fa-bus text-white text-xl"></i>
@@ -106,13 +106,18 @@
             </div>
         </div>
 
-        <!-- Filtros Avanzados con Diseño Moderno -->
+        <!-- Filtros con Inputs de Precio Corregidos -->
         <div class="bg-white bg-opacity-90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 mb-8 border border-white border-opacity-50" data-aos="fade-up">
             <div class="flex items-center mb-6">
                 <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center mr-3 shadow-lg">
                     <i class="fas fa-sliders-h text-white"></i>
                 </div>
                 <h3 class="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">Filtros de Búsqueda</h3>
+                {% if filtros_activos > 0 %}
+                <span class="ml-3 px-3 py-1 bg-sky-100 text-sky-700 rounded-full text-sm font-semibold">
+                    {{ filtros_activos }} filtro{{ filtros_activos|pluralize }}
+                </span>
+                {% endif %}
             </div>
             
             <form method="get" class="space-y-6">
@@ -122,10 +127,10 @@
                     <div class="relative group">
                         <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-sky-500 transition-colors"></i>
                         <input type="text" 
-                               name="q" 
-                               value="{{ filtros_aplicados.busqueda }}" 
-                               placeholder="Buscar servicios, destinos..." 
-                               class="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all bg-gray-50 hover:bg-white">
+                            name="q" 
+                            value="{{ filtros_aplicados.busqueda|default:'' }}" 
+                            placeholder="Buscar por nombre, descripción, destino..." 
+                            class="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all bg-gray-50 hover:bg-white">
                     </div>
                     
                     <!-- Tipo de Servicio -->
@@ -192,30 +197,30 @@
                     </div>
                 </div>
 
-                <!-- Tercera fila: Precio y Calificación -->
+                <!-- Tercera fila: Precio y Calificación - CORREGIDO -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <!-- Precio Mínimo -->
+                    <!-- Precio Mínimo - SIN STEP, acepta cualquier valor -->
                     <div class="relative group">
                         <i class="fas fa-dollar-sign absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-sky-500 transition-colors"></i>
                         <input type="number" 
-                               name="precio_min" 
-                               value="{{ filtros_aplicados.precio_min }}" 
-                               placeholder="Precio mínimo" 
-                               min="0"
-                               step="10"
-                               class="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all bg-gray-50 hover:bg-white">
+                            name="precio_min" 
+                            value="{{ filtros_aplicados.precio_min|default:'' }}" 
+                            placeholder="Precio mínimo" 
+                            min="0"
+                            step="0.01"
+                            class="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all bg-gray-50 hover:bg-white">
                     </div>
 
-                    <!-- Precio Máximo -->
+                    <!-- Precio Máximo - SIN STEP, acepta cualquier valor -->
                     <div class="relative group">
                         <i class="fas fa-dollar-sign absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-sky-500 transition-colors"></i>
                         <input type="number" 
-                               name="precio_max" 
-                               value="{{ filtros_aplicados.precio_max }}" 
-                               placeholder="Precio máximo" 
-                               min="0"
-                               step="10"
-                               class="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all bg-gray-50 hover:bg-white">
+                            name="precio_max" 
+                            value="{{ filtros_aplicados.precio_max|default:'' }}" 
+                            placeholder="Precio máximo" 
+                            min="0"
+                            step="0.01"
+                            class="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all bg-gray-50 hover:bg-white">
                     </div>
 
                     <!-- Calificación -->
@@ -226,31 +231,49 @@
                             <option value="">Cualquier calificación</option>
                             <option value="4.5" {% if filtros_aplicados.calificacion == "4.5" %}selected{% endif %}>★ 4.5+</option>
                             <option value="4" {% if filtros_aplicados.calificacion == "4" %}selected{% endif %}>★ 4+</option>
+                            <option value="3.5" {% if filtros_aplicados.calificacion == "3.5" %}selected{% endif %}>★ 3.5+</option>
                             <option value="3" {% if filtros_aplicados.calificacion == "3" %}selected{% endif %}>★ 3+</option>
                         </select>
                         <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                     </div>
 
-                    <!-- Botón Buscar -->
-                    <button type="submit" 
-                            class="py-4 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-xl font-semibold flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-                        <i class="fas fa-search"></i>
-                        <span>Buscar</span>
-                    </button>
+                    <!-- Botones de Acción -->
+                    <div class="flex gap-2">
+                        <button type="submit" 
+                                class="flex-1 py-4 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-xl font-semibold flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                            <i class="fas fa-search"></i>
+                            <span>Buscar</span>
+                        </button>
+                        
+                        {% if filtros_activos > 0 %}
+                        <a href="{% url 'servicios:listar_servicios' %}" 
+                        class="px-4 py-4 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-all duration-300 flex items-center justify-center"
+                        title="Limpiar filtros">
+                            <i class="fas fa-times"></i>
+                        </a>
+                        {% endif %}
+                    </div>
                 </div>
             </form>
         </div>
 
-        <!-- Sort y Resultados -->
+        <!-- Mensaje de resultados mejorado -->
         <div class="flex items-center justify-between mb-6 flex-wrap gap-4" data-aos="fade-up">
             <div class="flex items-center space-x-2">
                 <div class="w-10 h-10 bg-gradient-to-br from-sky-400 to-blue-500 rounded-lg flex items-center justify-center shadow-md">
                     <i class="fas fa-filter text-white"></i>
                 </div>
                 <p class="text-sm text-gray-600">
-                    Mostrando <span class="font-bold text-sky-600">{{ page_obj.start_index }}</span> - 
-                    <span class="font-bold text-sky-600">{{ page_obj.end_index }}</span> de 
-                    <span class="font-bold text-sky-600">{{ page_obj.paginator.count }}</span> servicios
+                    {% if filtros_activos > 0 %}
+                        Mostrando <span class="font-bold text-sky-600">{{ page_obj.start_index }}</span> - 
+                        <span class="font-bold text-sky-600">{{ page_obj.end_index }}</span> de 
+                        <span class="font-bold text-sky-600">{{ resultados_filtrados }}</span> servicios encontrados
+                        <span class="text-gray-500">({{ total_resultados }} en total)</span>
+                    {% else %}
+                        Mostrando <span class="font-bold text-sky-600">{{ page_obj.start_index }}</span> - 
+                        <span class="font-bold text-sky-600">{{ page_obj.end_index }}</span> de 
+                        <span class="font-bold text-sky-600">{{ page_obj.paginator.count }}</span> servicios
+                    {% endif %}
                 </p>
             </div>
             

@@ -91,6 +91,7 @@ def detalle_destino(request, slug):
     """
     Vista de detalle de un destino con toda la información
     RF-005: Incluye coordenadas para Google Maps
+    RF-006: Muestra calificaciones de servicios del destino
     """
     destino = get_object_or_404(
         Destino.objects.select_related('categoria', 'creado_por'),
@@ -107,28 +108,101 @@ def detalle_destino(request, slug):
     # Obtener atracciones turísticas
     atracciones = destino.atracciones.filter(activo=True)
     
-    # Obtener calificaciones recientes
-    calificaciones = Calificacion.objects.filter(
-        servicio__destino=destino
-    ).select_related('usuario').order_by('-fecha_creacion')[:10]
+    # ========================================
+    # CALIFICACIONES Y ESTADÍSTICAS
+    # ========================================
+    calificaciones = []
+    stats_calificaciones = {
+        '5': 0,
+        '4': 0,
+        '3': 0,
+        '2': 0,
+        '1': 0,
+    }
+    total_calificaciones = 0
     
-    # Destinos relacionados (misma región)
+    try:
+        from apps.calificaciones.models import Calificacion
+        
+        # Obtener calificaciones de servicios del destino
+        calificaciones_queryset = Calificacion.objects.filter(
+            servicio__destino=destino,
+            activo=True
+        ).select_related('usuario', 'servicio').order_by('-fecha_creacion')
+        
+        # Calcular estadísticas (antes del slice)
+        total_calificaciones = calificaciones_queryset.count()
+        for puntuacion in range(1, 6):
+            stats_calificaciones[str(puntuacion)] = calificaciones_queryset.filter(
+                puntuacion=puntuacion
+            ).count()
+        
+        # Obtener las últimas 10 para mostrar
+        calificaciones = calificaciones_queryset[:10]
+        
+    except ImportError:
+        # La app de calificaciones aún no existe
+        pass
+    
+    # ========================================
+    # SERVICIOS DEL DESTINO
+    # ========================================
+    try:
+        from apps.servicios.models import Servicio
+        
+        servicios_destino = Servicio.objects.filter(
+            destino=destino,
+            activo=True,
+            disponible=True
+        ).order_by('-calificacion_promedio')[:6]
+        
+    except ImportError:
+        servicios_destino = []
+    
+    # ========================================
+    # DESTINOS RELACIONADOS
+    # ========================================
     destinos_relacionados = Destino.objects.filter(
         region=destino.region,
         activo=True
     ).exclude(id=destino.id).order_by('-calificacion_promedio')[:4]
+
+    calificaciones_por_tipo = {}
+    if total_calificaciones > 0:
+        try:
+            from apps.servicios.models import Servicio
+            
+            # Agrupar calificaciones por tipo de servicio
+            for tipo_code, tipo_nombre in Servicio.TIPO_SERVICIO_CHOICES:
+                tipo_calificaciones = calificaciones_queryset.filter(
+                    servicio__tipo=tipo_code
+                )
+                count = tipo_calificaciones.count()
+                if count > 0:
+                    promedio = tipo_calificaciones.aggregate(
+                        promedio=Avg('puntuacion')
+                    )['promedio']
+                    calificaciones_por_tipo[tipo_nombre] = {
+                        'count': count,
+                        'promedio': round(promedio, 1)
+                    }
+        except (ImportError, Exception):
+            pass
     
     context = {
         'destino': destino,
         'imagenes': imagenes,
         'atracciones': atracciones,
         'calificaciones': calificaciones,
+        'stats_calificaciones': stats_calificaciones,
+        'total_calificaciones': total_calificaciones,
+        'calificaciones_por_tipo': calificaciones_por_tipo,
+        'servicios_destino': servicios_destino,
         'destinos_relacionados': destinos_relacionados,
         'coordenadas': destino.get_coordenadas(),
     }
     
     return render(request, 'destinos/detalle_destino.html', context)
-
 
 def destinos_por_region(request, region):
     """
