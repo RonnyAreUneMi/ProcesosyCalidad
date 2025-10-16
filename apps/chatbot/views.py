@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 import hashlib
 
 
-# SISTEMA DE APRENDIZAJE Y MEMORIA
+# SISTEMA DE APRENDIZAJE Y MEMORIA      d
 
 class ChatbotMemory:
     """
