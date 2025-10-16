@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'apps.rutas',
     'apps.reservas',
     'apps.calificaciones',
-    'apps.chatbot',
+    'apps.chatbot',  # ✅ Ya está agregada
 ]
 
 MIDDLEWARE = [
@@ -87,6 +87,21 @@ DATABASES = {
         'PORT': config('DB_PORT'),
     }
 }
+
+# ============================================
+# ✅ AGREGAR ESTA SECCIÓN: AI CONFIGURATION
+# ============================================
+OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
+GROQ_API_KEY = config('GROQ_API_KEY', default='')
+
+# Validar que al menos una key esté configurada
+if not OPENAI_API_KEY and not GROQ_API_KEY and DEBUG:
+    import warnings
+    warnings.warn(
+        "⚠️  Ni OPENAI_API_KEY ni GROQ_API_KEY están configuradas. El chatbot no funcionará.",
+        RuntimeWarning
+    )
+# ============================================
 
 # Otras variables de entorno
 SUPABASE_URL = config('SUPABASE_URL')
@@ -172,6 +187,8 @@ LOGOUT_REDIRECT_URL = 'home'
 SESSION_COOKIE_AGE = 86400  # 24 horas en segundos
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
 
 
 # Security settings (para producción)

@@ -21,7 +21,7 @@ urlpatterns = [
     # path('rutas/', include('apps.rutas.urls')),
     path('reservas/', include('apps.reservas.urls')),
     path('calificaciones/', include('apps.calificaciones.urls')),
-    # path('chatbot/', include('apps.chatbot.urls')),
+    path('chatbot/', include('apps.chatbot.urls')),
 ]
 
 # Configuración para servir archivos media y static en desarrollo

@@ -334,12 +334,27 @@
                                         <div class="flex items-start space-x-3">
                                             <i class="fas fa-reply text-sky-600 mt-1"></i>
                                             <div class="flex-1">
-                                                <p class="font-semibold text-sky-900 text-sm mb-1">Respuesta del proveedor</p>
-                                                <p class="text-sky-900 text-sm">{{ calificacion.respuesta.respuesta }}</p>
+                                                <div class="flex items-center justify-between mb-1">
+                                                    <p class="font-semibold text-sky-900 text-sm">Respuesta del proveedor</p>
+                                                    {% if user.is_authenticated and user == servicio.proveedor %}
+                                                    <button onclick="editarRespuesta({{ calificacion.respuesta.id }}, '{{ calificacion.respuesta.respuesta|escapejs }}')" 
+                                                            class="text-xs text-blue-600 hover:text-blue-800 flex items-center">
+                                                        <i class="fas fa-edit mr-1"></i> Editar
+                                                    </button>
+                                                    {% endif %}
+                                                </div>
+                                                <p class="text-sky-900 text-sm" id="respuesta-texto-{{ calificacion.respuesta.id }}">{{ calificacion.respuesta.respuesta }}</p>
                                                 <p class="text-xs text-sky-700 mt-1">{{ calificacion.respuesta.fecha_respuesta|date:"d M Y" }}</p>
                                             </div>
                                         </div>
                                     </div>
+                                    {% elif user.is_authenticated and user == servicio.proveedor %}
+                                    <!-- Botón para responder -->
+                                    <button onclick="mostrarFormRespuesta({{ calificacion.id }}, '{{ calificacion.comentario|escapejs }}')" 
+                                            class="mt-3 inline-flex items-center px-3 py-1.5 text-sm text-sky-600 hover:text-sky-700 hover:bg-sky-50 rounded-lg transition-colors">
+                                        <i class="fas fa-reply mr-1.5"></i>
+                                        Responder
+                                    </button>
                                     {% endif %}
                                 </div>
                             </div>
@@ -421,6 +436,9 @@
         </div>
     </div>
 </div>
+
+<!-- MODALES -->
+
 <!-- Modal Reserva Rápida -->
 <div id="modalReserva" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
@@ -513,6 +531,7 @@
         </form>
     </div>
 </div>
+
 <!-- Modal Calificar -->
 <div id="modalCalificar" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6">
@@ -625,7 +644,7 @@
 </div>
 {% endif %}
 
-<!-- Modal Confirmar Eliminación -->
+<!-- Modal Confirmar Eliminación Calificación -->
 <div id="modalEliminarCalificacion" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
         <div class="text-center mb-6">
@@ -646,6 +665,108 @@
                 <button type="submit" 
                         class="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold">
                     Sí, eliminar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Responder Calificación (PROVEEDOR) -->
+<div id="modalResponder" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-gray-900">
+                <i class="fas fa-reply text-sky-600 mr-2"></i>
+                Responder Reseña
+            </h3>
+            <button onclick="cerrarModalResponder()" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <div class="bg-sky-50 rounded-xl p-4 mb-4 border border-sky-200">
+            <p class="text-sm font-semibold text-sky-900 mb-1">Comentario del cliente:</p>
+            <p class="text-sm text-sky-800" id="comentarioOriginal"></p>
+        </div>
+
+        <form id="formResponder">
+            {% csrf_token %}
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Tu respuesta
+                </label>
+                <textarea name="respuesta" 
+                          id="textoRespuesta"
+                          rows="4" 
+                          maxlength="500"
+                          required
+                          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none resize-none"
+                          placeholder="Agradece al cliente y responde a sus comentarios..."></textarea>
+                <div class="flex justify-between items-center mt-1">
+                    <p class="text-xs text-gray-500">Máximo 500 caracteres</p>
+                    <p class="text-xs text-gray-500">
+                        <span id="charCountRespuesta">0</span>/500
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button type="button" onclick="cerrarModalResponder()"
+                        class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50">
+                    Cancelar
+                </button>
+                <button type="submit" 
+                        class="flex-1 px-4 py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-semibold">
+                    <i class="fas fa-paper-plane mr-2"></i>
+                    Publicar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Editar Respuesta (PROVEEDOR) -->
+<div id="modalEditarRespuesta" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-gray-900">
+                <i class="fas fa-edit text-blue-600 mr-2"></i>
+                Editar Respuesta
+            </h3>
+            <button onclick="cerrarModalEditarRespuesta()" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <form id="formEditarRespuesta">
+            {% csrf_token %}
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Tu respuesta
+                </label>
+                <textarea name="respuesta" 
+                          id="textoEditarRespuesta"
+                          rows="4" 
+                          maxlength="500"
+                          required
+                          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none resize-none"></textarea>
+                <div class="flex justify-between items-center mt-1">
+                    <p class="text-xs text-gray-500">Máximo 500 caracteres</p>
+                    <p class="text-xs text-gray-500">
+                        <span id="charCountEditarRespuesta">0</span>/500
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button type="button" onclick="cerrarModalEditarRespuesta()"
+                        class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50">
+                    Cancelar
+                </button>
+                <button type="submit" 
+                        class="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold">
+                    <i class="fas fa-save mr-2"></i>
+                    Guardar
                 </button>
             </div>
         </form>
@@ -680,345 +801,712 @@ html {
     transition: opacity 0.3s ease-in-out;
 }
 </style>
-
+    
 <script>
-// ====================================
-// VARIABLES GLOBALES
-// ====================================
-const precioUnitario = parseFloat('{{ servicio.precio }}');
-let currentRating = 0;
-let currentRatingEditar = parseInt('{{ calificacion_usuario.puntuacion|default:0 }}');
+    // VARIABLES GLOBALES
+    const precioUnitario = parseFloat('{{ servicio.precio }}');
+    let currentRating = 0;
+    let currentRatingEditar = parseInt('{{ calificacion_usuario.puntuacion|default:0 }}');
+    let calificacionActual = null;
+    let respuestaActual = null;
 
-const ratingTexts = {
-    1: '⭐ Malo',
-    2: '⭐⭐ Regular',
-    3: '⭐⭐⭐ Bueno',
-    4: '⭐⭐⭐⭐ Muy bueno',
-    5: '⭐⭐⭐⭐⭐ Excelente'
-};
-
-// ====================================
-// CAMBIAR IMAGEN PRINCIPAL
-// ====================================
-function cambiarImagen(url) {
-    const img = document.getElementById('imagenPrincipal');
-    if (img) {
-        img.style.opacity = '0';
-        setTimeout(() => {
-            img.src = url;
-            img.style.opacity = '1';
-        }, 150);
-    }
-}
-
-// ====================================
-// MODAL DE RESERVA
-// ====================================
-function mostrarModalReserva() {
-    const modal = document.getElementById('modalReserva');
-    if (!modal) {
-        console.error('Modal no encontrado');
-        return;
-    }
-    
-    modal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-    
-    // Establecer fecha mínima
-    const fechaInput = document.getElementById('fechaServicio');
-    if (fechaInput) {
-        fechaInput.setAttribute('min', '{{ fecha_minima }}');
-    }
-    
-    // Reset valores
-    const cantidadInput = document.getElementById('cantidadPersonas');
-    if (cantidadInput) {
-        cantidadInput.value = 1;
-    }
-    if (fechaInput) {
-        fechaInput.value = '';
-    }
-    actualizarTotal();
-}
-
-function cerrarModalReserva() {
-    const modal = document.getElementById('modalReserva');
-    if (modal) {
-        modal.classList.add('hidden');
-        document.body.style.overflow = '';
-    }
-}
-
-function actualizarTotal() {
-    const cantidad = parseInt(document.getElementById('cantidadPersonas')?.value) || 1;
-    const subtotal = precioUnitario * cantidad;
-    
-    const subtotalTexto = document.getElementById('subtotalTexto');
-    const personasTexto = document.getElementById('personasTexto');
-    
-    if (subtotalTexto) {
-        subtotalTexto.textContent = `$${Math.round(subtotal)}`;
-    }
-    if (personasTexto) {
-        personasTexto.textContent = `${cantidad} ${cantidad === 1 ? 'persona' : 'personas'}`;
-    }
-}
-
-// ====================================
-// CARRITO Y RESERVAS (CORREGIDO)
-// ====================================
-function agregarAlCarrito(servicioId) {
-    // Solo abre el modal - al enviar se agrega al carrito
-    mostrarModalReserva();
-}
-
-function reservarAhora(servicioId) {
-    // Abre el modal pero marca que debe redirigir a confirmar
-    mostrarModalReserva();
-    
-    // Modificar el formulario para que redirija a confirmar después
-    const form = document.getElementById('formReserva');
-    if (form) {
-        // Añadir campo oculto para indicar reserva rápida
-        let inputReservaRapida = form.querySelector('input[name="reserva_rapida"]');
-        if (!inputReservaRapida) {
-            inputReservaRapida = document.createElement('input');
-            inputReservaRapida.type = 'hidden';
-            inputReservaRapida.name = 'reserva_rapida';
-            inputReservaRapida.value = '1';
-            form.appendChild(inputReservaRapida);
+    const ratingTexts = {
+        1: '⭐ Malo',
+        2: '⭐⭐ Regular',
+        3: '⭐⭐⭐ Bueno',
+        4: '⭐⭐⭐⭐ Muy bueno',
+        5: '⭐⭐⭐⭐⭐ Excelente'
+    };
+    // CAMBIAR IMAGEN PRINCIPAL
+    function cambiarImagen(url) {
+        const img = document.getElementById('imagenPrincipal');
+        if (img) {
+            img.style.opacity = '0';
+            setTimeout(() => {
+                img.src = url;
+                img.style.opacity = '1';
+            }, 150);
         }
     }
-}
-
-// ====================================
-// SISTEMA DE CALIFICACIÓN
-// ====================================
-function setRating(rating) {
-    currentRating = rating;
-    const ratingValue = document.getElementById('ratingValue');
-    const ratingText = document.getElementById('ratingText');
-    
-    if (ratingValue) ratingValue.value = rating;
-    if (ratingText) ratingText.textContent = ratingTexts[rating];
-    
-    const stars = document.querySelectorAll('#ratingStars .star-btn');
-    stars.forEach((star, index) => {
-        const icon = star.querySelector('i');
-        if (index < rating) {
-            icon.classList.remove('far');
-            icon.classList.add('fas');
-            star.classList.remove('text-gray-300');
-            star.classList.add('text-yellow-400');
-        } else {
-            icon.classList.remove('fas');
-            icon.classList.add('far');
-            star.classList.remove('text-yellow-400');
-            star.classList.add('text-gray-300');
+    // MODAL DE RESERVA
+    function mostrarModalReserva() {
+        const modal = document.getElementById('modalReserva');
+        if (!modal) {
+            console.error('Modal no encontrado');
+            return;
         }
-    });
-}
-
-function setRatingEditar(rating) {
-    currentRatingEditar = rating;
-    const ratingValueEditar = document.getElementById('ratingValueEditar');
-    if (ratingValueEditar) ratingValueEditar.value = rating;
-    
-    const stars = document.querySelectorAll('#ratingStarsEditar .star-btn-editar');
-    stars.forEach((star, index) => {
-        const icon = star.querySelector('i');
-        if (index < rating) {
-            icon.classList.remove('far');
-            icon.classList.add('fas');
-            star.classList.remove('text-gray-300');
-            star.classList.add('text-yellow-400');
-        } else {
-            icon.classList.remove('fas');
-            icon.classList.add('far');
-            star.classList.remove('text-yellow-400');
-            star.classList.add('text-gray-300');
+        
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        
+        // Establecer fecha mínima
+        const fechaInput = document.getElementById('fechaServicio');
+        if (fechaInput) {
+            fechaInput.setAttribute('min', '{{ fecha_minima }}');
         }
-    });
-}
-
-function mostrarModalCalificar() {
-    const modal = document.getElementById('modalCalificar');
-    if (modal) {
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
-}
-
-function cerrarModalCalificar() {
-    const modal = document.getElementById('modalCalificar');
-    if (modal) {
-        modal.classList.add('hidden');
-        document.body.style.overflow = '';
-        currentRating = 0;
         
-        // Reset formulario
-        const form = modal.querySelector('form');
-        if (form) form.reset();
-        
-        // Reset estrellas
-        const stars = document.querySelectorAll('#ratingStars .star-btn');
-        stars.forEach(star => {
-            const icon = star.querySelector('i');
-            icon.classList.remove('fas');
-            icon.classList.add('far');
-            star.classList.remove('text-yellow-400');
-            star.classList.add('text-gray-300');
-        });
-        
-        const ratingText = document.getElementById('ratingText');
-        if (ratingText) ratingText.textContent = 'Selecciona una calificación';
+        // Reset valores
+        const cantidadInput = document.getElementById('cantidadPersonas');
+        if (cantidadInput) {
+            cantidadInput.value = 1;
+        }
+        if (fechaInput) {
+            fechaInput.value = '';
+        }
+        actualizarTotal();
     }
-}
 
-function mostrarModalEditarCalificacion() {
-    const modal = document.getElementById('modalEditarCalificacion');
-    if (modal) {
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
-}
-
-function cerrarModalEditarCalificacion() {
-    const modal = document.getElementById('modalEditarCalificacion');
-    if (modal) {
-        modal.classList.add('hidden');
-        document.body.style.overflow = '';
-    }
-}
-
-function confirmarEliminarCalificacion(calificacionId) {
-    const modal = document.getElementById('modalEliminarCalificacion');
-    const form = document.getElementById('formEliminarCalificacion');
-    if (modal && form) {
-        form.action = `/calificaciones/eliminar/${calificacionId}/`;
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
-}
-
-function cerrarModalEliminarCalificacion() {
-    const modal = document.getElementById('modalEliminarCalificacion');
-    if (modal) {
-        modal.classList.add('hidden');
-        document.body.style.overflow = '';
-    }
-}
-
-function mostrarNotificacion(mensaje, tipo) {
-    const notif = document.createElement('div');
-    notif.className = `fixed top-20 right-4 px-6 py-4 rounded-xl shadow-2xl z-50 transition-all transform ${
-        tipo === 'success' ? 'bg-green-500' : 'bg-red-500'
-    } text-white font-semibold`;
-    notif.innerHTML = `
-        <div class="flex items-center space-x-3">
-            <i class="fas fa-${tipo === 'success' ? 'check-circle' : 'exclamation-circle'} text-xl"></i>
-            <span>${mensaje}</span>
-        </div>
-    `;
-    document.body.appendChild(notif);
-    
-    setTimeout(() => {
-        notif.style.opacity = '0';
-        notif.style.transform = 'translateX(100%)';
-        setTimeout(() => notif.remove(), 300);
-    }, 3000);
-}
-
-// ====================================
-// EVENT LISTENERS
-// ====================================
-document.addEventListener('DOMContentLoaded', function() {
-    // Modal de reserva - cerrar al hacer clic fuera
-    const modalReserva = document.getElementById('modalReserva');
-    if (modalReserva) {
-        modalReserva.addEventListener('click', function(e) {
-            if (e.target === this) {
-                cerrarModalReserva();
-            }
-        });
-    }
-    
-    // Actualizar total al cambiar cantidad
-    const cantidadInput = document.getElementById('cantidadPersonas');
-    if (cantidadInput) {
-        cantidadInput.addEventListener('input', actualizarTotal);
-    }
-    
-    // Hover effect para estrellas (crear calificación)
-    document.querySelectorAll('.star-btn').forEach((star, index) => {
-        star.addEventListener('mouseenter', () => {
-            for (let i = 0; i <= index; i++) {
-                const btn = document.querySelectorAll('.star-btn')[i];
-                if (btn) {
-                    btn.querySelector('i').classList.add('fas');
-                    btn.querySelector('i').classList.remove('far');
-                    btn.classList.add('text-yellow-400');
-                }
-            }
-        });
-    });
-
-    const ratingStars = document.getElementById('ratingStars');
-    if (ratingStars) {
-        ratingStars.addEventListener('mouseleave', () => {
-            if (currentRating > 0) {
-                setRating(currentRating);
-            } else {
-                document.querySelectorAll('.star-btn').forEach(star => {
-                    const icon = star.querySelector('i');
-                    if (icon) {
-                        icon.classList.remove('fas');
-                        icon.classList.add('far');
-                    }
-                    star.classList.remove('text-yellow-400');
-                    star.classList.add('text-gray-300');
-                });
-                const ratingText = document.getElementById('ratingText');
-                if (ratingText) {
-                    ratingText.textContent = 'Selecciona una calificación';
-                }
-            }
-        });
-    }
-    
-    // Contador de caracteres
-    const comentarioCalificacion = document.getElementById('comentarioCalificacion');
-    if (comentarioCalificacion) {
-        comentarioCalificacion.addEventListener('input', function() {
-            const charCount = document.getElementById('charCount');
-            if (charCount) {
-                charCount.textContent = this.value.length;
-            }
-        });
-    }
-    
-    // Cerrar modales al hacer clic fuera
-    ['modalCalificar', 'modalEditarCalificacion', 'modalEliminarCalificacion'].forEach(modalId => {
-        const modal = document.getElementById(modalId);
+    function cerrarModalReserva() {
+        const modal = document.getElementById('modalReserva');
         if (modal) {
-            modal.addEventListener('click', function(e) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+    }
+
+    function actualizarTotal() {
+        const cantidad = parseInt(document.getElementById('cantidadPersonas')?.value) || 1;
+        const subtotal = precioUnitario * cantidad;
+        
+        const subtotalTexto = document.getElementById('subtotalTexto');
+        const personasTexto = document.getElementById('personasTexto');
+        
+        if (subtotalTexto) {
+            subtotalTexto.textContent = `$${Math.round(subtotal)}`;
+        }
+        if (personasTexto) {
+            personasTexto.textContent = `${cantidad} ${cantidad === 1 ? 'persona' : 'personas'}`;
+        }
+    }
+
+    // CARRITO Y RESERVAS
+    function agregarAlCarrito(servicioId) {
+        mostrarModalReserva();
+    }
+
+    function reservarAhora(servicioId) {
+        mostrarModalReserva();
+        
+        const form = document.getElementById('formReserva');
+        if (form) {
+            let inputReservaRapida = form.querySelector('input[name="reserva_rapida"]');
+            if (!inputReservaRapida) {
+                inputReservaRapida = document.createElement('input');
+                inputReservaRapida.type = 'hidden';
+                inputReservaRapida.name = 'reserva_rapida';
+                inputReservaRapida.value = '1';
+                form.appendChild(inputReservaRapida);
+            }
+        }
+    }
+
+    // SISTEMA DE CALIFICACIÓN (TURISTAS)
+    function setRating(rating) {
+        currentRating = rating;
+        const ratingValue = document.getElementById('ratingValue');
+        const ratingText = document.getElementById('ratingText');
+        
+        if (ratingValue) ratingValue.value = rating;
+        if (ratingText) ratingText.textContent = ratingTexts[rating];
+        
+        const stars = document.querySelectorAll('#ratingStars .star-btn');
+        stars.forEach((star, index) => {
+            const icon = star.querySelector('i');
+            if (index < rating) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                star.classList.remove('text-gray-300');
+                star.classList.add('text-yellow-400');
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                star.classList.remove('text-yellow-400');
+                star.classList.add('text-gray-300');
+            }
+        });
+    }
+
+    function setRatingEditar(rating) {
+        currentRatingEditar = rating;
+        const ratingValueEditar = document.getElementById('ratingValueEditar');
+        if (ratingValueEditar) ratingValueEditar.value = rating;
+        
+        const stars = document.querySelectorAll('#ratingStarsEditar .star-btn-editar');
+        stars.forEach((star, index) => {
+            const icon = star.querySelector('i');
+            if (index < rating) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                star.classList.remove('text-gray-300');
+                star.classList.add('text-yellow-400');
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                star.classList.remove('text-yellow-400');
+                star.classList.add('text-gray-300');
+            }
+        });
+    }
+
+    function mostrarModalCalificar() {
+        const modal = document.getElementById('modalCalificar');
+        if (modal) {
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function cerrarModalCalificar() {
+        const modal = document.getElementById('modalCalificar');
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+            currentRating = 0;
+            
+            const form = modal.querySelector('form');
+            if (form) form.reset();
+            
+            const stars = document.querySelectorAll('#ratingStars .star-btn');
+            stars.forEach(star => {
+                const icon = star.querySelector('i');
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                star.classList.remove('text-yellow-400');
+                star.classList.add('text-gray-300');
+            });
+            
+            const ratingText = document.getElementById('ratingText');
+            if (ratingText) ratingText.textContent = 'Selecciona una calificación';
+        }
+    }
+
+    function mostrarModalEditarCalificacion() {
+        const modal = document.getElementById('modalEditarCalificacion');
+        if (modal) {
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function cerrarModalEditarCalificacion() {
+        const modal = document.getElementById('modalEditarCalificacion');
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+    }
+
+    function confirmarEliminarCalificacion(calificacionId) {
+        const modal = document.getElementById('modalEliminarCalificacion');
+        const form = document.getElementById('formEliminarCalificacion');
+        if (modal && form) {
+            form.action = `/calificaciones/eliminar/${calificacionId}/`;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function cerrarModalEliminarCalificacion() {
+        const modal = document.getElementById('modalEliminarCalificacion');
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+    }
+
+    // SISTEMA DE RESPUESTAS (PROVEEDORES)
+    function mostrarFormRespuesta(calificacionId, comentario) {
+        calificacionActual = calificacionId;
+        const modal = document.getElementById('modalResponder');
+        const textarea = document.getElementById('textoRespuesta');
+        const comentarioDiv = document.getElementById('comentarioOriginal');
+        
+        if (modal && textarea) {
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            textarea.value = '';
+            
+            // Mostrar el comentario original
+            if (comentarioDiv) {
+                comentarioDiv.textContent = comentario || 'Sin comentario';
+            }
+            
+            // Actualizar contador
+            const charCount = document.getElementById('charCountRespuesta');
+            if (charCount) charCount.textContent = '0';
+            
+            textarea.focus();
+        }
+    }
+
+    function cerrarModalResponder() {
+        const modal = document.getElementById('modalResponder');
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+            calificacionActual = null;
+            
+            // Limpiar formulario
+            const textarea = document.getElementById('textoRespuesta');
+            if (textarea) textarea.value = '';
+        }
+    }
+
+    async function enviarRespuesta() {
+        const respuesta = document.getElementById('textoRespuesta')?.value.trim();
+        
+        if (!respuesta) {
+            mostrarNotificacion('La respuesta no puede estar vacía', 'error');
+            return;
+        }
+        
+        if (respuesta.length > 500) {
+            mostrarNotificacion('La respuesta no puede exceder 500 caracteres', 'error');
+            return;
+        }
+        
+        try {
+            const formData = new FormData();
+            formData.append('respuesta', respuesta);
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+            
+            const response = await fetch(`/calificaciones/responder/${calificacionActual}/`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                mostrarNotificacion('Respuesta publicada exitosamente', 'success');
+                cerrarModalResponder();
+                
+                // Recargar la página para mostrar la respuesta
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                mostrarNotificacion(data.error || 'Error al publicar la respuesta', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            mostrarNotificacion('Error al enviar la respuesta', 'error');
+        }
+    }
+
+    function editarRespuesta(respuestaId, textoActual) {
+        respuestaActual = respuestaId;
+        const modal = document.getElementById('modalEditarRespuesta');
+        const textarea = document.getElementById('textoEditarRespuesta');
+        
+        if (modal && textarea) {
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            textarea.value = textoActual;
+            
+            // Actualizar contador
+            const charCount = document.getElementById('charCountEditarRespuesta');
+            if (charCount) charCount.textContent = textoActual.length;
+            
+            textarea.focus();
+        }
+    }
+
+    function cerrarModalEditarRespuesta() {
+        const modal = document.getElementById('modalEditarRespuesta');
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+            respuestaActual = null;
+        }
+    }
+
+    async function actualizarRespuesta() {
+        const respuesta = document.getElementById('textoEditarRespuesta')?.value.trim();
+        
+        if (!respuesta) {
+            mostrarNotificacion('La respuesta no puede estar vacía', 'error');
+            return;
+        }
+        
+        if (respuesta.length > 500) {
+            mostrarNotificacion('La respuesta no puede exceder 500 caracteres', 'error');
+            return;
+        }
+        
+        try {
+            const formData = new FormData();
+            formData.append('respuesta', respuesta);
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+            
+            const response = await fetch(`/calificaciones/respuesta/editar/${respuestaActual}/`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                mostrarNotificacion('Respuesta actualizada exitosamente', 'success');
+                cerrarModalEditarRespuesta();
+                
+                // Actualizar el texto en la página sin recargar
+                const textoElement = document.getElementById(`respuesta-texto-${respuestaActual}`);
+                if (textoElement) {
+                    textoElement.textContent = respuesta;
+                }
+                
+                // O recargar la página
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                mostrarNotificacion(data.error || 'Error al actualizar la respuesta', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            mostrarNotificacion('Error al actualizar la respuesta', 'error');
+        }
+    }
+
+    // NOTIFICACIONES
+    function mostrarNotificacion(mensaje, tipo) {
+        const notif = document.createElement('div');
+        notif.className = `fixed top-20 right-4 px-6 py-4 rounded-xl shadow-2xl z-50 transition-all transform ${
+            tipo === 'success' ? 'bg-green-500' : 'bg-red-500'
+        } text-white font-semibold`;
+        notif.innerHTML = `
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-${tipo === 'success' ? 'check-circle' : 'exclamation-circle'} text-xl"></i>
+                <span>${mensaje}</span>
+            </div>
+        `;
+        document.body.appendChild(notif);
+        
+        setTimeout(() => {
+            notif.style.opacity = '0';
+            notif.style.transform = 'translateX(100%)';
+            setTimeout(() => notif.remove(), 300);
+        }, 3000);
+    }
+    // EVENT LISTENERS
+    document.addEventListener('DOMContentLoaded', function() {
+        // Modal de reserva - cerrar al hacer clic fuera
+        const modalReserva = document.getElementById('modalReserva');
+        if (modalReserva) {
+            modalReserva.addEventListener('click', function(e) {
                 if (e.target === this) {
-                    this.classList.add('hidden');
-                    document.body.style.overflow = '';
+                    cerrarModalReserva();
                 }
             });
         }
+        
+        // Actualizar total al cambiar cantidad
+        const cantidadInput = document.getElementById('cantidadPersonas');
+        if (cantidadInput) {
+            cantidadInput.addEventListener('input', actualizarTotal);
+        }
+        
+        // Hover effect para estrellas (crear calificación)
+        document.querySelectorAll('.star-btn').forEach((star, index) => {
+            star.addEventListener('mouseenter', () => {
+                for (let i = 0; i <= index; i++) {
+                    const btn = document.querySelectorAll('.star-btn')[i];
+                    if (btn) {
+                        btn.querySelector('i').classList.add('fas');
+                        btn.querySelector('i').classList.remove('far');
+                        btn.classList.add('text-yellow-400');
+                    }
+                }
+            });
+        });
+
+        const ratingStars = document.getElementById('ratingStars');
+        if (ratingStars) {
+            ratingStars.addEventListener('mouseleave', () => {
+                if (currentRating > 0) {
+                    setRating(currentRating);
+                } else {
+                    document.querySelectorAll('.star-btn').forEach(star => {
+                        const icon = star.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('fas');
+                            icon.classList.add('far');
+                        }
+                        star.classList.remove('text-yellow-400');
+                        star.classList.add('text-gray-300');
+                    });
+                    const ratingText = document.getElementById('ratingText');
+                    if (ratingText) {
+                        ratingText.textContent = 'Selecciona una calificación';
+                    }
+                }
+            });
+        }
+        
+        // Contador de caracteres para calificación
+        const comentarioCalificacion = document.getElementById('comentarioCalificacion');
+        if (comentarioCalificacion) {
+            comentarioCalificacion.addEventListener('input', function() {
+                const charCount = document.getElementById('charCount');
+                if (charCount) {
+                    charCount.textContent = this.value.length;
+                }
+            });
+        }
+        
+        // Contador de caracteres para respuesta
+        const textoRespuesta = document.getElementById('textoRespuesta');
+        if (textoRespuesta) {
+            textoRespuesta.addEventListener('input', function() {
+                const charCount = document.getElementById('charCountRespuesta');
+                if (charCount) {
+                    charCount.textContent = this.value.length;
+                }
+            });
+        }
+        
+        // Contador de caracteres para editar respuesta
+        const textoEditarRespuesta = document.getElementById('textoEditarRespuesta');
+        if (textoEditarRespuesta) {
+            textoEditarRespuesta.addEventListener('input', function() {
+                const charCount = document.getElementById('charCountEditarRespuesta');
+                if (charCount) {
+                    charCount.textContent = this.value.length;
+                }
+            });
+        }
+        
+        // Cerrar modales al hacer clic fuera
+        const modales = [
+            'modalCalificar', 
+            'modalEditarCalificacion', 
+            'modalEliminarCalificacion', 
+            'modalResponder', 
+            'modalEditarRespuesta'
+        ];
+        
+        modales.forEach(modalId => {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.classList.add('hidden');
+                        document.body.style.overflow = '';
+                    }
+                });
+            }
+        });
+
+        // Cerrar modales con ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                cerrarModalReserva();
+                cerrarModalCalificar();
+                cerrarModalEditarCalificacion();
+                cerrarModalEliminarCalificacion();
+                cerrarModalResponder();
+                cerrarModalEditarRespuesta();
+            }
+        });
+        
+        // Handler para formulario de respuesta
+        const formResponder = document.getElementById('formResponder');
+        if (formResponder) {
+            formResponder.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await enviarRespuesta();
+            });
+        }
+        
+        // Handler para formulario de editar respuesta
+        const formEditarRespuesta = document.getElementById('formEditarRespuesta');
+        if (formEditarRespuesta) {
+            formEditarRespuesta.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await actualizarRespuesta();
+            });
+        }
+        
+        // Prevenir envío múltiple de formularios
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            form.addEventListener('submit', function() {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Enviando...';
+                    
+                    // Reactivar después de 3 segundos (por si falla)
+                    setTimeout(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = submitBtn.dataset.originalText || 'Enviar';
+                    }, 3000);
+                }
+            });
+        });
+        
+        // Guardar texto original de botones submit
+        document.querySelectorAll('button[type="submit"]').forEach(btn => {
+            btn.dataset.originalText = btn.innerHTML;
+        });
     });
 
-    // Cerrar modales con ESC
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            cerrarModalReserva();
-            cerrarModalCalificar();
-            cerrarModalEditarCalificacion();
-            cerrarModalEliminarCalificacion();
+    // ====================================
+    // FUNCIONES AUXILIARES
+    // ====================================
+
+    // Validar fecha de servicio
+    function validarFechaServicio() {
+        const fechaInput = document.getElementById('fechaServicio');
+        if (fechaInput && fechaInput.value) {
+            const fechaSeleccionada = new Date(fechaInput.value);
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            
+            if (fechaSeleccionada < hoy) {
+                mostrarNotificacion('Debes seleccionar una fecha futura', 'error');
+                fechaInput.value = '';
+                return false;
+            }
         }
+        return true;
+    }
+
+    // Scroll suave a sección de calificaciones
+    function scrollACalificaciones() {
+        const seccion = document.getElementById('seccion-calificaciones');
+        if (seccion) {
+            seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    // Copiar enlace del servicio
+    function copiarEnlace() {
+        const url = window.location.href;
+        
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(() => {
+                mostrarNotificacion('Enlace copiado al portapapeles', 'success');
+            }).catch(err => {
+                console.error('Error al copiar:', err);
+                mostrarNotificacion('Error al copiar el enlace', 'error');
+            });
+        } else {
+            // Fallback para navegadores antiguos
+            const textarea = document.createElement('textarea');
+            textarea.value = url;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                document.execCommand('copy');
+                mostrarNotificacion('Enlace copiado al portapapeles', 'success');
+            } catch (err) {
+                console.error('Error al copiar:', err);
+                mostrarNotificacion('Error al copiar el enlace', 'error');
+            }
+            
+            document.body.removeChild(textarea);
+        }
+    }
+
+    // Imprimir página
+    function imprimirServicio() {
+        window.print();
+    }
+
+    // Reportar contenido inapropiado
+    function reportarContenido(tipo, id) {
+        if (confirm('¿Estás seguro de que deseas reportar este contenido?')) {
+            // Aquí iría la lógica para enviar el reporte
+            mostrarNotificacion('Reporte enviado. Lo revisaremos pronto.', 'success');
+        }
+    }
+
+    // ====================================
+    // UTILIDADES DE DEPURACIÓN
+    // ====================================
+    function debug(mensaje, datos) {
+        if (console && console.log) {
+            console.log(`[DEBUG] ${mensaje}`, datos || '');
+        }
+    }
+
+    // Verificar estado de elementos al cargar
+    window.addEventListener('load', function() {
+        debug('Página cargada completamente');
+        debug('Precio unitario:', precioUnitario);
+        debug('Modales encontrados:', {
+            reserva: !!document.getElementById('modalReserva'),
+            calificar: !!document.getElementById('modalCalificar'),
+            responder: !!document.getElementById('modalResponder')
+        });
     });
-});
+
+    // ====================================
+    // MANEJO DE ERRORES GLOBAL
+    // ====================================
+    window.addEventListener('error', function(e) {
+        console.error('Error global capturado:', e.message);
+        // No mostrar notificación al usuario para no saturar
+    });
+
+    // ====================================
+    // COMPATIBILIDAD CON NAVEGADORES ANTIGUOS
+    // ====================================
+    if (!String.prototype.includes) {
+        String.prototype.includes = function(search, start) {
+            if (typeof start !== 'number') {
+                start = 0;
+            }
+            
+            if (start + search.length > this.length) {
+                return false;
+            } else {
+                return this.indexOf(search, start) !== -1;
+            }
+        };
+    }
+
+    // Polyfill para fetch (si no existe)
+    if (!window.fetch) {
+        console.warn('Fetch API no disponible. Algunas funcionalidades pueden no funcionar.');
+    }
+
+    // ====================================
+    // ANALYTICS Y TRACKING (OPCIONAL)
+    // ====================================
+    function trackEvent(categoria, accion, etiqueta) {
+        // Si tienes Google Analytics o similar, trackear eventos aquí
+        if (typeof gtag !== 'undefined') {
+            gtag('event', accion, {
+                'event_category': categoria,
+                'event_label': etiqueta
+            });
+        }
+    }
+
+    // Ejemplos de tracking
+    function trackReserva() {
+        trackEvent('Reservas', 'click_reservar', '{{ servicio.nombre }}');
+    }
+
+    function trackCalificacion() {
+        trackEvent('Calificaciones', 'crear_calificacion', '{{ servicio.nombre }}');
+    }
+
+    function trackRespuesta() {
+        trackEvent('Respuestas', 'responder_calificacion', '{{ servicio.nombre }}');
+    }
+    console.log('✅ Scripts de detalle.html cargados correctamente');
 </script>
 {% endblock %}

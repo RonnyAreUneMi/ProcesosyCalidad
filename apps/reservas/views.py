@@ -666,18 +666,32 @@ def estadisticas_reservas_ajax(request):
         servicios_populares = [{
             'nombre': s.nombre,
             'reservas': s.num_reservas,
-            'destino': s.destino.nombre
+            'destino': s.destino.nombre,
+            'tipo': s.get_tipo_display()
         } for s in mas_reservados]
+        
+        # Reservas por mes (últimos 6 meses)
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        hace_6_meses = timezone.now() - timedelta(days=180)
+        reservas_recientes = Reserva.objects.filter(
+            fecha_creacion__gte=hace_6_meses
+        ).count()
         
         return JsonResponse({
             'success': True,
             'total_reservas': total_reservas,
+            'reservas_recientes': reservas_recientes,
             'por_estado': por_estado,
             'ingresos_totales': float(ingresos_totales),
             'servicios_populares': servicios_populares
         })
         
     except Exception as e:
+        import traceback
+        print(f"Error en estadisticas_reservas_ajax: {str(e)}")
+        print(traceback.format_exc())
         return JsonResponse({
             'success': False,
             'error': str(e)
@@ -689,27 +703,46 @@ def estadisticas_reservas_ajax(request):
 def mis_estadisticas_ajax(request):
     """
     Vista AJAX para estadísticas personales del usuario
+    Diferencia entre turistas y proveedores
     """
     try:
         if request.user.rol.nombre == 'turista':
             # Estadísticas para turistas
-            total_reservas = Reserva.objects.filter(usuario=request.user).count()
-            gasto_total = Reserva.objects.filter(
-                usuario=request.user,
+            mis_reservas = Reserva.objects.filter(usuario=request.user)
+            
+            total_reservas = mis_reservas.count()
+            
+            gasto_total = mis_reservas.filter(
                 estado__in=[Reserva.CONFIRMADA, Reserva.COMPLETADA]
             ).aggregate(total=Sum('costo_total'))['total'] or 0
             
-            destinos_visitados = Reserva.objects.filter(
-                usuario=request.user,
+            # Destinos únicos visitados
+            destinos_visitados = mis_reservas.filter(
                 estado=Reserva.COMPLETADA
             ).values('servicio__destino__nombre').distinct().count()
+            
+            # Próximas reservas
+            from django.utils import timezone
+            proximas = mis_reservas.filter(
+                fecha_inicio__gte=timezone.now(),
+                estado__in=[Reserva.PENDIENTE, Reserva.CONFIRMADA]
+            ).count()
+            
+            # Reservas por tipo de servicio
+            por_tipo = {}
+            for tipo_code, tipo_nombre in Servicio.TIPO_CHOICES:
+                count = mis_reservas.filter(servicio__tipo=tipo_code).count()
+                if count > 0:
+                    por_tipo[tipo_nombre] = count
             
             return JsonResponse({
                 'success': True,
                 'rol': 'turista',
                 'total_reservas': total_reservas,
                 'gasto_total': float(gasto_total),
-                'destinos_visitados': destinos_visitados
+                'destinos_visitados': destinos_visitados,
+                'proximas_reservas': proximas,
+                'por_tipo_servicio': por_tipo
             })
             
         elif request.user.rol.nombre == 'proveedor':
@@ -718,29 +751,54 @@ def mis_estadisticas_ajax(request):
                 proveedor=request.user
             ).values_list('id', flat=True)
             
-            total_reservas = Reserva.objects.filter(
+            reservas_servicios = Reserva.objects.filter(
                 servicio_id__in=servicios_ids
-            ).count()
+            )
             
-            ingresos = Reserva.objects.filter(
-                servicio_id__in=servicios_ids,
+            total_reservas = reservas_servicios.count()
+            
+            ingresos = reservas_servicios.filter(
                 estado__in=[Reserva.CONFIRMADA, Reserva.COMPLETADA]
             ).aggregate(total=Sum('costo_total'))['total'] or 0
+            
+            # Reservas pendientes de confirmar
+            pendientes = reservas_servicios.filter(
+                estado=Reserva.PENDIENTE
+            ).count()
+            
+            # Servicio más reservado
+            servicio_popular = Servicio.objects.filter(
+                proveedor=request.user
+            ).annotate(
+                num_reservas=Count('reservas')
+            ).order_by('-num_reservas').first()
+            
+            servicio_top = None
+            if servicio_popular:
+                servicio_top = {
+                    'nombre': servicio_popular.nombre,
+                    'reservas': servicio_popular.num_reservas
+                }
             
             return JsonResponse({
                 'success': True,
                 'rol': 'proveedor',
                 'total_reservas': total_reservas,
-                'ingresos_totales': float(ingresos)
+                'ingresos_totales': float(ingresos),
+                'pendientes': pendientes,
+                'servicio_mas_reservado': servicio_top
             })
         
         else:
             return JsonResponse({
                 'success': False,
-                'error': 'Rol no soportado'
+                'error': 'Rol no soportado para estadísticas'
             }, status=400)
             
     except Exception as e:
+        import traceback
+        print(f"Error en mis_estadisticas_ajax: {str(e)}")
+        print(traceback.format_exc())
         return JsonResponse({
             'success': False,
             'error': str(e)

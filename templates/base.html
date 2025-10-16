@@ -16,38 +16,57 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
     
     <style>
-        /* Paleta de colores profesional - Azul Corporativo */
+        /* Paleta de colores ecuatorianos profesionales */
         :root {
-            --primary: #0284c7;      /* Sky blue 600 */
-            --primary-dark: #0369a1; /* Sky blue 700 */
-            --primary-light: #38bdf8; /* Sky blue 400 */
-            --secondary: #0891b2;     /* Cyan 600 */
-            --accent: #0ea5e9;        /* Sky blue 500 */
-            --dark: #0c4a6e;          /* Sky blue 900 */
-            --light: #e0f2fe;         /* Sky blue 100 */
+            --ecuador-yellow: #FFD700;
+            --ecuador-blue: #0033A0;
+            --ecuador-red: #CE1126;
+            --primary: #0052A3;          /* Azul Ecuador más suave */
+            --primary-dark: #003875;     /* Azul oscuro */
+            --primary-light: #4A90E2;    /* Azul claro */
+            --accent-yellow: #F4C430;    /* Amarillo suave */
+            --accent-red: #D64545;       /* Rojo suave */
+            --dark: #1a2332;
+            --light: #f0f4f8;
         }
         
-        /* Gradientes profesionales */
+        /* Gradientes profesionales con colores ecuatorianos */
         .gradient-bg {
-            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
+        }
+        
+        .gradient-ecuador {
+            background: linear-gradient(135deg, #0052A3 0%, #003875 50%, #F4C430 100%);
         }
         
         .gradient-text {
-            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
             transition: all 0.3s ease;
         }
         
         .btn-primary:hover {
-            background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+            background: linear-gradient(135deg, #003875 0%, #0052A3 100%);
             transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(2, 132, 199, 0.3);
+            box-shadow: 0 8px 16px rgba(0, 82, 163, 0.3);
+        }
+        
+        .btn-ecuador {
+            background: linear-gradient(135deg, #F4C430 0%, #FFD700 100%);
+            color: #003875;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-ecuador:hover {
+            background: linear-gradient(135deg, #FFD700 0%, #F4C430 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(244, 196, 48, 0.4);
         }
         
         /* Card effects */
@@ -57,7 +76,7 @@
         
         .card-hover:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 12px 24px rgba(0, 82, 163, 0.15);
         }
         
         /* Animaciones sutiles */
@@ -85,6 +104,21 @@
             animation: fadeIn 0.4s ease-out;
         }
         
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .slide-in-right {
+            animation: slideInRight 0.3s ease-out;
+        }
+        
         /* Backdrop blur */
         .backdrop-blur-custom {
             backdrop-filter: blur(12px);
@@ -101,12 +135,12 @@
         }
         
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
             border-radius: 5px;
         }
         
         ::-webkit-scrollbar-thumb:hover {
-            background: #0369a1;
+            background: #003875;
         }
         
         /* Message styles profesionales */
@@ -123,7 +157,7 @@
         }
         
         .message-info {
-            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
         }
         
         /* Mobile menu animation */
@@ -142,9 +176,9 @@
         
         /* Loading spinner */
         .spinner {
-            border: 3px solid rgba(2, 132, 199, 0.2);
+            border: 3px solid rgba(0, 82, 163, 0.2);
             border-radius: 50%;
-            border-top-color: #0284c7;
+            border-top-color: #0052A3;
             width: 24px;
             height: 24px;
             animation: spin 1s linear infinite;
@@ -163,6 +197,176 @@
         .pulse {
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
+
+        /* Chatbot Styles */
+        .chatbot-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+        }
+
+        .chatbot-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+
+        .chatbot-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .chatbot-button i {
+            color: #0052A3;
+            font-size: 28px;
+        }
+
+        .chatbot-button img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .chatbot-window {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 380px;
+            height: 550px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-window.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: all;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8fafc;
+        }
+
+        .chatbot-input-area {
+            padding: 16px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .chat-message {
+            margin-bottom: 16px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .chat-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .chat-message.bot .chat-avatar {
+            background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
+            color: white;
+        }
+
+        .chat-message.user .chat-avatar {
+            background: linear-gradient(135deg, #F4C430 0%, #FFD700 100%);
+            color: #003875;
+        }
+
+        .chat-bubble {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .chat-message.bot .chat-bubble {
+            background: white;
+            color: #1e293b;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-message.user .chat-bubble {
+            background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        @media (max-width: 640px) {
+            .chatbot-window {
+                width: calc(100vw - 32px);
+                height: calc(100vh - 120px);
+                bottom: 80px;
+                right: 16px;
+            }
+
+            .chatbot-container {
+                bottom: 16px;
+                right: 16px;
+            }
+        }
+
+        /* Badge de notificación del chatbot */
+        .chatbot-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #D64545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            border: 2px solid white;
+        }
     </style>
     
     {% block extra_css %}{% endblock %}
@@ -180,43 +384,29 @@
                     </div>
                     <div>
                         <h1 class="text-xl font-bold text-gray-900">Ecuador Turismo</h1>
-                        <p class="text-xs text-gray-500">Plataforma Oficial de Turismo</p>
+                        <p class="text-xs text-gray-500">Descubre lo Extraordinario</p>
                     </div>
                 </a>
                 
                 <!-- Desktop Navigation -->
                 <nav class="hidden md:flex items-center space-x-1">
-                    <a href="{% url 'home' %}" class="text-gray-700 hover:text-sky-600 hover:bg-sky-50 transition font-medium px-4 py-2 rounded-lg">
+                    <a href="{% url 'home' %}" class="text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition font-medium px-4 py-2 rounded-lg">
                         <i class="fas fa-home mr-2"></i>Inicio
                     </a>
-                    <a href="{% url 'destinos:lista_destinos' %}" class="text-gray-700 hover:text-sky-600 hover:bg-sky-50 transition font-medium px-4 py-2 rounded-lg">
+                    <a href="{% url 'destinos:lista_destinos' %}" class="text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition font-medium px-4 py-2 rounded-lg">
                         <i class="fas fa-map-marked-alt mr-2"></i>Destinos
                     </a>
-                    <a href="{% url 'servicios:listar_servicios' %}" class="text-gray-700 hover:text-sky-600 hover:bg-sky-50 transition font-medium px-4 py-2 rounded-lg">
+                    <a href="{% url 'servicios:listar_servicios' %}" class="text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition font-medium px-4 py-2 rounded-lg">
                         <i class="fas fa-concierge-bell mr-2"></i>Servicios
                     </a>
-                    <a href="{% url 'destinos:mapa_destinos' %}" class="text-gray-700 hover:text-sky-600 hover:bg-sky-50 transition font-medium px-4 py-2 rounded-lg">
-                        <i class="fas fa-map-marked-alt mr-2"></i> Mapa de Destinos
+                    <a href="{% url 'destinos:mapa_destinos' %}" class="text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition font-medium px-4 py-2 rounded-lg">
+                        <i class="fas fa-route mr-2"></i>Rutas
                     </a>
                     
                     {% if user.is_authenticated %}
-                        <!-- Menú según rol -->
-                        {% if user.rol.nombre == 'turista' %}
-                            <a href="{% url 'reservas:mis_reservas' %}" class="text-gray-700 hover:text-sky-600 hover:bg-sky-50 transition font-medium px-4 py-2 rounded-lg">
-                                <i class="fas fa-calendar-check mr-2"></i>Mis Reservas
-                            </a>
-                        {% elif user.rol.nombre == 'proveedor' %}
-                            <a href="{% url 'reservas:reservas_proveedor' %}" class="text-gray-700 hover:text-sky-600 hover:bg-sky-50 transition font-medium px-4 py-2 rounded-lg">
-                                <i class="fas fa-calendar-alt mr-2"></i>Mis Reservas
-                            </a>
-                            <a href="{% url 'servicios:mis_servicios' %}" class="text-gray-700 hover:text-sky-600 hover:bg-sky-50 transition font-medium px-4 py-2 rounded-lg">
-                                <i class="fas fa-briefcase mr-2"></i>Mis Servicios
-                            </a>
-                        {% endif %}
-                        
                         <!-- Carrito (solo para turistas) -->
                         {% if user.rol.nombre == 'turista' %}
-                            <a href="{% url 'reservas:ver_carrito' %}" class="relative p-2 hover:bg-gray-100 rounded-lg transition ml-2" title="Carrito de compras">
+                            <a href="{% url 'reservas:ver_carrito' %}" class="relative p-2 hover:bg-blue-50 rounded-lg transition ml-2" title="Carrito de compras">
                                 <i class="fas fa-shopping-cart text-gray-700 text-lg"></i>
                                 <span id="carritoCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold pulse">
                                     0
@@ -245,7 +435,7 @@
                                     <p class="text-sm font-semibold text-gray-900">{{ user.nombre }}</p>
                                     <p class="text-xs text-gray-500 mt-1">{{ user.correo }}</p>
                                     {% if user.rol %}
-                                        <span class="inline-block mt-2 px-3 py-1 text-xs font-semibold rounded-full bg-sky-100 text-sky-700">
+                                        <span class="inline-block mt-2 px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700">
                                             {% if user.rol.nombre == 'turista' %}
                                                 <i class="fas fa-user mr-1"></i>Turista
                                             {% elif user.rol.nombre == 'proveedor' %}
@@ -258,38 +448,36 @@
                                 </div>
                                 
                                 <a href="{% url 'usuarios:perfil' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                    <i class="fas fa-user-circle mr-3 text-sky-600 w-4"></i>
+                                    <i class="fas fa-user-circle mr-3 text-blue-600 w-4"></i>
                                     Mi Perfil
                                 </a>
                                 
-                                {% if user.rol.nombre == 'administrador' %}
+                                {% if user.rol.nombre == 'turista' %}
+                                    <a href="{% url 'reservas:mis_reservas' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                        <i class="fas fa-calendar-check mr-3 text-blue-600 w-4"></i>
+                                        Mis Reservas
+                                    </a>
+                                    <a href="{% url 'reservas:ver_carrito' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                        <i class="fas fa-shopping-cart mr-3 text-blue-600 w-4"></i>
+                                        Mi Carrito
+                                    </a>
+                                {% elif user.rol.nombre == 'proveedor' %}
+                                    <a href="{% url 'reservas:reservas_proveedor' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                        <i class="fas fa-calendar-alt mr-3 text-blue-600 w-4"></i>
+                                        Gestionar Reservas
+                                    </a>
+                                    <a href="{% url 'servicios:mis_servicios' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                        <i class="fas fa-briefcase mr-3 text-blue-600 w-4"></i>
+                                        Mis Servicios
+                                    </a>
+                                {% elif user.rol.nombre == 'administrador' %}
                                     <a href="{% url 'usuarios:listar_usuarios' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                        <i class="fas fa-users-cog mr-3 text-sky-600 w-4"></i>
+                                        <i class="fas fa-users-cog mr-3 text-blue-600 w-4"></i>
                                         Gestión de Usuarios
                                     </a>
                                     <a href="/admin/" target="_blank" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
                                         <i class="fas fa-cog mr-3 text-gray-600 w-4"></i>
                                         Panel Django
-                                    </a>
-                                {% endif %}
-                                
-                                {% if user.rol.nombre == 'turista' %}
-                                    <a href="{% url 'reservas:mis_reservas' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                        <i class="fas fa-calendar-check mr-3 text-sky-600 w-4"></i>
-                                        Mis Reservas
-                                    </a>
-                                    <a href="{% url 'reservas:ver_carrito' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                        <i class="fas fa-shopping-cart mr-3 text-sky-600 w-4"></i>
-                                        Mi Carrito
-                                    </a>
-                                {% elif user.rol.nombre == 'proveedor' %}
-                                    <a href="{% url 'reservas:reservas_proveedor' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                        <i class="fas fa-calendar-alt mr-3 text-sky-600 w-4"></i>
-                                        Gestionar Reservas
-                                    </a>
-                                    <a href="{% url 'servicios:mis_servicios' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                        <i class="fas fa-briefcase mr-3 text-sky-600 w-4"></i>
-                                        Mis Servicios
                                     </a>
                                 {% endif %}
                                 
@@ -303,7 +491,7 @@
                         </div>
                     {% else %}
                         <!-- Usuario no autenticado -->
-                        <a href="{% url 'usuarios:login' %}" class="ml-4 px-4 py-2 text-sky-600 border border-sky-600 rounded-lg hover:bg-sky-50 transition font-medium">
+                        <a href="{% url 'usuarios:login' %}" class="ml-4 px-4 py-2 text-blue-700 border border-blue-700 rounded-lg hover:bg-blue-50 transition font-medium">
                             Iniciar Sesión
                         </a>
                         <a href="{% url 'usuarios:register' %}" class="px-4 py-2 btn-primary text-white rounded-lg font-medium shadow-sm">
@@ -331,6 +519,9 @@
                 <a href="{% url 'servicios:listar_servicios' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
                     <i class="fas fa-concierge-bell mr-2"></i>Servicios
                 </a>
+                <a href="{% url 'destinos:mapa_destinos' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+                    <i class="fas fa-route mr-2"></i>Rutas
+                </a>
                 
                 {% if user.is_authenticated %}
                     {% if user.rol.nombre == 'turista' %}
@@ -341,11 +532,15 @@
                             <i class="fas fa-calendar-check mr-2"></i>Mis Reservas
                         </a>
                     {% elif user.rol.nombre == 'proveedor' %}
+                        <a href="{% url 'reservas:reservas_proveedor' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+                            <i class="fas fa-calendar-alt mr-2"></i>Gestionar Reservas
+                        </a>
                         <a href="{% url 'servicios:mis_servicios' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
                             <i class="fas fa-briefcase mr-2"></i>Mis Servicios
                         </a>
-                        <a href="{% url 'reservas:reservas_proveedor' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
-                            <i class="fas fa-calendar-alt mr-2"></i>Mis Reservas
+                    {% elif user.rol.nombre == 'administrador' %}
+                        <a href="{% url 'usuarios:listar_usuarios' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+                            <i class="fas fa-users-cog mr-2"></i>Gestión de Usuarios
                         </a>
                     {% endif %}
                     
@@ -353,17 +548,11 @@
                         <i class="fas fa-user-circle mr-2"></i>Mi Perfil
                     </a>
                     
-                    {% if user.rol.nombre == 'administrador' %}
-                        <a href="{% url 'usuarios:listar_usuarios' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
-                            <i class="fas fa-users-cog mr-2"></i>Gestión de Usuarios
-                        </a>
-                    {% endif %}
-                    
                     <a href="{% url 'usuarios:logout' %}" class="block py-2 text-red-600 hover:bg-red-50 rounded-lg px-3 transition">
                         <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
                     </a>
                 {% else %}
-                    <a href="{% url 'usuarios:login' %}" class="block py-2 text-sky-600 hover:bg-sky-50 rounded-lg px-3 transition font-medium">
+                    <a href="{% url 'usuarios:login' %}" class="block py-2 text-blue-700 hover:bg-blue-50 rounded-lg px-3 transition font-medium">
                         Iniciar Sesión
                     </a>
                     <a href="{% url 'usuarios:register' %}" class="block py-2 gradient-bg text-white rounded-lg px-3 font-medium">
@@ -406,6 +595,64 @@
         {% block content %}{% endblock %}
     </main>
     
+    <!-- Chatbot Flotante -->
+    <div class="chatbot-container">
+        <!-- Botón del Chatbot -->
+        <div class="chatbot-button" onclick="toggleChatbot()" id="chatbotButton" title="Asistente Virtual">
+            <img src="/media/bot.png" alt="Chatbot" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <i class="fas fa-robot" style="display: none;"></i>
+            <!-- Badge de notificación (opcional) -->
+            <span class="chatbot-badge" id="chatbotBadge" style="display: none;">1</span>
+        </div>
+
+        <!-- Ventana del Chatbot -->
+        <div class="chatbot-window" id="chatbotWindow">
+            <!-- Header -->
+            <div class="chatbot-header">
+                <div class="flex items-center space-x-3">
+                    <img src="/media/bot.png" alt="Bot Avatar" class="w-10 h-10 rounded-full border-2 border-white object-cover" onerror="this.src='https://ui-avatars.com/api/?name=Bot&background=0052A3&color=fff&bold=true'">
+                    <div>
+                        <h3 class="font-semibold text-white">Asistente Virtual</h3>
+                        <p class="text-xs text-blue-200">Ecuador Turismo</p>
+                    </div>
+                </div>
+                <button onclick="toggleChatbot()" class="text-white hover:text-gray-200 transition">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Mensajes -->
+            <div class="chatbot-messages" id="chatbotMessages">
+                <div class="chat-message bot slide-in-right">
+                    <div class="chat-avatar">
+                        <img src="/media/bot.png" alt="Bot" class="w-full h-full rounded-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-robot\'></i>'">
+                    </div>
+                    <div class="chat-bubble">
+                        ¡Hola! 👋 Soy tu asistente virtual de Ecuador Turismo. ¿En qué puedo ayudarte hoy?
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="chatbot-input-area">
+                <div class="flex space-x-2">
+                    <input 
+                        type="text" 
+                        id="chatbotInput" 
+                        placeholder="Escribe tu mensaje..." 
+                        class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        onkeypress="handleChatKeyPress(event)"
+                    >
+                    <button 
+                        onclick="sendChatMessage()" 
+                        class="btn-primary text-white px-4 py-2 rounded-lg hover:opacity-90 transition">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Footer -->
     <footer class="bg-gray-900 text-white mt-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -427,10 +674,11 @@
                 <div>
                     <h4 class="font-semibold mb-4 text-white">Enlaces Rápidos</h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="{% url 'destinos:lista_destinos' %}" class="text-gray-400 hover:text-sky-400 transition">Destinos</a></li>
-                        <li><a href="{% url 'servicios:listar_servicios' %}" class="text-gray-400 hover:text-sky-400 transition">Servicios</a></li>
+                        <li><a href="{% url 'destinos:lista_destinos' %}" class="text-gray-400 hover:text-yellow-400 transition">Destinos</a></li>
+                        <li><a href="{% url 'servicios:listar_servicios' %}" class="text-gray-400 hover:text-yellow-400 transition">Servicios</a></li>
+                        <li><a href="{% url 'destinos:mapa_destinos' %}" class="text-gray-400 hover:text-yellow-400 transition">Rutas</a></li>
                         {% if user.is_authenticated and user.rol.nombre == 'turista' %}
-                            <li><a href="{% url 'reservas:mis_reservas' %}" class="text-gray-400 hover:text-sky-400 transition">Mis Reservas</a></li>
+                            <li><a href="{% url 'reservas:mis_reservas' %}" class="text-gray-400 hover:text-yellow-400 transition">Mis Reservas</a></li>
                         {% endif %}
                     </ul>
                 </div>
@@ -439,10 +687,10 @@
                 <div>
                     <h4 class="font-semibold mb-4 text-white">Regiones</h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="{% url 'servicios:listar_servicios' %}?region=costa" class="text-gray-400 hover:text-sky-400 transition">Costa</a></li>
-                        <li><a href="{% url 'servicios:listar_servicios' %}?region=sierra" class="text-gray-400 hover:text-sky-400 transition">Sierra</a></li>
-                        <li><a href="{% url 'servicios:listar_servicios' %}?region=oriente" class="text-gray-400 hover:text-sky-400 transition">Oriente</a></li>
-                        <li><a href="{% url 'servicios:listar_servicios' %}?region=galapagos" class="text-gray-400 hover:text-sky-400 transition">Galápagos</a></li>
+                        <li><a href="{% url 'servicios:listar_servicios' %}?region=costa" class="text-gray-400 hover:text-yellow-400 transition">Costa</a></li>
+                        <li><a href="{% url 'servicios:listar_servicios' %}?region=sierra" class="text-gray-400 hover:text-yellow-400 transition">Sierra</a></li>
+                        <li><a href="{% url 'servicios:listar_servicios' %}?region=oriente" class="text-gray-400 hover:text-yellow-400 transition">Oriente</a></li>
+                        <li><a href="{% url 'servicios:listar_servicios' %}?region=galapagos" class="text-gray-400 hover:text-yellow-400 transition">Galápagos</a></li>
                     </ul>
                 </div>
                 
@@ -451,21 +699,21 @@
                     <h4 class="font-semibold mb-4 text-white">Contacto</h4>
                     <ul class="space-y-3 text-sm text-gray-400">
                         <li class="flex items-center">
-                            <i class="fas fa-envelope mr-2 text-sky-400"></i>
+                            <i class="fas fa-envelope mr-2 text-yellow-400"></i>
                             info@ecuadorturismo.ec
                         </li>
                         <li class="flex items-center">
-                            <i class="fas fa-phone mr-2 text-sky-400"></i>
+                            <i class="fas fa-phone mr-2 text-yellow-400"></i>
                             +593 2 123 4567
                         </li>
                         <li class="flex space-x-3 pt-2">
-                            <a href="#" class="w-9 h-9 bg-sky-600 rounded-lg flex items-center justify-center hover:bg-sky-700 transition">
+                            <a href="#" class="w-9 h-9 bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center transition">
                                 <i class="fab fa-facebook-f"></i>
                             </a>
-                            <a href="#" class="w-9 h-9 bg-sky-600 rounded-lg flex items-center justify-center hover:bg-sky-700 transition">
+                            <a href="#" class="w-9 h-9 bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center transition">
                                 <i class="fab fa-instagram"></i>
                             </a>
-                            <a href="#" class="w-9 h-9 bg-sky-600 rounded-lg flex items-center justify-center hover:bg-sky-700 transition">
+                            <a href="#" class="w-9 h-9 bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center transition">
                                 <i class="fab fa-twitter"></i>
                             </a>
                         </li>
@@ -480,11 +728,15 @@
         </div>
     </footer>
     
-    <!-- Alpine.js para dropdowns -->
+ <!-- Alpine.js para dropdowns -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
     <!-- Scripts -->
     <script>
+        // ====================================
+        // INICIALIZACIÓN Y CONFIGURACIÓN
+        // ====================================
+        
         // Initialize AOS
         AOS.init({
             duration: 600,
@@ -512,6 +764,12 @@
             
             // Actualizar contador del carrito al cargar la página
             actualizarContadorCarrito();
+            
+            // Cargar historial del chatbot
+            cargarHistorialChat();
+            
+            // Configurar limpieza al cerrar sesión
+            configurarLimpiezaAlCerrarSesion();
         });
         
         // Smooth scroll
@@ -563,6 +821,295 @@
         {% if user.is_authenticated and user.rol.nombre == 'turista' %}
             setInterval(actualizarContadorCarrito, 30000);
         {% endif %}
+
+        // ====================================
+        // CHATBOT CON GPT-4 Y GESTIÓN DE HISTORIAL
+        // ====================================
+        
+        const CHAT_HISTORY_KEY = 'ecuadorTurismoChatHistory';
+        let isProcessing = false;
+        
+        // Cargar historial al iniciar
+        function cargarHistorialChat() {
+            const historial = obtenerHistorialChat();
+            const messagesContainer = document.getElementById('chatbotMessages');
+            
+            messagesContainer.innerHTML = '';
+            
+            if (historial.length === 0) {
+                // Mensaje de bienvenida por defecto
+                addChatMessage(
+                    '¡Hola! 👋 Soy Guía Ecuador, tu asistente virtual. Puedo ayudarte a:\n\n' +
+                    '🔍 Buscar servicios turísticos\n' +
+                    '📊 Comparar opciones\n' +
+                    '💰 Encontrar las mejores ofertas\n' +
+                    '🗺️ Recomendar destinos\n\n' +
+                    '¿Qué te gustaría explorar hoy?',
+                    'bot',
+                    false
+                );
+            } else {
+                // Renderizar historial guardado
+                historial.forEach(msg => {
+                    addChatMessage(msg.content, msg.role === 'user' ? 'user' : 'bot', false);
+                });
+            }
+        }
+        
+        function obtenerHistorialChat() {
+            const historialStr = sessionStorage.getItem(CHAT_HISTORY_KEY);
+            return historialStr ? JSON.parse(historialStr) : [];
+        }
+        
+        function guardarMensajeHistorial(content, role) {
+            const historial = obtenerHistorialChat();
+            historial.push({ 
+                content, 
+                role, 
+                timestamp: Date.now() 
+            });
+            
+            // Limitar a últimos 30 mensajes
+            if (historial.length > 30) {
+                historial.splice(0, historial.length - 30);
+            }
+            
+            sessionStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(historial));
+        }
+        
+        function toggleChatbot() {
+            const chatbotWindow = document.getElementById('chatbotWindow');
+            const chatbotBadge = document.getElementById('chatbotBadge');
+            
+            chatbotWindow.classList.toggle('active');
+            
+            if (chatbotWindow.classList.contains('active')) {
+                chatbotBadge.style.display = 'none';
+                document.getElementById('chatbotInput').focus();
+            }
+        }
+        
+        async function sendChatMessage() {
+            if (isProcessing) return;
+            
+            const input = document.getElementById('chatbotInput');
+            const message = input.value.trim();
+            
+            if (message === '') return;
+            
+            // Prevenir múltiples envíos
+            isProcessing = true;
+            input.disabled = true;
+            
+            // Agregar mensaje del usuario
+            addChatMessage(message, 'user', true);
+            guardarMensajeHistorial(message, 'user');
+            
+            // Limpiar input
+            input.value = '';
+            
+            // Mostrar indicador de escritura
+            const typingId = mostrarIndicadorEscritura();
+            
+            try {
+                const historial = obtenerHistorialChat();
+                
+                const response = await fetch('/chatbot/message/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        history: historial
+                    })
+                });
+                
+                removerIndicadorEscritura(typingId);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    addChatMessage(data.response, 'bot', true);
+                    guardarMensajeHistorial(data.response, 'assistant');
+                } else {
+                    addChatMessage(
+                        '😔 Lo siento, ocurrió un error. Por favor intenta de nuevo.',
+                        'bot',
+                        true
+                    );
+                }
+                
+            } catch (error) {
+                removerIndicadorEscritura(typingId);
+                console.error('Error en chatbot:', error);
+                addChatMessage(
+                    '❌ No pude conectarme al servidor. Verifica tu conexión e intenta nuevamente.',
+                    'bot',
+                    true
+                );
+            } finally {
+                isProcessing = false;
+                input.disabled = false;
+                input.focus();
+            }
+        }
+        
+        function addChatMessage(text, sender, animate = true) {
+            const messagesContainer = document.getElementById('chatbotMessages');
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender}${animate ? ' slide-in-right' : ''}`;
+            
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'chat-avatar';
+            
+            if (sender === 'bot') {
+                const botImg = document.createElement('img');
+                botImg.src = '/media/bot.png';
+                botImg.alt = 'Bot';
+                botImg.className = 'w-full h-full rounded-full object-cover';
+                botImg.onerror = function() {
+                    this.style.display = 'none';
+                    this.parentElement.innerHTML = '<i class="fas fa-robot"></i>';
+                };
+                avatarDiv.appendChild(botImg);
+            } else {
+                const userInitial = '{{ user.nombre|slice:":1"|upper }}'.toUpperCase() || 'U';
+                avatarDiv.textContent = userInitial;
+            }
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'chat-bubble';
+            
+            // Convertir markdown y preservar saltos de línea
+            const htmlText = convertirMarkdownAHTML(text);
+            bubbleDiv.innerHTML = htmlText;
+            
+            messageDiv.appendChild(avatarDiv);
+            messageDiv.appendChild(bubbleDiv);
+            
+            messagesContainer.appendChild(messageDiv);
+            
+            // Scroll suave al último mensaje
+            messagesContainer.scrollTo({
+                top: messagesContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+        
+        function convertirMarkdownAHTML(text) {
+            // Convertir saltos de línea a <br>
+            let html = text.replace(/\n/g, '<br>');
+            
+            // Convertir enlaces [texto](url) a <a>
+            html = html.replace(
+                /\[([^\]]+)\]\(([^)]+)\)/g,
+                '<a href="$2" class="text-blue-600 hover:underline font-medium" target="_blank">$1 <i class="fas fa-external-link-alt text-xs"></i></a>'
+            );
+            
+            // Convertir **negrita** a <strong>
+            html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            
+            // Convertir emojis de estrella a HTML
+            html = html.replace(/⭐/g, '<span class="text-yellow-400">⭐</span>');
+            
+            return html;
+        }
+        
+        function mostrarIndicadorEscritura() {
+            const messagesContainer = document.getElementById('chatbotMessages');
+            
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'chat-message bot slide-in-right';
+            typingDiv.id = 'typing-indicator-' + Date.now();
+            
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'chat-avatar';
+            avatarDiv.innerHTML = '<i class="fas fa-robot"></i>';
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'chat-bubble';
+            bubbleDiv.innerHTML = `
+                <div class="flex space-x-1">
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                </div>
+            `;
+            
+            typingDiv.appendChild(avatarDiv);
+            typingDiv.appendChild(bubbleDiv);
+            
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            return typingDiv.id;
+        }
+        
+        function removerIndicadorEscritura(id) {
+            const indicator = document.getElementById(id);
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+        
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendChatMessage();
+            }
+        }
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        function configurarLimpiezaAlCerrarSesion() {
+            {% if user.is_authenticated %}
+            const logoutLinks = document.querySelectorAll('a[href="{% url "usuarios:logout" %}"]');
+            logoutLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Limpiar historial
+                    sessionStorage.removeItem(CHAT_HISTORY_KEY);
+                    
+                    // Notificar al backend (opcional)
+                    fetch('/chatbot/limpiar/', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        }
+                    }).catch(err => console.log('Error limpiando:', err));
+                });
+            });
+            {% endif %}
+        }
+        
+        // Badge de notificación después de 15 segundos
+        setTimeout(() => {
+            const chatbotWindow = document.getElementById('chatbotWindow');
+            const chatbotBadge = document.getElementById('chatbotBadge');
+            
+            if (!chatbotWindow.classList.contains('active')) {
+                chatbotBadge.style.display = 'flex';
+            }
+        }, 15000);
     </script>
     
     {% block extra_js %}{% endblock %}

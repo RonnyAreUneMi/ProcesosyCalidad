@@ -647,48 +647,81 @@ def servicios_por_tipo(request, tipo):
 @require_http_methods(["GET"])
 def buscar_servicios_ajax(request):
     """
-    Vista AJAX para búsqueda en tiempo real de servicios
+    Vista AJAX para búsqueda de servicios
+    VERSIÓN CORREGIDA: Maneja parámetros opcionales correctamente
     Usado por el chatbot (RF-007) y búsqueda predictiva
     """
-    query = request.GET.get('q', '')
-    tipo = request.GET.get('tipo')
-    destino_id = request.GET.get('destino')
-    precio_max = request.GET.get('precio_max')
+    # Obtener parámetros (todos opcionales)
+    query = request.GET.get('q', '').strip()
+    tipo = request.GET.get('tipo', '').strip()
+    region = request.GET.get('region', '').strip()
+    destino_id = request.GET.get('destino', '').strip()
+    precio_max = request.GET.get('precio_max', '').strip()
     
-    if len(query) < 2:
-        return JsonResponse({'servicios': []})
-    
+    # Query base
     servicios = Servicio.objects.filter(
-        Q(nombre__icontains=query) | Q(descripcion__icontains=query),
         activo=True,
         disponible=True
-    )
+    ).select_related('destino', 'categoria', 'proveedor')
+    
+    # Aplicar filtros solo si tienen valor
+    if query:
+        servicios = servicios.filter(
+            Q(nombre__icontains=query) | 
+            Q(descripcion__icontains=query) |
+            Q(destino__nombre__icontains=query)
+        )
     
     if tipo:
         servicios = servicios.filter(tipo=tipo)
     
+    if region:
+        servicios = servicios.filter(destino__region=region)
+    
     if destino_id:
-        servicios = servicios.filter(destino_id=destino_id)
+        try:
+            servicios = servicios.filter(destino_id=int(destino_id))
+        except (ValueError, TypeError):
+            pass
     
     if precio_max:
         try:
             servicios = servicios.filter(precio__lte=float(precio_max))
-        except ValueError:
+        except (ValueError, TypeError):
             pass
     
-    servicios = servicios[:10]
+    # Ordenar por calificación y limitar
+    servicios = servicios.order_by('-calificacion_promedio', '-total_calificaciones')[:15]
     
+    # Construir respuesta
     resultados = [{
         'id': s.id,
         'nombre': s.nombre,
         'tipo': s.get_tipo_display(),
+        'tipo_code': s.tipo,
         'precio': float(s.precio),
         'destino': s.destino.nombre,
+        'region': s.destino.get_region_display(),
         'calificacion': float(s.calificacion_promedio),
-        'url': f'/servicios/{s.id}/'
+        'total_calificaciones': s.total_calificaciones,
+        'capacidad': s.capacidad_maxima,
+        'descripcion_corta': s.descripcion[:150] + '...' if len(s.descripcion) > 150 else s.descripcion,
+        'url': f'/servicios/{s.id}/',
+        'imagen': s.get_imagen_principal() if hasattr(s, 'get_imagen_principal') else None
     } for s in servicios]
     
-    return JsonResponse({'servicios': resultados})
+    return JsonResponse({
+        'success': True,
+        'servicios': resultados,
+        'total_encontrados': len(resultados),
+        'filtros_aplicados': {
+            'query': query or None,
+            'tipo': tipo or None,
+            'region': region or None,
+            'destino_id': destino_id or None,
+            'precio_max': precio_max or None
+        }
+    })
 
 
 @require_http_methods(["GET"])
