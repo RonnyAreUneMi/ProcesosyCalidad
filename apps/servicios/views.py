@@ -9,6 +9,7 @@ from django.db import transaction
 from .models import Servicio, ImagenServicio
 from apps.destinos.models import Destino, Categoria
 from apps.usuarios.models import Usuario
+from datetime import date, timedelta
 
 
 def rol_requerido(roles_permitidos):
@@ -207,7 +208,8 @@ def listar_servicios(request):
 def detalle_servicio(request, servicio_id):
     """
     Vista para mostrar el detalle de un servicio
-    Relacionado con RF-003: Sistema de Reservas
+    Relacionado con RF-003: Sistema de Reservas y RF-006: Calificaciones
+    VERSIÓN CORREGIDA con integración completa
     """
     servicio = get_object_or_404(
         Servicio.objects.select_related('destino', 'categoria', 'proveedor'),
@@ -220,8 +222,8 @@ def detalle_servicio(request, servicio_id):
     imagen_principal = imagenes.filter(es_principal=True).first()
     imagenes_secundarias = imagenes.filter(es_principal=False)
     
-    # Variables para calificaciones (por si el modelo no existe aún)
-    calificaciones = []
+    # Variables para calificaciones (valores por defecto)
+    calificaciones_lista = []
     stats_calificaciones = {
         '5': 0,
         '4': 0,
@@ -231,18 +233,19 @@ def detalle_servicio(request, servicio_id):
     }
     puede_calificar = False
     ya_califico = False
+    calificacion_usuario = None
     
     # Intentar obtener calificaciones solo si el modelo existe
     try:
         from apps.calificaciones.models import Calificacion
         
-        # IMPORTANTE: Primero obtener las estadísticas SIN slice
+        # CORRECCIÓN: Obtener el QuerySet completo primero
         calificaciones_queryset = Calificacion.objects.filter(
             servicio=servicio,
             activo=True
-        ).select_related('usuario')
+        ).select_related('usuario').prefetch_related('respuesta')
         
-        # Estadísticas de calificaciones (ANTES del slice)
+        # Calcular estadísticas ANTES del slice (sobre el QuerySet completo)
         stats_calificaciones = {
             '5': calificaciones_queryset.filter(puntuacion=5).count(),
             '4': calificaciones_queryset.filter(puntuacion=4).count(),
@@ -251,31 +254,36 @@ def detalle_servicio(request, servicio_id):
             '1': calificaciones_queryset.filter(puntuacion=1).count(),
         }
         
-        # Ahora sí aplicar el slice para mostrar solo 10
-        calificaciones = calificaciones_queryset.order_by('-fecha_creacion')[:10]
+        # AHORA sí aplicar slice para mostrar solo las últimas 10
+        calificaciones_lista = list(calificaciones_queryset.order_by('-fecha_creacion')[:10])
         
-        # Verificar si el usuario ya calificó este servicio
+        # Verificar permisos del usuario autenticado
         if request.user.is_authenticated:
-            # Verificar si tiene reservas completadas (si existe el modelo)
-            try:
-                from apps.reservas.models import Reserva
-                tiene_reserva_completada = Reserva.objects.filter(
-                    usuario=request.user,
-                    servicio=servicio,
-                    estado='completada'
-                ).exists()
-            except ImportError:
-                tiene_reserva_completada = False
-            
-            if tiene_reserva_completada:
-                # Verificar si ya calificó
-                ya_califico = Calificacion.objects.filter(
-                    usuario=request.user,
-                    servicio=servicio,
-                    activo=True
-                ).exists()
-                puede_calificar = not ya_califico
+            # Solo verificar si es turista
+            if hasattr(request.user, 'rol') and request.user.rol.nombre == 'turista':
+                # Verificar si tiene reservas completadas
+                try:
+                    from apps.reservas.models import Reserva
+                    tiene_reserva_completada = Reserva.objects.filter(
+                        usuario=request.user,
+                        servicio=servicio,
+                        estado='completada'
+                    ).exists()
+                except ImportError:
+                    # Si no existe el modelo de reservas, no permitir calificar
+                    tiene_reserva_completada = False
                 
+                if tiene_reserva_completada:
+                    # Verificar si ya calificó
+                    calificacion_usuario = Calificacion.objects.filter(
+                        usuario=request.user,
+                        servicio=servicio,
+                        activo=True
+                    ).first()
+                    
+                    ya_califico = calificacion_usuario is not None
+                    puede_calificar = not ya_califico
+                    
     except ImportError:
         # El modelo Calificacion aún no existe, usar valores por defecto
         pass
@@ -287,15 +295,37 @@ def detalle_servicio(request, servicio_id):
         disponible=True
     ).exclude(id=servicio.id).order_by('-calificacion_promedio')[:4]
     
+    # Verificar si el servicio está en el carrito (si existe el modelo)
+    en_carrito = False
+    cantidad_en_carrito = 0
+    if request.user.is_authenticated:
+        try:
+            from apps.reservas.models import ItemCarrito
+            item_carrito = ItemCarrito.objects.filter(
+                usuario=request.user,
+                servicio=servicio
+            ).first()
+            
+            if item_carrito:
+                en_carrito = True
+                cantidad_en_carrito = item_carrito.cantidad_personas
+        except ImportError:
+            pass
+    fecha_minima = (date.today() + timedelta(days=1)).isoformat()
     context = {
         'servicio': servicio,
         'imagen_principal': imagen_principal,
         'imagenes_secundarias': imagenes_secundarias,
-        'calificaciones': calificaciones,
+        'calificaciones': calificaciones_lista,
         'stats_calificaciones': stats_calificaciones,
+        'total_calificaciones': sum(stats_calificaciones.values()),
         'servicios_relacionados': servicios_relacionados,
         'puede_calificar': puede_calificar,
         'ya_califico': ya_califico,
+        'calificacion_usuario': calificacion_usuario,
+        'en_carrito': en_carrito,
+        'cantidad_en_carrito': cantidad_en_carrito,
+        'fecha_minima': fecha_minima,
     }
     
     return render(request, 'servicios/detalle.html', context)

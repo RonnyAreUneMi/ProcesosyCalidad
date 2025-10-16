@@ -1,6 +1,3 @@
-from django.shortcuts import render
-
-# Create your views here.
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -39,41 +36,104 @@ def rol_requerido(roles_permitidos):
     return decorator
 
 
+def solo_turistas(view_func):
+    """
+    Decorador específico para validar que solo turistas realicen ciertas acciones
+    """
+    from functools import wraps
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.warning(request, 'Debes iniciar sesión.')
+            return redirect('usuarios:login')
+        
+        if not hasattr(request.user, 'rol') or request.user.rol.nombre != 'turista':
+            messages.error(request, 'Solo los turistas pueden realizar esta acción.')
+            return redirect('home')
+        
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+def contiene_contenido_ofensivo(texto):
+    """
+    Valida si un texto contiene contenido ofensivo
+    Retorna (es_ofensivo: bool, palabras_detectadas: list)
+    """
+    if not texto:
+        return False, []
+    
+    palabras_ofensivas = [
+        'idiota', 'estupido', 'estúpido', 'imbecil', 'imbécil',
+        'basura', 'porqueria', 'porquería', 'mierda', 'pendejo',
+        'inutil', 'inútil', 'pésimo', 'fatal', 'desastre'
+    ]
+    
+    texto_limpio = texto.lower()
+    # Eliminar números y caracteres especiales que intentan evadir filtro
+    texto_limpio = ''.join(c if c.isalpha() or c.isspace() else ' ' for c in texto_limpio)
+    
+    palabras_detectadas = []
+    for palabra in palabras_ofensivas:
+        if palabra in texto_limpio:
+            palabras_detectadas.append(palabra)
+    
+    return len(palabras_detectadas) > 0, palabras_detectadas
+
+
+def usuario_puede_calificar_servicio(usuario, servicio):
+    """
+    Verifica si un usuario puede calificar un servicio
+    Retorna (puede: bool, razon: str)
+    """
+    # Verificar rol
+    if not hasattr(usuario, 'rol') or usuario.rol.nombre != 'turista':
+        return False, 'Solo los turistas pueden calificar servicios'
+    
+    # Verificar reserva completada
+    try:
+        from apps.reservas.models import Reserva
+        tiene_reserva = Reserva.objects.filter(
+            usuario=usuario,
+            servicio=servicio,
+            estado='completada'
+        ).exists()
+        
+        if not tiene_reserva:
+            return False, 'Solo puedes calificar servicios que hayas utilizado'
+    except ImportError:
+        # Si no existe el modelo, permitir temporalmente
+        pass
+    
+    # Verificar si ya calificó
+    ya_califico = Calificacion.objects.filter(
+        usuario=usuario,
+        servicio=servicio,
+        activo=True
+    ).exists()
+    
+    if ya_califico:
+        return False, 'Ya has calificado este servicio'
+    
+    return True, None
+
+
 @login_required
+@solo_turistas
 @require_http_methods(["POST"])
 def crear_calificacion(request, servicio_id):
     """
     RF-006: Crear una calificación para un servicio
-    Solo usuarios que hayan completado una reserva pueden calificar
+    Solo turistas que hayan completado una reserva pueden calificar
     """
     servicio = get_object_or_404(Servicio, id=servicio_id, activo=True)
     
-    # Verificar que el usuario tenga una reserva completada
-    try:
-        from apps.reservas.models import Reserva
-        tiene_reserva_completada = Reserva.objects.filter(
-            usuario=request.user,
-            servicio=servicio,
-            estado='completada'
-        ).exists()
-    except ImportError:
-        # Si el módulo de reservas no existe, permitir calificar temporalmente
-        tiene_reserva_completada = True
+    # Verificar permisos con función auxiliar
+    puede_calificar, razon = usuario_puede_calificar_servicio(request.user, servicio)
     
-    if not tiene_reserva_completada:
-        messages.error(request, 'Solo puedes calificar servicios que hayas utilizado.')
+    if not puede_calificar:
+        messages.error(request, razon)
         return redirect('servicios:detalle_servicio', servicio_id=servicio_id)
-    
-    # Verificar que no haya calificado previamente
-    calificacion_existente = Calificacion.objects.filter(
-        usuario=request.user,
-        servicio=servicio,
-        activo=True
-    ).first()
-    
-    if calificacion_existente:
-        messages.warning(request, 'Ya has calificado este servicio. Puedes editarla.')
-        return redirect('calificaciones:editar_calificacion', calificacion_id=calificacion_existente.id)
     
     try:
         # Obtener datos del formulario
@@ -90,15 +150,13 @@ def crear_calificacion(request, servicio_id):
             messages.error(request, 'La puntuación debe estar entre 1 y 5 estrellas.')
             return redirect('servicios:detalle_servicio', servicio_id=servicio_id)
         
-        # Validar comentario (opcional pero con límites)
+        # Validar longitud del comentario
         if comentario and len(comentario) > 1000:
             messages.error(request, 'El comentario no puede exceder 1000 caracteres.')
             return redirect('servicios:detalle_servicio', servicio_id=servicio_id)
         
-        # Detectar palabras ofensivas básicas (moderación simple)
-        palabras_ofensivas = ['idiota', 'estupido', 'basura', 'horrible']  # Expandir según necesidad
-        comentario_lower = comentario.lower()
-        es_ofensivo = any(palabra in comentario_lower for palabra in palabras_ofensivas)
+        # Moderación mejorada
+        es_ofensivo, palabras = contiene_contenido_ofensivo(comentario)
         
         # Crear la calificación
         with transaction.atomic():
@@ -107,11 +165,15 @@ def crear_calificacion(request, servicio_id):
                 servicio=servicio,
                 puntuacion=puntuacion,
                 comentario=comentario if comentario else None,
-                activo=not es_ofensivo,  # Desactivar si es ofensivo
+                activo=not es_ofensivo,
                 moderado=es_ofensivo
             )
             
-            # El método save() del modelo ya actualiza el promedio del servicio
+            # ✅ ACTUALIZAR CALIFICACIÓN DEL SERVICIO
+            servicio.actualizar_calificacion()
+            
+            # ✅ ACTUALIZAR CALIFICACIÓN DEL DESTINO
+            servicio.destino.actualizar_calificacion()
         
         if es_ofensivo:
             messages.warning(
@@ -132,6 +194,7 @@ def crear_calificacion(request, servicio_id):
 
 
 @login_required
+@solo_turistas
 def editar_calificacion(request, calificacion_id):
     """
     RF-006: Editar una calificación existente
@@ -157,12 +220,14 @@ def editar_calificacion(request, calificacion_id):
                 messages.error(request, 'El comentario no puede exceder 1000 caracteres.')
                 return redirect('calificaciones:editar_calificacion', calificacion_id=calificacion_id)
             
-            # Detectar contenido ofensivo
-            palabras_ofensivas = ['idiota', 'estupido', 'basura', 'horrible']
-            comentario_lower = comentario.lower()
-            es_ofensivo = any(palabra in comentario_lower for palabra in palabras_ofensivas)
+            # Moderación mejorada
+            es_ofensivo, palabras = contiene_contenido_ofensivo(comentario)
             
             with transaction.atomic():
+                # Guardar servicio y destino antes de actualizar
+                servicio = calificacion.servicio
+                destino = servicio.destino
+                
                 calificacion.puntuacion = puntuacion
                 calificacion.comentario = comentario if comentario else None
                 
@@ -171,6 +236,12 @@ def editar_calificacion(request, calificacion_id):
                     calificacion.moderado = True
                 
                 calificacion.save()
+                
+                # ✅ ACTUALIZAR CALIFICACIÓN DEL SERVICIO
+                servicio.actualizar_calificacion()
+                
+                # ✅ ACTUALIZAR CALIFICACIÓN DEL DESTINO
+                destino.actualizar_calificacion()
             
             if es_ofensivo:
                 messages.warning(request, 'Tu calificación está en revisión por contener contenido inapropiado.')
@@ -192,6 +263,7 @@ def editar_calificacion(request, calificacion_id):
 
 
 @login_required
+@solo_turistas
 @require_http_methods(["POST"])
 def eliminar_calificacion(request, calificacion_id):
     """
@@ -207,11 +279,19 @@ def eliminar_calificacion(request, calificacion_id):
     
     try:
         with transaction.atomic():
+            # Guardar referencias antes de desactivar
+            servicio = calificacion.servicio
+            destino = servicio.destino
+            
             # Desactivar en lugar de eliminar (soft delete)
             calificacion.activo = False
             calificacion.save()
             
-            # El método save() ya actualiza el promedio del servicio
+            # ✅ ACTUALIZAR CALIFICACIÓN DEL SERVICIO
+            servicio.actualizar_calificacion()
+            
+            # ✅ ACTUALIZAR CALIFICACIÓN DEL DESTINO
+            destino.actualizar_calificacion()
         
         messages.success(request, 'Calificación eliminada exitosamente.')
     except Exception as e:
@@ -221,9 +301,10 @@ def eliminar_calificacion(request, calificacion_id):
 
 
 @login_required
+@solo_turistas
 def mis_calificaciones(request):
     """
-    Vista para que el usuario vea todas sus calificaciones
+    Vista para que el turista vea todas sus calificaciones
     """
     calificaciones = Calificacion.objects.filter(
         usuario=request.user
@@ -275,7 +356,7 @@ def calificaciones_proveedor(request):
     calificaciones = Calificacion.objects.filter(
         servicio_id__in=servicios_ids,
         activo=True
-    ).select_related('usuario', 'servicio').order_by('-fecha_creacion')
+    ).select_related('usuario', 'servicio').prefetch_related('respuesta').order_by('-fecha_creacion')
     
     # Estadísticas
     total_calificaciones = calificaciones.count()
@@ -298,12 +379,16 @@ def calificaciones_proveedor(request):
     # Filtros
     servicio_id = request.GET.get('servicio')
     puntuacion = request.GET.get('puntuacion')
+    sin_responder = request.GET.get('sin_responder')
     
     if servicio_id:
         calificaciones = calificaciones.filter(servicio_id=servicio_id)
     
     if puntuacion:
         calificaciones = calificaciones.filter(puntuacion=int(puntuacion))
+    
+    if sin_responder == 'true':
+        calificaciones = calificaciones.filter(respuesta__isnull=True)
     
     # Paginación
     paginator = Paginator(calificaciones, 15)
@@ -326,6 +411,7 @@ def calificaciones_proveedor(request):
         'filtros': {
             'servicio': servicio_id,
             'puntuacion': puntuacion,
+            'sin_responder': sin_responder,
         }
     }
     
@@ -556,7 +642,7 @@ def estadisticas_calificaciones_ajax(request):
         peor_calificados = Servicio.objects.filter(
             activo=True,
             disponible=True,
-            total_calificaciones__gte=3  # Al menos 3 calificaciones
+            total_calificaciones__gte=3
         ).order_by('calificacion_promedio')[:5]
         
         mejores = [{

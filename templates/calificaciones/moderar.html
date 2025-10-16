@@ -1,0 +1,402 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    
+    <!-- Header Section -->
+    <div class="gradient-bg py-12" data-aos="fade-down">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-4xl font-bold text-white mb-2">
+                        Panel de Moderación
+                    </h1>
+                    <p class="text-sky-100">Gestiona y modera las calificaciones reportadas</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="hidden md:flex items-center bg-white/20 backdrop-blur-custom rounded-xl px-4 py-2">
+                        <i class="fas fa-exclamation-triangle text-yellow-300 mr-2"></i>
+                        <span class="text-white font-semibold">{{ total_pendientes }} Pendientes</span>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="w-16 h-16 bg-white bg-opacity-20 backdrop-blur-custom rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-shield-alt text-white text-3xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-10">
+        
+        <!-- Filtros -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8" data-aos="fade-up">
+            <div class="flex items-center mb-4">
+                <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center mr-3">
+                    <i class="fas fa-filter text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900">Filtrar Calificaciones</h3>
+            </div>
+            
+            <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Estado -->
+                <div class="relative md:col-span-2">
+                    <i class="fas fa-clipboard-list absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                    <select name="estado" 
+                            onchange="this.form.submit()"
+                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none appearance-none bg-white">
+                        <option value="">Todas las calificaciones</option>
+                        <option value="pendiente" {% if request.GET.estado == "pendiente" %}selected{% endif %}>
+                            Pendientes de revisión
+                        </option>
+                        <option value="aprobada" {% if request.GET.estado == "aprobada" %}selected{% endif %}>
+                            Aprobadas después de moderación
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Botón Limpiar -->
+                <a href="{% url 'calificaciones:moderar_calificaciones' %}" 
+                   class="px-4 py-3 border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors text-center">
+                    <i class="fas fa-redo mr-2"></i>
+                    Limpiar Filtros
+                </a>
+            </form>
+        </div>
+
+        <!-- Lista de Calificaciones para Moderar -->
+        <div class="space-y-4 mb-8">
+            {% for calificacion in page_obj %}
+            <div class="bg-white rounded-xl shadow-sm border-2 {% if not calificacion.activo %}border-red-200{% else %}border-green-200{% endif %} p-6 hover:shadow-md transition-all" 
+                 data-aos="fade-up"
+                 id="calificacion{{ calificacion.id }}">
+                
+                <div class="flex items-start gap-4">
+                    <!-- Avatar Usuario -->
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-lg font-bold">
+                            {{ calificacion.usuario.nombre|first|upper }}
+                        </div>
+                    </div>
+
+                    <!-- Contenido Principal -->
+                    <div class="flex-1 min-w-0">
+                        <!-- Header con Estado -->
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h4 class="font-bold text-gray-900">{{ calificacion.usuario.nombre }}</h4>
+                                    
+                                    <!-- Badge de Estado -->
+                                    {% if not calificacion.activo %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                                        <i class="fas fa-times-circle mr-1"></i>
+                                        Pendiente / Rechazada
+                                    </span>
+                                    {% else %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                                        <i class="fas fa-check-circle mr-1"></i>
+                                        Aprobada
+                                    </span>
+                                    {% endif %}
+                                    
+                                    {% if calificacion.moderado %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
+                                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                                        Moderada
+                                    </span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Estrellas y Fecha -->
+                                <div class="flex items-center gap-4 text-sm">
+                                    <div class="flex items-center">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= calificacion.puntuacion %}
+                                            <i class="fas fa-star text-yellow-400"></i>
+                                            {% else %}
+                                            <i class="far fa-star text-yellow-400"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <span class="text-gray-600">
+                                        <i class="far fa-calendar mr-1"></i>
+                                        {{ calificacion.fecha_creacion|date:"d M Y, H:i" }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Info del Servicio -->
+                        <div class="bg-gray-50 rounded-lg p-3 mb-4">
+                            <div class="flex items-center gap-3">
+                                {% if calificacion.servicio.imagenes.first %}
+                                <img src="{{ calificacion.servicio.imagenes.first.imagen.url }}" 
+                                     class="w-16 h-16 rounded-lg object-cover" 
+                                     alt="{{ calificacion.servicio.nombre }}">
+                                {% else %}
+                                <div class="w-16 h-16 bg-gradient-to-br from-sky-400 to-blue-500 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-concierge-bell text-white text-xl"></i>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="flex-1">
+                                    <h5 class="font-semibold text-gray-900">{{ calificacion.servicio.nombre }}</h5>
+                                    <p class="text-sm text-gray-600">
+                                        <i class="fas fa-user-tie mr-1"></i>
+                                        Proveedor: {{ calificacion.servicio.proveedor.nombre }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Comentario -->
+                        {% if calificacion.comentario %}
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                            <p class="text-sm font-semibold text-yellow-800 mb-1">
+                                <i class="fas fa-comment-alt mr-1"></i>
+                                Comentario del usuario:
+                            </p>
+                            <p class="text-gray-800 leading-relaxed">{{ calificacion.comentario }}</p>
+                        </div>
+                        {% else %}
+                        <p class="text-gray-400 italic mb-4 text-sm">Sin comentario escrito</p>
+                        {% endif %}
+
+                        <!-- Acciones de Moderación -->
+                        <div class="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
+                            {% if not calificacion.activo %}
+                            <!-- Aprobar -->
+                            <button onclick="aprobarCalificacion({{ calificacion.id }})"
+                                    class="flex-1 md:flex-none px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all hover:scale-105 shadow-sm">
+                                <i class="fas fa-check mr-2"></i>
+                                Aprobar
+                            </button>
+                            {% endif %}
+                            
+                            {% if calificacion.activo %}
+                            <!-- Rechazar -->
+                            <button onclick="rechazarCalificacion({{ calificacion.id }})"
+                                    class="flex-1 md:flex-none px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-all hover:scale-105 shadow-sm">
+                                <i class="fas fa-times mr-2"></i>
+                                Rechazar
+                            </button>
+                            {% endif %}
+                            
+                            <!-- Ver Servicio -->
+                            <a href="{% url 'servicios:detalle_servicio' calificacion.servicio.id %}" 
+                               target="_blank"
+                               class="flex-1 md:flex-none px-6 py-2.5 border-2 border-sky-600 text-sky-600 rounded-lg font-semibold hover:bg-sky-50 transition-colors text-center">
+                                <i class="fas fa-external-link-alt mr-2"></i>
+                                Ver Servicio
+                            </a>
+                            
+                            <!-- Ver Usuario -->
+                            <button onclick="verDetallesUsuario({{ calificacion.usuario.id }})"
+                                    class="px-6 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors">
+                                <i class="fas fa-user mr-2"></i>
+                                Ver Usuario
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check-double text-green-600 text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">¡Todo al día!</h3>
+                <p class="text-gray-500">No hay calificaciones pendientes de moderación</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="flex items-center justify-center mb-8" data-aos="fade-up">
+            <nav class="inline-flex rounded-lg shadow-sm">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}" 
+                   class="relative inline-flex items-center px-3 py-2 rounded-l-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+                {% else %}
+                <span class="relative inline-flex items-center px-3 py-2 rounded-l-lg border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                    <i class="fas fa-angle-left"></i>
+                </span>
+                {% endif %}
+
+                <span class="relative inline-flex items-center px-4 py-2 border-t border-b border-gray-300 bg-white text-sm font-semibold text-gray-700">
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}" 
+                   class="relative inline-flex items-center px-3 py-2 rounded-r-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+                {% else %}
+                <span class="relative inline-flex items-center px-3 py-2 rounded-r-lg border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                    <i class="fas fa-angle-right"></i>
+                </span>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<!-- Toast de Notificación -->
+<div id="toast" class="hidden fixed top-20 right-4 bg-white rounded-xl shadow-2xl p-4 z-50 max-w-sm transform transition-all">
+    <div class="flex items-start">
+        <div id="toastIcon" class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center mr-3">
+            <i class="fas fa-check text-white"></i>
+        </div>
+        <div class="flex-1">
+            <h4 id="toastTitle" class="font-bold text-gray-900 mb-1"></h4>
+            <p id="toastMessage" class="text-sm text-gray-600"></p>
+        </div>
+        <button onclick="cerrarToast()" class="text-gray-400 hover:text-gray-600 ml-2">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+// Aprobar calificación
+function aprobarCalificacion(calificacionId) {
+    if (!confirm('¿Aprobar esta calificación y hacerla pública?')) return;
+    
+    fetch(`/calificaciones/moderar/aprobar/${calificacionId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            mostrarToast('success', '¡Aprobada!', data.message);
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            mostrarToast('error', 'Error', data.error || 'No se pudo aprobar');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarToast('error', 'Error', 'Error de conexión');
+    });
+}
+
+// Rechazar calificación
+function rechazarCalificacion(calificacionId) {
+    if (!confirm('¿Rechazar esta calificación? Será ocultada al público.')) return;
+    
+    fetch(`/calificaciones/moderar/rechazar/${calificacionId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            mostrarToast('warning', 'Rechazada', data.message);
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            mostrarToast('error', 'Error', data.error || 'No se pudo rechazar');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarToast('error', 'Error', 'Error de conexión');
+    });
+}
+
+// Ver detalles del usuario (puedes expandir esto)
+function verDetallesUsuario(usuarioId) {
+    alert(`Función para ver detalles del usuario ${usuarioId}\nPuedes implementar un modal o redirigir a un perfil.`);
+}
+
+// Sistema de Toast/Notificaciones
+function mostrarToast(tipo, titulo, mensaje) {
+    const toast = document.getElementById('toast');
+    const icon = document.getElementById('toastIcon');
+    const title = document.getElementById('toastTitle');
+    const message = document.getElementById('toastMessage');
+    
+    // Configurar estilos según tipo
+    const configs = {
+        success: {
+            bg: 'bg-green-500',
+            icon: 'fa-check'
+        },
+        error: {
+            bg: 'bg-red-500',
+            icon: 'fa-times'
+        },
+        warning: {
+            bg: 'bg-yellow-500',
+            icon: 'fa-exclamation-triangle'
+        }
+    };
+    
+    const config = configs[tipo] || configs.success;
+    
+    icon.className = `flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center mr-3 ${config.bg}`;
+    icon.querySelector('i').className = `fas ${config.icon} text-white`;
+    title.textContent = titulo;
+    message.textContent = mensaje;
+    
+    toast.classList.remove('hidden');
+    
+    setTimeout(() => {
+        cerrarToast();
+    }, 4000);
+}
+
+function cerrarToast() {
+    const toast = document.getElementById('toast');
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(100%)';
+    setTimeout(() => {
+        toast.classList.add('hidden');
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(0)';
+    }, 300);
+}
+</script>
+
+<style>
+/* Animación para el toast */
+#toast {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Transiciones suaves */
+button, a {
+    transition: all 0.2s ease;
+}
+
+button:active, a:active {
+    transform: scale(0.95);
+}
+</style>
+
+{% endblock %}

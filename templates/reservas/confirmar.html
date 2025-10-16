@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirmar Reserva - Ecuador Turismo{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="container mx-auto px-4 max-w-5xl">
+        <!-- Progreso de reserva -->
+        <div class="mb-8">
+            <div class="flex items-center justify-center">
+                <div class="flex items-center">
+                    <!-- Paso 1: Completado -->
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <span class="ml-2 text-sm font-medium text-gray-700">Carrito</span>
+                    </div>
+                    
+                    <div class="w-20 h-1 bg-green-500 mx-2"></div>
+                    
+                    <!-- Paso 2: Actual -->
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                            <span class="text-white font-bold">2</span>
+                        </div>
+                        <span class="ml-2 text-sm font-medium text-blue-600">Confirmación</span>
+                    </div>
+                    
+                    <div class="w-20 h-1 bg-gray-300 mx-2"></div>
+                    
+                    <!-- Paso 3: Pendiente -->
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                            <span class="text-gray-600 font-bold">3</span>
+                        </div>
+                        <span class="ml-2 text-sm font-medium text-gray-600">Completado</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Encabezado -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Confirma tu Reserva</h1>
+            <p class="text-gray-600">Revisa los detalles antes de confirmar tu reserva</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Detalles de los servicios -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Lista de servicios a reservar -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                        Servicios a Reservar
+                    </h2>
+
+                    <div class="space-y-4">
+                        {% for item in items %}
+                        <div class="border rounded-lg p-4 hover:border-blue-300 transition-colors">
+                            <div class="flex gap-4">
+                                <!-- Imagen miniatura -->
+                                <div class="flex-shrink-0">
+                                    {% if item.servicio.imagenes.all.0 %}
+                                    <img src="{{ item.servicio.imagenes.all.0.imagen.url }}" 
+                                         alt="{{ item.servicio.nombre }}"
+                                         class="w-20 h-20 object-cover rounded-lg">
+                                    {% else %}
+                                    <div class="w-20 h-20 bg-gray-200 rounded-lg"></div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Información -->
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-900">{{ item.servicio.nombre }}</h3>
+                                    <div class="grid grid-cols-2 gap-2 mt-2 text-sm text-gray-600">
+                                        <div>
+                                            <span class="text-gray-500">📍</span> {{ item.servicio.destino.nombre }}
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-500">🏷️</span> {{ item.servicio.get_tipo_display }}
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-500">📅</span> {{ item.fecha_servicio|date:"d/m/Y" }}
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-500">👥</span> {{ item.cantidad_personas }} persona{{ item.cantidad_personas|pluralize }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Precio -->
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-500">Precio</p>
+                                    <p class="text-lg font-bold text-blue-600">${{ item.get_total|floatformat:2 }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Botón volver al carrito -->
+                    <div class="mt-4 pt-4 border-t">
+                        <a href="{% url 'reservas:ver_carrito' %}" 
+                           class="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                            Volver al carrito
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Términos y condiciones -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        Términos y Condiciones
+                    </h2>
+
+                    <div class="space-y-3 text-sm text-gray-600">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <p><strong>Confirmación:</strong> Tu reserva quedará en estado "Pendiente" hasta que el proveedor la confirme.</p>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <p><strong>Cancelación:</strong> Puedes cancelar gratuitamente antes de la fecha del servicio.</p>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <p><strong>Pago:</strong> No se realizará ningún cargo hasta que el proveedor confirme tu reserva.</p>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <p><strong>Notificaciones:</strong> Recibirás confirmación por email y podrás ver el estado en "Mis Reservas".</p>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                            </svg>
+                            <p><strong>Calificación:</strong> Podrás calificar el servicio una vez completada la reserva.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información del proveedor -->
+                <div class="bg-blue-50 rounded-lg p-6">
+                    <h3 class="font-semibold text-gray-900 mb-2">📞 ¿Necesitas ayuda?</h3>
+                    <p class="text-sm text-gray-600 mb-3">
+                        Si tienes dudas sobre tu reserva, puedes contactar directamente con el proveedor después de confirmar.
+                    </p>
+                    <p class="text-sm text-gray-600">
+                        También puedes gestionar todas tus reservas desde tu panel de <a href="{% url 'reservas:mis_reservas' %}" class="text-blue-600 hover:underline font-medium">Mis Reservas</a>.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Panel de confirmación (sticky) -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-lg p-6 sticky top-4">
+                    <h2 class="text-xl font-bold text-gray-900 mb-6">Resumen de Pago</h2>
+                    
+                    <!-- Desglose de costos -->
+                    <div class="space-y-3 mb-6">
+                        <div class="flex justify-between text-gray-600">
+                            <span>Subtotal:</span>
+                            <span class="font-semibold">${{ subtotal|floatformat:2 }}</span>
+                        </div>
+                        <div class="flex justify-between text-gray-600">
+                            <span>IVA (12%):</span>
+                            <span class="font-semibold">${{ impuestos|floatformat:2 }}</span>
+                        </div>
+                        <div class="border-t pt-3">
+                            <div class="flex justify-between text-2xl font-bold text-gray-900">
+                                <span>Total:</span>
+                                <span class="text-blue-600">${{ total|floatformat:2 }}</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1 text-right">Precio final en USD</p>
+                        </div>
+                    </div>
+
+                    <!-- Checkbox de aceptación -->
+                    <form method="POST" action="{% url 'reservas:confirmar_reserva' %}" id="formConfirmar">
+                        {% csrf_token %}
+                        
+                        <div class="mb-6">
+                            <label class="flex items-start gap-3 cursor-pointer">
+                                <input type="checkbox" 
+                                       id="aceptarTerminos"
+                                       required
+                                       class="mt-1 w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                                <span class="text-sm text-gray-700">
+                                    He leído y acepto los 
+                                    <a href="#" class="text-blue-600 hover:underline">términos y condiciones</a> 
+                                    de la reserva
+                                </span>
+                            </label>
+                        </div>
+
+                        <!-- Botón confirmar -->
+                        <button type="submit" 
+                                id="btnConfirmar"
+                                class="w-full bg-blue-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed">
+                            Confirmar Reserva
+                        </button>
+
+                        <!-- Nota de seguridad -->
+                        <div class="mt-4 p-3 bg-green-50 rounded-lg">
+                            <div class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <div>
+                                    <p class="text-xs text-green-800 font-semibold">Reserva Segura</p>
+                                    <p class="text-xs text-green-700 mt-1">Tus datos están protegidos y no se realizará ningún cargo sin confirmación previa.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Métodos de pago (informativo) -->
+                    <div class="mt-6 pt-6 border-t">
+                        <p class="text-xs text-gray-500 text-center mb-3">Métodos de pago aceptados:</p>
+                        <div class="flex justify-center gap-3 flex-wrap">
+                            <div class="px-3 py-1 bg-gray-100 rounded text-xs font-medium text-gray-700">💳 Tarjeta</div>
+                            <div class="px-3 py-1 bg-gray-100 rounded text-xs font-medium text-gray-700">🏦 Transferencia</div>
+                            <div class="px-3 py-1 bg-gray-100 rounded text-xs font-medium text-gray-700">💵 Efectivo</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script para validación del formulario -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('aceptarTerminos');
+    const btnConfirmar = document.getElementById('btnConfirmar');
+    const formConfirmar = document.getElementById('formConfirmar');
+
+    // Validar checkbox
+    checkbox.addEventListener('change', function() {
+        btnConfirmar.disabled = !this.checked;
+    });
+
+    // Confirmar antes de enviar
+    formConfirmar.addEventListener('submit', function(e) {
+        if (!checkbox.checked) {
+            e.preventDefault();
+            alert('Debes aceptar los términos y condiciones para continuar.');
+            return false;
+        }
+
+        // Mostrar loading
+        btnConfirmar.disabled = true;
+        btnConfirmar.innerHTML = `
+            <svg class="animate-spin h-5 w-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        `;
+    });
+
+    // Inicializar estado del botón
+    btnConfirmar.disabled = !checkbox.checked;
+});
+</script>
+{% endblock %}

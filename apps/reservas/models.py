@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.utils import timezone
+from decimal import Decimal
 from apps.usuarios.models import Usuario
 from apps.servicios.models import Servicio
 
@@ -139,10 +140,11 @@ class Reserva(models.Model):
                 random.choices(string.ascii_uppercase + string.digits, k=10)
             )
         
-        # Calcular totales
+        # Calcular totales usando Decimal
+        TASA_IVA = Decimal('0.12')  # 12% IVA
         self.precio_unitario = self.servicio.precio
         self.subtotal = self.precio_unitario * self.cantidad_personas
-        self.impuestos = self.subtotal * 0.12  # 12% IVA
+        self.impuestos = self.subtotal * TASA_IVA
         self.costo_total = self.subtotal + self.impuestos
         
         super().save(*args, **kwargs)
@@ -221,7 +223,8 @@ class ItemCarrito(models.Model):
     
     def get_impuestos(self):
         """Calcula los impuestos (12% IVA)"""
-        return self.get_subtotal() * 0.12
+        TASA_IVA = Decimal('0.12')
+        return self.get_subtotal() * TASA_IVA
     
     def get_total(self):
         """Calcula el total del item"""

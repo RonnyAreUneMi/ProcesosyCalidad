@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
+{% load calificaciones_extra %}
 
 {% block content %}
 <div class="min-h-screen bg-gray-50">
     
     <!-- Hero Section con Galería -->
     <div class="relative h-[600px] overflow-hidden">
-        <!-- Galería de Imágenes -->
         <div class="absolute inset-0">
             {% if imagen_principal %}
             <img src="{{ imagen_principal.imagen.url }}" 
@@ -17,12 +17,9 @@
                 <i class="fas fa-image text-white text-8xl opacity-30"></i>
             </div>
             {% endif %}
-            
-            <!-- Overlay Gradient -->
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
         </div>
 
-        <!-- Contenido Hero -->
         <div class="relative z-10 h-full flex items-end">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pb-8">
                 <!-- Breadcrumb -->
@@ -37,7 +34,6 @@
                 </nav>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Info Principal -->
                     <div class="lg:col-span-2">
                         <!-- Badges -->
                         <div class="flex flex-wrap items-center gap-2 mb-4">
@@ -61,11 +57,6 @@
                                 <i class="fas fa-check-circle mr-1.5"></i>
                                 Disponible
                             </span>
-                            {% else %}
-                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold bg-red-500 text-white">
-                                <i class="fas fa-times-circle mr-1.5"></i>
-                                No Disponible
-                            </span>
                             {% endif %}
 
                             {% if servicio.categoria %}
@@ -76,13 +67,11 @@
                             {% endif %}
                         </div>
 
-                        <!-- Título -->
                         <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
                             {{ servicio.nombre }}
                         </h1>
 
-                        <!-- Ubicación y Rating -->
-                        <div class="flex flex-wrap items-center gap-4 text-white/90">
+                        <div class="flex flex-wrap items-center gap-4 text-white/90 mb-4">
                             <div class="flex items-center space-x-2">
                                 <i class="fas fa-location-dot text-sky-400"></i>
                                 <span>{{ servicio.destino.nombre }}, {{ servicio.destino.get_region_display }}</span>
@@ -110,7 +99,7 @@
 
                         <!-- Miniaturas de Galería -->
                         {% if imagenes_secundarias %}
-                        <div class="mt-6 flex gap-2 overflow-x-auto pb-2">
+                        <div class="flex gap-2 overflow-x-auto pb-2">
                             {% if imagen_principal %}
                             <button onclick="cambiarImagen('{{ imagen_principal.imagen.url }}')" 
                                     class="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 border-white shadow-lg hover:scale-105 transition-transform">
@@ -128,8 +117,8 @@
                     </div>
 
                     <!-- Card de Precio (Desktop) -->
-                    <div class="hidden lg:block lg:col-span-1">
-                        <div class="bg-white rounded-xl shadow-2xl p-6">
+                    <div class="hidden lg:block">
+                        <div class="bg-white rounded-xl shadow-2xl p-6 sticky top-4">
                             <div class="text-center mb-4">
                                 <p class="text-sm text-gray-600 mb-1">Precio por persona</p>
                                 <div class="flex items-baseline justify-center mb-4">
@@ -157,7 +146,6 @@
                             </a>
                             {% endif %}
 
-                            <!-- Info Extra -->
                             <div class="mt-4 pt-4 border-t border-gray-200 space-y-2">
                                 <div class="flex items-center text-sm text-gray-600">
                                     <i class="fas fa-shield-alt mr-2 text-green-600"></i>
@@ -216,76 +204,153 @@
                     </div>
                 </div>
 
-                <!-- Calificaciones y Reseñas -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <div class="flex items-center justify-between mb-4">
+                <!-- SECCIÓN DE CALIFICACIONES -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6" id="seccion-calificaciones">
+                    <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
                         <div class="flex items-center">
                             <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mr-3">
                                 <i class="fas fa-star text-yellow-600 text-lg"></i>
                             </div>
-                            <h2 class="text-2xl font-bold text-gray-900">Calificaciones</h2>
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-900">Calificaciones</h2>
+                                <p class="text-sm text-gray-600">{{ servicio.total_calificaciones }} opiniones</p>
+                            </div>
                         </div>
                         
-                        {% if puede_calificar %}
-                        <button onclick="mostrarModalCalificar()" 
-                                class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold text-sm transition-colors">
-                            <i class="fas fa-plus mr-1"></i>
-                            Dejar Reseña
-                        </button>
-                        {% elif ya_califico %}
-                        <span class="px-4 py-2 bg-green-100 text-green-700 rounded-lg font-semibold text-sm">
-                            <i class="fas fa-check-circle mr-1"></i>
-                            Ya calificaste
-                        </span>
+                        {% if user.is_authenticated %}
+                            {% if puede_calificar %}
+                            <button onclick="mostrarModalCalificar()" 
+                                    class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold text-sm transition-all hover:scale-105">
+                                <i class="fas fa-plus mr-1"></i>
+                                Dejar Reseña
+                            </button>
+                            {% elif ya_califico %}
+                            <div class="flex items-center space-x-2">
+                                <span class="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg font-semibold text-sm">
+                                    <i class="fas fa-check-circle mr-1"></i>
+                                    Ya calificaste
+                                </span>
+                                {% if calificacion_usuario %}
+                                <button onclick="mostrarModalEditarCalificacion()" 
+                                        class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                        title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="confirmarEliminarCalificacion({{ calificacion_usuario.id }})" 
+                                        class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                        title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        {% else %}
+                        <a href="{% url 'usuarios:login' %}?next={{ request.path }}" 
+                           class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-semibold text-sm transition-colors">
+                            <i class="fas fa-sign-in-alt mr-1"></i>
+                            Iniciar sesión
+                        </a>
                         {% endif %}
                     </div>
 
-                    <!-- Estadísticas de Calificación -->
-                    <div class="grid grid-cols-5 gap-3 mb-6">
-                        {% for rating, count in stats_calificaciones.items %}
-                        <div class="text-center p-3 bg-yellow-50 rounded-lg">
-                            <div class="text-xl font-bold text-yellow-600 mb-1">{{ count }}</div>
-                            <div class="flex items-center justify-center text-yellow-500">
-                                {% for i in rating %}
-                                <i class="fas fa-star text-xs"></i>
+                    <!-- Resumen de Calificaciones -->
+                    <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-6 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="text-center">
+                                <div class="text-5xl font-bold text-gray-900 mb-2">
+                                    {{ servicio.calificacion_promedio|floatformat:1 }}
+                                </div>
+                                <div class="flex items-center justify-center mb-2">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= servicio.calificacion_promedio %}
+                                        <i class="fas fa-star text-yellow-400 text-xl"></i>
+                                        {% else %}
+                                        <i class="far fa-star text-yellow-400 text-xl"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <p class="text-sm text-gray-600">Basado en {{ servicio.total_calificaciones }} reseñas</p>
+                            </div>
+
+                            <div class="space-y-2">
+                                {% for rating in "54321" %}
+                                <div class="flex items-center space-x-3">
+                                    <div class="flex items-center text-sm text-gray-600 w-12">
+                                        <span>{{ rating }}</span>
+                                        <i class="fas fa-star text-yellow-400 text-xs ml-1"></i>
+                                    </div>
+                                    <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                        {% with total=servicio.total_calificaciones count=stats_calificaciones|get_item:rating %}
+                                        <div class="bg-yellow-400 h-full rounded-full transition-all"
+                                             style="width: {% if total > 0 %}{{ count|mul:100|div:total|floatformat:0 }}{% else %}0{% endif %}%">
+                                        </div>
+                                        {% endwith %}
+                                    </div>
+                                    <span class="text-sm text-gray-600 w-8 text-right">
+                                        {{ stats_calificaciones|get_item:rating }}
+                                    </span>
+                                </div>
                                 {% endfor %}
                             </div>
                         </div>
-                        {% endfor %}
                     </div>
 
                     <!-- Lista de Reseñas -->
-                    <div class="space-y-4">
+                    <div class="space-y-6">
                         {% for calificacion in calificaciones %}
-                        <div class="border-b border-gray-100 pb-4 last:border-0">
-                            <div class="flex items-start space-x-3">
-                                <div class="w-10 h-10 bg-gradient-to-br from-sky-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
-                                    {{ calificacion.usuario.nombre|first }}
+                        <div class="border-b border-gray-100 pb-6 last:border-0">
+                            <div class="flex items-start space-x-4">
+                                <div class="flex-shrink-0">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-sky-500 to-blue-600 rounded-full flex items-center justify-center text-white text-lg font-bold">
+                                        {{ calificacion.usuario.nombre|first|upper }}
+                                    </div>
                                 </div>
-                                <div class="flex-1">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <h4 class="font-semibold text-gray-900">{{ calificacion.usuario.nombre }}</h4>
-                                        <span class="text-xs text-gray-500">{{ calificacion.fecha_creacion|date:"d M Y" }}</span>
+
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-start justify-between mb-2">
+                                        <div>
+                                            <h4 class="font-semibold text-gray-900">{{ calificacion.usuario.nombre }}</h4>
+                                            <div class="flex items-center space-x-3 mt-1">
+                                                <div class="flex items-center">
+                                                    {% for i in "12345" %}
+                                                        {% if forloop.counter <= calificacion.puntuacion %}
+                                                        <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                        {% else %}
+                                                        <i class="far fa-star text-yellow-400 text-sm"></i>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                                <span class="text-xs text-gray-500">{{ calificacion.fecha_creacion|date:"d M Y" }}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="flex items-center mb-2">
-                                        {% for i in "12345" %}
-                                            {% if forloop.counter <= calificacion.puntuacion %}
-                                            <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                            {% else %}
-                                            <i class="far fa-star text-yellow-400 text-sm"></i>
-                                            {% endif %}
-                                        {% endfor %}
+
+                                    {% if calificacion.comentario %}
+                                    <p class="text-gray-700 text-sm leading-relaxed mb-3">{{ calificacion.comentario }}</p>
+                                    {% endif %}
+
+                                    {% if calificacion.respuesta %}
+                                    <div class="bg-sky-50 rounded-lg p-4 border-l-4 border-sky-500">
+                                        <div class="flex items-start space-x-3">
+                                            <i class="fas fa-reply text-sky-600 mt-1"></i>
+                                            <div class="flex-1">
+                                                <p class="font-semibold text-sky-900 text-sm mb-1">Respuesta del proveedor</p>
+                                                <p class="text-sky-900 text-sm">{{ calificacion.respuesta.respuesta }}</p>
+                                                <p class="text-xs text-sky-700 mt-1">{{ calificacion.respuesta.fecha_respuesta|date:"d M Y" }}</p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <p class="text-gray-700 text-sm">{{ calificacion.comentario }}</p>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
                         {% empty %}
-                        <div class="text-center py-8">
-                            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                <i class="fas fa-comment-slash text-gray-400 text-2xl"></i>
+                        <div class="text-center py-12">
+                            <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-comment-slash text-gray-400 text-3xl"></i>
                             </div>
-                            <p class="text-gray-500 text-sm">Aún no hay calificaciones</p>
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">Aún no hay calificaciones</h3>
+                            <p class="text-gray-500 text-sm">Sé el primero en compartir tu experiencia</p>
                         </div>
                         {% endfor %}
                     </div>
@@ -293,14 +358,13 @@
             </div>
 
             <!-- Sidebar -->
-            <div class="lg:col-span-1 space-y-6">
+            <div class="space-y-6">
                 <!-- Servicios Relacionados -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 sticky top-4">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">Servicios Relacionados</h3>
                     <div class="space-y-3">
                         {% for relacionado in servicios_relacionados %}
-                        <a href="{% url 'servicios:detalle_servicio' relacionado.id %}" 
-                           class="block group">
+                        <a href="{% url 'servicios:detalle_servicio' relacionado.id %}" class="block group">
                             <div class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
                                 {% if relacionado.imagenes.first %}
                                 <img src="{{ relacionado.imagenes.first.imagen.url }}" 
@@ -329,32 +393,13 @@
                         {% endfor %}
                     </div>
                 </div>
-
-                <!-- Compartir -->
-                <div class="bg-gradient-to-br from-sky-600 to-blue-600 rounded-xl shadow-sm p-5 text-white">
-                    <h3 class="text-lg font-bold mb-3">Compartir</h3>
-                    <div class="grid grid-cols-3 gap-2">
-                        <button onclick="compartirFacebook()" 
-                                class="py-2.5 bg-white/20 hover:bg-white/30 rounded-lg transition-colors">
-                            <i class="fab fa-facebook-f text-lg"></i>
-                        </button>
-                        <button onclick="compartirTwitter()" 
-                                class="py-2.5 bg-white/20 hover:bg-white/30 rounded-lg transition-colors">
-                            <i class="fab fa-twitter text-lg"></i>
-                        </button>
-                        <button onclick="compartirWhatsApp()" 
-                                class="py-2.5 bg-white/20 hover:bg-white/30 rounded-lg transition-colors">
-                            <i class="fab fa-whatsapp text-lg"></i>
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 
     <!-- Sticky Bottom Bar (Mobile) -->
     <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-40">
-        <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center justify-between">
             <div>
                 <p class="text-xs text-gray-600">Precio por persona</p>
                 <div class="flex items-baseline">
@@ -363,70 +408,164 @@
                 </div>
             </div>
             {% if user.is_authenticated %}
-            <div class="flex gap-2">
-                <button onclick="agregarAlCarrito({{ servicio.id }})" 
-                        class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold text-sm transition-colors">
-                    <i class="fas fa-shopping-cart"></i>
-                </button>
-                <button onclick="reservarAhora({{ servicio.id }})" 
-                        class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-sm transition-colors">
-                    Reservar
-                </button>
-            </div>
+            <button onclick="reservarAhora({{ servicio.id }})" 
+                    class="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-sm transition-colors">
+                Reservar
+            </button>
             {% else %}
             <a href="{% url 'usuarios:login' %}?next={{ request.path }}" 
-               class="px-6 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold text-sm transition-colors">
+               class="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold text-sm transition-colors">
                 Iniciar Sesión
             </a>
             {% endif %}
         </div>
     </div>
 </div>
+<!-- Modal Reserva Rápida -->
+<div id="modalReserva" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-gray-900">
+                <i class="fas fa-calendar-check text-sky-600 mr-2"></i>
+                Reservar Servicio
+            </h3>
+            <button onclick="cerrarModalReserva()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
 
-<!-- Modal Calificar -->
-<div id="modalCalificar" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
-        <h3 class="text-xl font-bold text-gray-900 mb-4">Calificar Servicio</h3>
-        <form method="post" action="{% url 'calificaciones:crear_calificacion' servicio.id %}">
-            {% csrf_token %}
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Calificación</label>
-                <div class="flex justify-center space-x-2" id="ratingStars">
-                    <button type="button" onclick="setRating(1)" class="star-btn text-3xl text-gray-300 hover:text-yellow-400 transition-colors">
-                        <i class="far fa-star"></i>
-                    </button>
-                    <button type="button" onclick="setRating(2)" class="star-btn text-3xl text-gray-300 hover:text-yellow-400 transition-colors">
-                        <i class="far fa-star"></i>
-                    </button>
-                    <button type="button" onclick="setRating(3)" class="star-btn text-3xl text-gray-300 hover:text-yellow-400 transition-colors">
-                        <i class="far fa-star"></i>
-                    </button>
-                    <button type="button" onclick="setRating(4)" class="star-btn text-3xl text-gray-300 hover:text-yellow-400 transition-colors">
-                        <i class="far fa-star"></i>
-                    </button>
-                    <button type="button" onclick="setRating(5)" class="star-btn text-3xl text-gray-300 hover:text-yellow-400 transition-colors">
-                        <i class="far fa-star"></i>
-                    </button>
+        <div class="bg-sky-50 rounded-xl p-4 mb-6 border border-sky-200">
+            <div class="flex items-start space-x-3">
+                <i class="fas fa-info-circle text-sky-600 mt-0.5"></i>
+                <div>
+                    <h4 class="font-semibold text-sky-900 mb-1">{{ servicio.nombre }}</h4>
+                    <p class="text-sm text-sky-700">
+                        Precio: <span class="font-bold">${{ servicio.precio|floatformat:0 }}</span> por persona
+                    </p>
                 </div>
-                <input type="hidden" name="puntuacion" id="ratingValue" required>
+            </div>
+        </div>
+
+        <form method="post" action="{% url 'reservas:agregar_al_carrito' servicio.id %}" id="formReserva">
+            {% csrf_token %}
+            
+            <div class="mb-5">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-users text-gray-500 mr-1"></i>
+                    Número de personas
+                </label>
+                <input type="number" 
+                       name="cantidad_personas" 
+                       id="cantidadPersonas"
+                       min="1" 
+                       max="{{ servicio.capacidad_maxima }}"
+                       value="1"
+                       required
+                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none text-lg font-semibold"
+                       onchange="actualizarTotal()">
+                <p class="text-xs text-gray-500 mt-1.5">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Capacidad máxima: {{ servicio.capacidad_maxima }} personas
+                </p>
             </div>
 
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Comentario</label>
-                <textarea name="comentario" 
-                          rows="4" 
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none resize-none"
-                          placeholder="Cuéntanos sobre tu experiencia..."></textarea>
+            <div class="mb-5">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-calendar text-gray-500 mr-1"></i>
+                    Fecha del servicio
+                </label>
+                <input type="date" 
+                       name="fecha_servicio" 
+                       id="fechaServicio"
+                       min="{{ fecha_minima }}"
+                       required
+                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none text-lg">
+                <p class="text-xs text-gray-500 mt-1.5">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Selecciona una fecha futura
+                </p>
+            </div>
+
+            <div class="bg-gray-50 rounded-xl p-4 mb-6">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-sm text-gray-600">Subtotal:</span>
+                    <span class="text-lg font-bold text-gray-900" id="subtotalTexto">${{ servicio.precio|floatformat:0 }}</span>
+                </div>
+                <div class="flex items-center justify-between text-xs text-gray-500">
+                    <span id="personasTexto">1 persona</span>
+                    <span>× ${{ servicio.precio|floatformat:0 }}</span>
+                </div>
             </div>
 
             <div class="flex gap-3">
                 <button type="button" 
-                        onclick="cerrarModalCalificar()"
-                        class="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+                        onclick="cerrarModalReserva()"
+                        class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-times mr-2"></i>
                     Cancelar
                 </button>
                 <button type="submit" 
-                        class="flex-1 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold transition-colors">
+                        class="flex-1 px-4 py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-semibold transition-all hover:scale-105">
+                    <i class="fas fa-cart-plus mr-2"></i>
+                    Agregar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Modal Calificar -->
+<div id="modalCalificar" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-gray-900">Calificar Servicio</h3>
+            <button onclick="cerrarModalCalificar()" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <form method="post" action="{% url 'calificaciones:crear_calificacion' servicio.id %}">
+            {% csrf_token %}
+            
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">Tu calificación</label>
+                <div class="flex justify-center space-x-3" id="ratingStars">
+                    {% for i in "12345" %}
+                    <button type="button" onclick="setRating({{ i }})" 
+                            class="star-btn text-4xl text-gray-300 hover:text-yellow-400 transition-all">
+                        <i class="far fa-star"></i>
+                    </button>
+                    {% endfor %}
+                </div>
+                <input type="hidden" name="puntuacion" id="ratingValue" required>
+                <p class="text-center text-sm text-gray-500 mt-2" id="ratingText">Selecciona una calificación</p>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Tu comentario <span class="text-gray-400 font-normal">(opcional)</span>
+                </label>
+                <textarea name="comentario" 
+                          id="comentarioCalificacion"
+                          rows="4" 
+                          maxlength="1000"
+                          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none resize-none"
+                          placeholder="Cuéntanos sobre tu experiencia..."></textarea>
+                <div class="flex justify-between items-center mt-1">
+                    <p class="text-xs text-gray-500">Máximo 1000 caracteres</p>
+                    <p class="text-xs text-gray-500">
+                        <span id="charCount">0</span>/1000
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button type="button" onclick="cerrarModalCalificar()"
+                        class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50">
+                    Cancelar
+                </button>
+                <button type="submit" 
+                        class="flex-1 px-4 py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-semibold">
+                    <i class="fas fa-paper-plane mr-2"></i>
                     Publicar
                 </button>
             </div>
@@ -434,27 +573,236 @@
     </div>
 </div>
 
+<!-- Modal Editar Calificación -->
+{% if calificacion_usuario %}
+<div id="modalEditarCalificacion" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-gray-900">Editar Reseña</h3>
+            <button onclick="cerrarModalEditarCalificacion()" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <form method="post" action="{% url 'calificaciones:editar_calificacion' calificacion_usuario.id %}">
+            {% csrf_token %}
+            
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">Tu calificación</label>
+                <div class="flex justify-center space-x-3" id="ratingStarsEditar">
+                    {% for i in "12345" %}
+                    <button type="button" onclick="setRatingEditar({{ i }})" 
+                            class="star-btn-editar text-4xl {% if i|stringformat:'s' <= calificacion_usuario.puntuacion|stringformat:'s' %}text-yellow-400{% else %}text-gray-300{% endif %} hover:text-yellow-400 transition-all">
+                        <i class="{% if i|stringformat:'s' <= calificacion_usuario.puntuacion|stringformat:'s' %}fas{% else %}far{% endif %} fa-star"></i>
+                    </button>
+                    {% endfor %}
+                </div>
+                <input type="hidden" name="puntuacion" id="ratingValueEditar" value="{{ calificacion_usuario.puntuacion }}" required>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Tu comentario</label>
+                <textarea name="comentario" 
+                          rows="4" 
+                          maxlength="1000"
+                          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none resize-none"
+                          placeholder="Cuéntanos sobre tu experiencia...">{{ calificacion_usuario.comentario }}</textarea>
+            </div>
+
+            <div class="flex gap-3">
+                <button type="button" onclick="cerrarModalEditarCalificacion()"
+                        class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50">
+                    Cancelar
+                </button>
+                <button type="submit" 
+                        class="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold">
+                    <i class="fas fa-save mr-2"></i>
+                    Guardar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<!-- Modal Confirmar Eliminación -->
+<div id="modalEliminarCalificacion" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">¿Eliminar calificación?</h3>
+            <p class="text-gray-600">Esta acción no se puede deshacer</p>
+        </div>
+        
+        <form id="formEliminarCalificacion" method="post" action="">
+            {% csrf_token %}
+            <div class="flex gap-3">
+                <button type="button" onclick="cerrarModalEliminarCalificacion()"
+                        class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50">
+                    Cancelar
+                </button>
+                <button type="submit" 
+                        class="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold">
+                    Sí, eliminar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+/* Animaciones para estrellas */
+.star-btn, .star-btn-editar {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.star-btn:hover, .star-btn-editar:hover {
+    transform: scale(1.15) rotate(5deg);
+}
+
+/* Scroll suave */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Espacio para bottom bar en mobile */
+@media (max-width: 1023px) {
+    body {
+        padding-bottom: 80px;
+    }
+}
+
+/* Transición para cambio de imagen */
+#imagenPrincipal {
+    transition: opacity 0.3s ease-in-out;
+}
+</style>
+
 <script>
-// Cambiar imagen principal
+// ====================================
+// VARIABLES GLOBALES
+// ====================================
+const precioUnitario = parseFloat('{{ servicio.precio }}');
+let currentRating = 0;
+let currentRatingEditar = parseInt('{{ calificacion_usuario.puntuacion|default:0 }}');
+
+const ratingTexts = {
+    1: '⭐ Malo',
+    2: '⭐⭐ Regular',
+    3: '⭐⭐⭐ Bueno',
+    4: '⭐⭐⭐⭐ Muy bueno',
+    5: '⭐⭐⭐⭐⭐ Excelente'
+};
+
+// ====================================
+// CAMBIAR IMAGEN PRINCIPAL
+// ====================================
 function cambiarImagen(url) {
-    const imagenPrincipal = document.getElementById('imagenPrincipal');
-    if (imagenPrincipal) {
-        imagenPrincipal.style.opacity = '0';
+    const img = document.getElementById('imagenPrincipal');
+    if (img) {
+        img.style.opacity = '0';
         setTimeout(() => {
-            imagenPrincipal.src = url;
-            imagenPrincipal.style.opacity = '1';
+            img.src = url;
+            img.style.opacity = '1';
         }, 150);
     }
 }
 
-// Sistema de calificación con estrellas
-let currentRating = 0;
+// ====================================
+// MODAL DE RESERVA
+// ====================================
+function mostrarModalReserva() {
+    const modal = document.getElementById('modalReserva');
+    if (!modal) {
+        console.error('Modal no encontrado');
+        return;
+    }
+    
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    
+    // Establecer fecha mínima
+    const fechaInput = document.getElementById('fechaServicio');
+    if (fechaInput) {
+        fechaInput.setAttribute('min', '{{ fecha_minima }}');
+    }
+    
+    // Reset valores
+    const cantidadInput = document.getElementById('cantidadPersonas');
+    if (cantidadInput) {
+        cantidadInput.value = 1;
+    }
+    if (fechaInput) {
+        fechaInput.value = '';
+    }
+    actualizarTotal();
+}
 
+function cerrarModalReserva() {
+    const modal = document.getElementById('modalReserva');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+}
+
+function actualizarTotal() {
+    const cantidad = parseInt(document.getElementById('cantidadPersonas')?.value) || 1;
+    const subtotal = precioUnitario * cantidad;
+    
+    const subtotalTexto = document.getElementById('subtotalTexto');
+    const personasTexto = document.getElementById('personasTexto');
+    
+    if (subtotalTexto) {
+        subtotalTexto.textContent = `$${Math.round(subtotal)}`;
+    }
+    if (personasTexto) {
+        personasTexto.textContent = `${cantidad} ${cantidad === 1 ? 'persona' : 'personas'}`;
+    }
+}
+
+// ====================================
+// CARRITO Y RESERVAS (CORREGIDO)
+// ====================================
+function agregarAlCarrito(servicioId) {
+    // Solo abre el modal - al enviar se agrega al carrito
+    mostrarModalReserva();
+}
+
+function reservarAhora(servicioId) {
+    // Abre el modal pero marca que debe redirigir a confirmar
+    mostrarModalReserva();
+    
+    // Modificar el formulario para que redirija a confirmar después
+    const form = document.getElementById('formReserva');
+    if (form) {
+        // Añadir campo oculto para indicar reserva rápida
+        let inputReservaRapida = form.querySelector('input[name="reserva_rapida"]');
+        if (!inputReservaRapida) {
+            inputReservaRapida = document.createElement('input');
+            inputReservaRapida.type = 'hidden';
+            inputReservaRapida.name = 'reserva_rapida';
+            inputReservaRapida.value = '1';
+            form.appendChild(inputReservaRapida);
+        }
+    }
+}
+
+// ====================================
+// SISTEMA DE CALIFICACIÓN
+// ====================================
 function setRating(rating) {
     currentRating = rating;
-    document.getElementById('ratingValue').value = rating;
+    const ratingValue = document.getElementById('ratingValue');
+    const ratingText = document.getElementById('ratingText');
     
-    const stars = document.querySelectorAll('.star-btn');
+    if (ratingValue) ratingValue.value = rating;
+    if (ratingText) ratingText.textContent = ratingTexts[rating];
+    
+    const stars = document.querySelectorAll('#ratingStars .star-btn');
     stars.forEach((star, index) => {
         const icon = star.querySelector('i');
         if (index < rating) {
@@ -471,155 +819,206 @@ function setRating(rating) {
     });
 }
 
-// Hover effect para estrellas
-document.querySelectorAll('.star-btn').forEach((star, index) => {
-    star.addEventListener('mouseenter', () => {
-        document.querySelectorAll('.star-btn').forEach((s, i) => {
-            if (i <= index) {
-                s.querySelector('i').classList.add('fas');
-                s.querySelector('i').classList.remove('far');
-            }
-        });
+function setRatingEditar(rating) {
+    currentRatingEditar = rating;
+    const ratingValueEditar = document.getElementById('ratingValueEditar');
+    if (ratingValueEditar) ratingValueEditar.value = rating;
+    
+    const stars = document.querySelectorAll('#ratingStarsEditar .star-btn-editar');
+    stars.forEach((star, index) => {
+        const icon = star.querySelector('i');
+        if (index < rating) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            star.classList.remove('text-gray-300');
+            star.classList.add('text-yellow-400');
+        } else {
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            star.classList.remove('text-yellow-400');
+            star.classList.add('text-gray-300');
+        }
     });
-});
+}
 
-document.getElementById('ratingStars')?.addEventListener('mouseleave', () => {
-    if (currentRating > 0) {
-        setRating(currentRating);
-    } else {
-        document.querySelectorAll('.star-btn').forEach(star => {
-            star.querySelector('i').classList.remove('fas');
-            star.querySelector('i').classList.add('far');
-        });
-    }
-});
-
-// Modales
 function mostrarModalCalificar() {
-    document.getElementById('modalCalificar').classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
+    const modal = document.getElementById('modalCalificar');
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
 }
 
 function cerrarModalCalificar() {
-    document.getElementById('modalCalificar').classList.add('hidden');
-    document.body.style.overflow = '';
-}
-
-// Cerrar modal al hacer clic fuera
-document.getElementById('modalCalificar')?.addEventListener('click', function(e) {
-    if (e.target === this) {
-        cerrarModalCalificar();
+    const modal = document.getElementById('modalCalificar');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+        currentRating = 0;
+        
+        // Reset formulario
+        const form = modal.querySelector('form');
+        if (form) form.reset();
+        
+        // Reset estrellas
+        const stars = document.querySelectorAll('#ratingStars .star-btn');
+        stars.forEach(star => {
+            const icon = star.querySelector('i');
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            star.classList.remove('text-yellow-400');
+            star.classList.add('text-gray-300');
+        });
+        
+        const ratingText = document.getElementById('ratingText');
+        if (ratingText) ratingText.textContent = 'Selecciona una calificación';
     }
-});
-
-// Funciones de carrito y reserva
-function agregarAlCarrito(servicioId) {
-    fetch(`/reservas/carrito/agregar/${servicioId}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'Content-Type': 'application/json',
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            mostrarNotificacion('Servicio agregado al carrito', 'success');
-        } else {
-            mostrarNotificacion(data.error || 'Error al agregar al carrito', 'error');
-        }
-    })
-    .catch(error => {
-        mostrarNotificacion('Error de conexión', 'error');
-    });
 }
 
-function reservarAhora(servicioId) {
-    window.location.href = `/reservas/crear/${servicioId}/`;
+function mostrarModalEditarCalificacion() {
+    const modal = document.getElementById('modalEditarCalificacion');
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function cerrarModalEditarCalificacion() {
+    const modal = document.getElementById('modalEditarCalificacion');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+}
+
+function confirmarEliminarCalificacion(calificacionId) {
+    const modal = document.getElementById('modalEliminarCalificacion');
+    const form = document.getElementById('formEliminarCalificacion');
+    if (modal && form) {
+        form.action = `/calificaciones/eliminar/${calificacionId}/`;
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function cerrarModalEliminarCalificacion() {
+    const modal = document.getElementById('modalEliminarCalificacion');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
 }
 
 function mostrarNotificacion(mensaje, tipo) {
-    const notificacion = document.createElement('div');
-    notificacion.className = `fixed top-20 right-4 px-4 py-3 rounded-lg shadow-lg z-50 transition-all ${
+    const notif = document.createElement('div');
+    notif.className = `fixed top-20 right-4 px-6 py-4 rounded-xl shadow-2xl z-50 transition-all transform ${
         tipo === 'success' ? 'bg-green-500' : 'bg-red-500'
     } text-white font-semibold`;
-    notificacion.innerHTML = `
-        <div class="flex items-center space-x-2">
-            <i class="fas fa-${tipo === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+    notif.innerHTML = `
+        <div class="flex items-center space-x-3">
+            <i class="fas fa-${tipo === 'success' ? 'check-circle' : 'exclamation-circle'} text-xl"></i>
             <span>${mensaje}</span>
         </div>
     `;
-    document.body.appendChild(notificacion);
+    document.body.appendChild(notif);
     
     setTimeout(() => {
-        notificacion.style.opacity = '0';
-        setTimeout(() => notificacion.remove(), 300);
+        notif.style.opacity = '0';
+        notif.style.transform = 'translateX(100%)';
+        setTimeout(() => notif.remove(), 300);
     }, 3000);
 }
 
-// Funciones de compartir
-function compartirFacebook() {
-    const url = encodeURIComponent(window.location.href);
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=600,height=400');
-}
-
-function compartirTwitter() {
-    const url = encodeURIComponent(window.location.href);
-    const texto = encodeURIComponent('{{ servicio.nombre }} - Ecuador Turismo');
-    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${texto}`, '_blank', 'width=600,height=400');
-}
-
-function compartirWhatsApp() {
-    const url = encodeURIComponent(window.location.href);
-    const texto = encodeURIComponent('Mira este servicio: {{ servicio.nombre }}');
-    window.open(`https://wa.me/?text=${texto}%20${url}`, '_blank');
-}
-</script>
-
-<style>
-/* Transición suave para imagen */
-#imagenPrincipal {
-    transition: opacity 0.3s ease-in-out;
-}
-
-/* Animación para las estrellas */
-.star-btn {
-    transition: all 0.2s ease;
-}
-
-.star-btn:hover {
-    transform: scale(1.15);
-}
-
-/* Scroll suave */
-html {
-    scroll-behavior: smooth;
-}
-
-/* Ocultar scrollbar en miniaturas pero mantener funcionalidad */
-.overflow-x-auto::-webkit-scrollbar {
-    height: 4px;
-}
-
-.overflow-x-auto::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
-}
-
-.overflow-x-auto::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 2px;
-}
-
-.overflow-x-auto::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.7);
-}
-
-/* Espacio para bottom bar en mobile */
-@media (max-width: 1023px) {
-    body {
-        padding-bottom: 80px;
+// ====================================
+// EVENT LISTENERS
+// ====================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Modal de reserva - cerrar al hacer clic fuera
+    const modalReserva = document.getElementById('modalReserva');
+    if (modalReserva) {
+        modalReserva.addEventListener('click', function(e) {
+            if (e.target === this) {
+                cerrarModalReserva();
+            }
+        });
     }
-}
-</style>
+    
+    // Actualizar total al cambiar cantidad
+    const cantidadInput = document.getElementById('cantidadPersonas');
+    if (cantidadInput) {
+        cantidadInput.addEventListener('input', actualizarTotal);
+    }
+    
+    // Hover effect para estrellas (crear calificación)
+    document.querySelectorAll('.star-btn').forEach((star, index) => {
+        star.addEventListener('mouseenter', () => {
+            for (let i = 0; i <= index; i++) {
+                const btn = document.querySelectorAll('.star-btn')[i];
+                if (btn) {
+                    btn.querySelector('i').classList.add('fas');
+                    btn.querySelector('i').classList.remove('far');
+                    btn.classList.add('text-yellow-400');
+                }
+            }
+        });
+    });
+
+    const ratingStars = document.getElementById('ratingStars');
+    if (ratingStars) {
+        ratingStars.addEventListener('mouseleave', () => {
+            if (currentRating > 0) {
+                setRating(currentRating);
+            } else {
+                document.querySelectorAll('.star-btn').forEach(star => {
+                    const icon = star.querySelector('i');
+                    if (icon) {
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                    }
+                    star.classList.remove('text-yellow-400');
+                    star.classList.add('text-gray-300');
+                });
+                const ratingText = document.getElementById('ratingText');
+                if (ratingText) {
+                    ratingText.textContent = 'Selecciona una calificación';
+                }
+            }
+        });
+    }
+    
+    // Contador de caracteres
+    const comentarioCalificacion = document.getElementById('comentarioCalificacion');
+    if (comentarioCalificacion) {
+        comentarioCalificacion.addEventListener('input', function() {
+            const charCount = document.getElementById('charCount');
+            if (charCount) {
+                charCount.textContent = this.value.length;
+            }
+        });
+    }
+    
+    // Cerrar modales al hacer clic fuera
+    ['modalCalificar', 'modalEditarCalificacion', 'modalEliminarCalificacion'].forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+    });
+
+    // Cerrar modales con ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            cerrarModalReserva();
+            cerrarModalCalificar();
+            cerrarModalEditarCalificacion();
+            cerrarModalEliminarCalificacion();
+        }
+    });
+});
+</script>
 {% endblock %}

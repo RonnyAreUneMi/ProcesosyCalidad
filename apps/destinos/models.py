@@ -1,3 +1,5 @@
+# apps/destinos/models.py
+
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.text import slugify
@@ -253,26 +255,24 @@ class Destino(models.Model):
         # Retorna imagen por defecto
         return '/static/images/destinos/destino_defecto.jpg'
     
-# Reemplaza el método actualizar_calificacion en tu modelo Destino con este:
-
-def actualizar_calificacion(self):
-    """
-    Actualizar la calificación promedio basada en las calificaciones de servicios asociados
-    """
-    from django.db.models import Avg, Count
-    from apps.calificaciones.models import Calificacion
-    
-    stats = Calificacion.objects.filter(
-        servicio__destino=self,
-        activo=True
-    ).aggregate(
-        promedio=Avg('puntuacion'),
-        total=Count('id')
-    )
-    
-    self.calificacion_promedio = round(stats['promedio'] or 0, 2)
-    self.total_calificaciones = stats['total'] or 0
-    self.save(update_fields=['calificacion_promedio', 'total_calificaciones'])
+    def actualizar_calificacion(self):
+        """
+        Actualizar la calificación promedio basada en las calificaciones de servicios asociados
+        """
+        from django.db.models import Avg, Count
+        from apps.calificaciones.models import Calificacion
+        
+        stats = Calificacion.objects.filter(
+            servicio__destino=self,
+            activo=True
+        ).aggregate(
+            promedio=Avg('puntuacion'),
+            total=Count('id')
+        )
+        
+        self.calificacion_promedio = round(stats['promedio'] or 0, 2)
+        self.total_calificaciones = stats['total'] or 0
+        self.save(update_fields=['calificacion_promedio', 'total_calificaciones'])
     
     def get_rango_precio(self):
         """Retorna el rango de precio formateado"""

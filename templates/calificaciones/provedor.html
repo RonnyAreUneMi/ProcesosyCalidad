@@ -1,0 +1,399 @@
+{% extends 'base.html' %}
+{% load calificaciones_extras %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    
+    <!-- Header Section -->
+    <div class="gradient-bg py-12" data-aos="fade-down">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-4xl font-bold text-white mb-2">
+                        Calificaciones de Mis Servicios
+                    </h1>
+                    <p class="text-sky-100">Gestiona las reseñas y responde a tus clientes</p>
+                </div>
+                <div class="hidden md:block">
+                    <div class="w-16 h-16 bg-white bg-opacity-20 backdrop-blur-custom rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-comments text-white text-3xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-10">
+        
+        <!-- Statistics Dashboard -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" data-aos="fade-up">
+            <!-- Total Calificaciones -->
+            <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 card-hover border-l-4 border-sky-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 mb-1">Total Reseñas</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ total_calificaciones }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-comment-dots text-sky-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Promedio General -->
+            <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 card-hover border-l-4 border-yellow-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 mb-1">Promedio General</p>
+                        <div class="flex items-center">
+                            <p class="text-3xl font-bold text-gray-900 mr-2">{{ promedio_general }}</p>
+                            <i class="fas fa-star text-yellow-400 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-award text-yellow-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sin Respuesta -->
+            <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 card-hover border-l-4 border-orange-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 mb-1">Sin Respuesta</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ sin_respuesta }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-reply text-orange-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5 Estrellas -->
+            <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 card-hover border-l-4 border-green-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600 mb-1">Excelentes (5★)</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ distribucion.5 }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-trophy text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros y Búsqueda -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8" data-aos="fade-up">
+            <div class="flex items-center mb-4">
+                <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center mr-3">
+                    <i class="fas fa-filter text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900">Filtros</h3>
+            </div>
+            
+            <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Servicio -->
+                <div class="relative">
+                    <i class="fas fa-concierge-bell absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                    <select name="servicio" 
+                            onchange="this.form.submit()"
+                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none appearance-none bg-white">
+                        <option value="">Todos los servicios</option>
+                        {% for servicio in servicios %}
+                        <option value="{{ servicio.id }}" {% if filtros.servicio == servicio.id|stringformat:"s" %}selected{% endif %}>
+                            {{ servicio.nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Puntuación -->
+                <div class="relative">
+                    <i class="fas fa-star absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                    <select name="puntuacion" 
+                            onchange="this.form.submit()"
+                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none appearance-none bg-white">
+                        <option value="">Todas las puntuaciones</option>
+                        <option value="5" {% if filtros.puntuacion == "5" %}selected{% endif %}>5 estrellas</option>
+                        <option value="4" {% if filtros.puntuacion == "4" %}selected{% endif %}>4 estrellas</option>
+                        <option value="3" {% if filtros.puntuacion == "3" %}selected{% endif %}>3 estrellas</option>
+                        <option value="2" {% if filtros.puntuacion == "2" %}selected{% endif %}>2 estrellas</option>
+                        <option value="1" {% if filtros.puntuacion == "1" %}selected{% endif %}>1 estrella</option>
+                    </select>
+                </div>
+
+                <!-- Botón Limpiar -->
+                <a href="{% url 'calificaciones:calificaciones_proveedor' %}" 
+                   class="px-4 py-3 border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors text-center">
+                    <i class="fas fa-redo mr-2"></i>
+                    Limpiar Filtros
+                </a>
+            </form>
+        </div>
+
+        <!-- Lista de Calificaciones -->
+        <div class="space-y-4 mb-8">
+            {% for calificacion in page_obj %}
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all" data-aos="fade-up">
+                <div class="flex items-start gap-4">
+                    <!-- Avatar Usuario -->
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white text-lg font-bold">
+                            {{ calificacion.usuario.nombre|first|upper }}
+                        </div>
+                    </div>
+
+                    <!-- Contenido Principal -->
+                    <div class="flex-1 min-w-0">
+                        <!-- Header -->
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-1">
+                                    <h4 class="font-bold text-gray-900">{{ calificacion.usuario.nombre }}</h4>
+                                    <div class="flex items-center">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= calificacion.puntuacion %}
+                                            <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                            {% else %}
+                                            <i class="far fa-star text-yellow-400 text-sm"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 text-sm text-gray-600">
+                                    <span>
+                                        <i class="fas fa-concierge-bell mr-1"></i>
+                                        {{ calificacion.servicio.nombre }}
+                                    </span>
+                                    <span>
+                                        <i class="far fa-calendar mr-1"></i>
+                                        {{ calificacion.fecha_creacion|date:"d M Y" }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Comentario -->
+                        {% if calificacion.comentario %}
+                        <p class="text-gray-700 mb-4 leading-relaxed">{{ calificacion.comentario }}</p>
+                        {% else %}
+                        <p class="text-gray-400 italic mb-4">Sin comentario</p>
+                        {% endif %}
+
+                        <!-- Respuesta del Proveedor -->
+                        {% if calificacion.respuesta %}
+                        <div class="bg-sky-50 rounded-lg p-4 border-l-4 border-sky-500">
+                            <div class="flex items-start justify-between mb-2">
+                                <div class="flex items-center">
+                                    <i class="fas fa-reply text-sky-600 mr-2"></i>
+                                    <span class="font-semibold text-sky-900 text-sm">Tu respuesta</span>
+                                </div>
+                                <button onclick="mostrarEditarRespuesta({{ calificacion.respuesta.id }}, '{{ calificacion.respuesta.respuesta|escapejs }}')"
+                                        class="text-sky-600 hover:text-sky-700 text-sm">
+                                    <i class="fas fa-edit mr-1"></i>
+                                    Editar
+                                </button>
+                            </div>
+                            <p class="text-sky-900 text-sm" id="respuestaTexto{{ calificacion.respuesta.id }}">
+                                {{ calificacion.respuesta.respuesta }}
+                            </p>
+                            <p class="text-xs text-sky-700 mt-2">
+                                {{ calificacion.respuesta.fecha_respuesta|date:"d M Y, H:i" }}
+                            </p>
+                        </div>
+                        {% else %}
+                        <!-- Formulario para Responder -->
+                        <div class="bg-gray-50 rounded-lg p-4" id="formResponder{{ calificacion.id }}">
+                            <form onsubmit="responderCalificacion(event, {{ calificacion.id }})">
+                                {% csrf_token %}
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <i class="fas fa-reply mr-1"></i>
+                                    Responder a esta reseña
+                                </label>
+                                <textarea name="respuesta" 
+                                          rows="3" 
+                                          maxlength="500"
+                                          required
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none resize-none mb-2"
+                                          placeholder="Escribe una respuesta profesional y cortés..."></textarea>
+                                <div class="flex justify-between items-center">
+                                    <p class="text-xs text-gray-500">Máximo 500 caracteres</p>
+                                    <button type="submit" 
+                                            class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold text-sm transition-colors">
+                                        <i class="fas fa-paper-plane mr-1"></i>
+                                        Enviar Respuesta
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-comment-slash text-gray-400 text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">No hay calificaciones aún</h3>
+                <p class="text-gray-500">Las reseñas de tus servicios aparecerán aquí</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="flex items-center justify-center mb-8" data-aos="fade-up">
+            <nav class="inline-flex rounded-lg shadow-sm">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if filtros.servicio %}&servicio={{ filtros.servicio }}{% endif %}{% if filtros.puntuacion %}&puntuacion={{ filtros.puntuacion }}{% endif %}" 
+                   class="px-3 py-2 rounded-l-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+                {% else %}
+                <span class="px-3 py-2 rounded-l-lg border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                    <i class="fas fa-angle-left"></i>
+                </span>
+                {% endif %}
+
+                <span class="px-4 py-2 border-t border-b border-gray-300 bg-white text-sm font-semibold text-gray-700">
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if filtros.servicio %}&servicio={{ filtros.servicio }}{% endif %}{% if filtros.puntuacion %}&puntuacion={{ filtros.puntuacion }}{% endif %}" 
+                   class="px-3 py-2 rounded-r-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+                {% else %}
+                <span class="px-3 py-2 rounded-r-lg border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                    <i class="fas fa-angle-right"></i>
+                </span>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<!-- Modal Editar Respuesta -->
+<div id="modalEditarRespuesta" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold text-gray-900">Editar Respuesta</h3>
+            <button onclick="cerrarModalEditar()" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <form id="formEditarRespuesta" onsubmit="editarRespuesta(event)">
+            {% csrf_token %}
+            <input type="hidden" id="respuestaId" name="respuesta_id">
+            <textarea name="respuesta" 
+                      id="respuestaTexto"
+                      rows="4" 
+                      maxlength="500"
+                      required
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none resize-none mb-2"></textarea>
+            <p class="text-sm text-gray-500 mb-4">Máximo 500 caracteres</p>
+            
+            <div class="flex gap-3">
+                <button type="button" 
+                        onclick="cerrarModalEditar()"
+                        class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50">
+                    Cancelar
+                </button>
+                <button type="submit" 
+                        class="flex-1 px-4 py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold">
+                    Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Responder a calificación
+function responderCalificacion(event, calificacionId) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const respuesta = form.querySelector('textarea[name="respuesta"]').value;
+    const csrfToken = form.querySelector('[name="csrfmiddlewaretoken"]').value;
+    
+    fetch(`/calificaciones/responder/${calificacionId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `respuesta=${encodeURIComponent(respuesta)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.error || 'Error al enviar la respuesta');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error de conexión');
+    });
+}
+
+// Editar respuesta
+function mostrarEditarRespuesta(respuestaId, textoActual) {
+    document.getElementById('respuestaId').value = respuestaId;
+    document.getElementById('respuestaTexto').value = textoActual;
+    document.getElementById('modalEditarRespuesta').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarModalEditar() {
+    document.getElementById('modalEditarRespuesta').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+
+function editarRespuesta(event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const respuestaId = form.querySelector('#respuestaId').value;
+    const respuesta = form.querySelector('#respuestaTexto').value;
+    const csrfToken = form.querySelector('[name="csrfmiddlewaretoken"]').value;
+    
+    fetch(`/calificaciones/respuesta/editar/${respuestaId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `respuesta=${encodeURIComponent(respuesta)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.error || 'Error al actualizar la respuesta');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error de conexión');
+    });
+}
+
+// Cerrar modal al hacer clic fuera
+document.getElementById('modalEditarRespuesta')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        cerrarModalEditar();
+    }
+});
+</script>
+
+{% endblock %}

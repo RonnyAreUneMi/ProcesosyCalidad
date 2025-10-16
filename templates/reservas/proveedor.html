@@ -1,0 +1,411 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Panel de Reservas - Proveedor{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="container mx-auto px-4 max-w-7xl">
+        <!-- Encabezado -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Panel de Reservas</h1>
+            <p class="text-gray-600">Gestiona las reservas de tus servicios</p>
+        </div>
+
+        <!-- Estadísticas principales -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+            <!-- Total de reservas -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <p class="text-sm text-gray-600">Total Reservas</p>
+                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-2xl font-bold text-gray-900">{{ total_reservas }}</p>
+            </div>
+
+            <!-- Pendientes -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <p class="text-sm text-gray-600">Pendientes</p>
+                    <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-2xl font-bold text-yellow-600">{{ pendientes }}</p>
+                {% if pendientes > 0 %}
+                <p class="text-xs text-yellow-600 mt-1">⚠️ Requieren atención</p>
+                {% endif %}
+            </div>
+
+            <!-- Confirmadas -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <p class="text-sm text-gray-600">Confirmadas</p>
+                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-2xl font-bold text-green-600">{{ confirmadas }}</p>
+            </div>
+
+            <!-- Completadas -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <p class="text-sm text-gray-600">Completadas</p>
+                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-2xl font-bold text-blue-600">{{ completadas }}</p>
+            </div>
+
+            <!-- Ingresos totales -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <p class="text-sm text-gray-600">Ingresos</p>
+                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-2xl font-bold text-blue-600">${{ ingresos|floatformat:2 }}</p>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="bg-white rounded-lg shadow p-4 mb-6">
+            <form method="GET" class="flex flex-col lg:flex-row gap-4">
+                <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Filtro por servicio -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Servicio</label>
+                        <select name="servicio" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Todos los servicios</option>
+                            {% for servicio in servicios %}
+                            <option value="{{ servicio.id }}" {% if filtros.servicio == servicio.id|stringformat:"s" %}selected{% endif %}>
+                                {{ servicio.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Filtro por estado -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                        <select name="estado" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Todos los estados</option>
+                            <option value="pendiente" {% if filtros.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                            <option value="confirmada" {% if filtros.estado == 'confirmada' %}selected{% endif %}>Confirmada</option>
+                            <option value="completada" {% if filtros.estado == 'completada' %}selected{% endif %}>Completada</option>
+                            <option value="cancelada" {% if filtros.estado == 'cancelada' %}selected{% endif %}>Cancelada</option>
+                        </select>
+                    </div>
+
+                    <!-- Filtro por fecha -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Fecha del servicio</label>
+                        <input type="date" 
+                               name="fecha" 
+                               value="{{ filtros.fecha }}"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+
+                <div class="flex items-end gap-2">
+                    <button type="submit" 
+                            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors">
+                        Filtrar
+                    </button>
+                    <a href="{% url 'reservas:reservas_proveedor' %}" 
+                       class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium transition-colors">
+                        Limpiar
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Lista de reservas -->
+        {% if page_obj %}
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Código
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Cliente
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Servicio
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Fecha Servicio
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Personas
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Total
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Estado
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Acciones
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for reserva in page_obj %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="text-sm font-medium text-gray-900">#{{ reserva.codigo_reserva }}</span>
+                                    <p class="text-xs text-gray-500">{{ reserva.fecha_reserva|date:"d/m/Y" }}</p>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                            <span class="text-sm font-medium text-blue-600">
+                                                {{ reserva.usuario.nombre|slice:":1"|upper }}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900">{{ reserva.usuario.nombre }}</p>
+                                            <p class="text-xs text-gray-500">{{ reserva.usuario.email }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-sm font-medium text-gray-900">{{ reserva.servicio.nombre }}</p>
+                                    <p class="text-xs text-gray-500">{{ reserva.servicio.destino.nombre }}</p>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <p class="text-sm text-gray-900">{{ reserva.fecha_servicio|date:"d/m/Y" }}</p>
+
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {{ reserva.cantidad_personas }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
+                                    ${{ reserva.costo_total|floatformat:2 }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
+                                        {% if reserva.estado == 'pendiente' %}bg-yellow-100 text-yellow-800
+                                        {% elif reserva.estado == 'confirmada' %}bg-green-100 text-green-800
+                                        {% elif reserva.estado == 'completada' %}bg-blue-100 text-blue-800
+                                        {% elif reserva.estado == 'cancelada' %}bg-red-100 text-red-800
+                                        {% endif %}">
+                                        {{ reserva.get_estado_display }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <div class="flex items-center gap-2">
+                                        <!-- Ver detalles -->
+                                        <a href="{% url 'reservas:detalle_reserva' reserva.id %}" 
+                                           class="text-blue-600 hover:text-blue-800"
+                                           title="Ver detalles">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            </svg>
+                                        </a>
+
+                                        <!-- Confirmar -->
+                                        {% if reserva.estado == 'pendiente' %}
+                                        <button onclick="confirmarReserva('{{ reserva.id }}')" 
+                                                class="text-green-600 hover:text-green-800"
+                                                title="Confirmar">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </button>
+                                        {% endif %}
+
+                                        <!-- Completar -->
+                                        {% if reserva.estado == 'confirmada' %}
+                                        <button onclick="completarReserva('{{ reserva.id }}')" 
+                                                class="text-blue-600 hover:text-blue-800"
+                                                title="Marcar como completada">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                        </button>
+                                        {% endif %}
+
+                                        <!-- Cancelar -->
+                                        {% if reserva.estado == 'pendiente' or reserva.estado == 'confirmada' %}
+                                        <button onclick="mostrarModalCancelar('{{ reserva.id }}', '{{ reserva.codigo_reserva }}')" 
+                                                class="text-red-600 hover:text-red-800"
+                                                title="Cancelar">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                        {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginación -->
+                {% if page_obj.has_other_pages %}
+                <div class="px-6 py-4 border-t flex items-center justify-between">
+                    <div class="text-sm text-gray-600">
+                        Mostrando {{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }} reservas
+                    </div>
+                    <nav class="flex items-center gap-2">
+                        {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if filtros.servicio %}&servicio={{ filtros.servicio }}{% endif %}{% if filtros.estado %}&estado={{ filtros.estado }}{% endif %}{% if filtros.fecha %}&fecha={{ filtros.fecha }}{% endif %}" 
+                           class="px-3 py-1 border rounded hover:bg-gray-50">
+                            ← Anterior
+                        </a>
+                        {% endif %}
+
+                        <span class="px-3 py-1 text-gray-700">
+                            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                        </span>
+
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if filtros.servicio %}&servicio={{ filtros.servicio }}{% endif %}{% if filtros.estado %}&estado={{ filtros.estado }}{% endif %}{% if filtros.fecha %}&fecha={{ filtros.fecha }}{% endif %}" 
+                           class="px-3 py-1 border rounded hover:bg-gray-50">
+                            Siguiente →
+                        </a>
+                        {% endif %}
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <!-- Sin reservas -->
+            <div class="bg-white rounded-lg shadow p-12 text-center">
+                <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">No hay reservas</h2>
+                <p class="text-gray-600">No se encontraron reservas con los filtros seleccionados.</p>
+            </div>
+        {% endif %}
+
+
+    </div>
+</div>
+
+<!-- Modal de cancelación -->
+<div id="modalCancelar" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-md w-full p-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">Cancelar Reserva</h3>
+        <p class="text-gray-600 mb-4">¿Estás seguro de que deseas cancelar la reserva <strong id="codigoReserva"></strong>?</p>
+        
+        <form id="formCancelar" method="POST" action="">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Motivo de cancelación <span class="text-red-500">*</span>
+                </label>
+                <textarea name="motivo" 
+                          rows="3"
+                          required
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Explica el motivo de la cancelación..."></textarea>
+            </div>
+
+            <div class="flex gap-3">
+                <button type="button" 
+                        onclick="cerrarModalCancelar()"
+                        class="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium">
+                    Volver
+                </button>
+                <button type="submit"
+                        class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium">
+                    Confirmar Cancelación
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function confirmarReserva(reservaId) {
+    if (confirm('¿Confirmar esta reserva?')) {
+        fetch(`/reservas/proveedor/confirmar/${reservaId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Error al confirmar la reserva');
+            console.error(error);
+        });
+    }
+}
+
+function completarReserva(reservaId) {
+    if (confirm('¿Marcar esta reserva como completada?')) {
+        fetch(`/reservas/proveedor/completar/${reservaId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Error al completar la reserva');
+            console.error(error);
+        });
+    }
+}
+
+function mostrarModalCancelar(reservaId, codigoReserva) {
+    document.getElementById('modalCancelar').classList.remove('hidden');
+    document.getElementById('codigoReserva').textContent = '#' + codigoReserva;
+    document.getElementById('formCancelar').action = `/reservas/cancelar/${reservaId}/`;
+}
+
+function cerrarModalCancelar() {
+    document.getElementById('modalCancelar').classList.add('hidden');
+}
+
+// Cerrar modal al hacer click fuera
+document.getElementById('modalCancelar').addEventListener('click', function(e) {
+    if (e.target === this) {
+        cerrarModalCancelar();
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Breadcrumb -->
+        <nav class="mb-6" data-aos="fade-down">
+            <ol class="flex items-center space-x-2 text-sm">
+                <li><a href="{% url 'home' %}" class="text-gray-600 hover:text-sky-600 transition-colors">Inicio</a></li>
+                <li><i class="fas fa-chevron-right text-gray-400 text-xs"></i></li>
+                <li><a href="{% url 'calificaciones:mis_calificaciones' %}" class="text-gray-600 hover:text-sky-600 transition-colors">Mis Calificaciones</a></li>
+                <li><i class="fas fa-chevron-right text-gray-400 text-xs"></i></li>
+                <li class="text-gray-900 font-medium">Editar Reseña</li>
+            </ol>
+        </nav>
+
+        <!-- Card Principal -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden" data-aos="fade-up">
+            
+            <!-- Header -->
+            <div class="gradient-bg px-8 py-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-white bg-opacity-20 backdrop-blur-custom rounded-xl flex items-center justify-center mr-4">
+                        <i class="fas fa-edit text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">Editar Reseña</h1>
+                        <p class="text-sky-100 text-sm">Actualiza tu opinión sobre este servicio</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido -->
+            <div class="p-8">
+                
+                <!-- Info del Servicio -->
+                <div class="bg-gray-50 rounded-xl p-6 mb-8">
+                    <div class="flex items-center gap-4">
+                        {% if calificacion.servicio.imagenes.first %}
+                        <img src="{{ calificacion.servicio.imagenes.first.imagen.url }}" 
+                             class="w-20 h-20 rounded-lg object-cover" 
+                             alt="{{ calificacion.servicio.nombre }}">
+                        {% else %}
+                        <div class="w-20 h-20 bg-gradient-to-br from-sky-400 to-blue-500 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-image text-white text-2xl"></i>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="flex-1">
+                            <h2 class="text-lg font-bold text-gray-900 mb-1">{{ calificacion.servicio.nombre }}</h2>
+                            <p class="text-sm text-gray-600">
+                                <i class="fas fa-location-dot mr-1"></i>
+                                {{ calificacion.servicio.destino.nombre }}
+                            </p>
+                            <p class="text-xs text-gray-500 mt-1">
+                                Calificado el {{ calificacion.fecha_creacion|date:"d M Y" }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulario -->
+                <form method="post" id="formEditarCalificacion">
+                    {% csrf_token %}
+
+                    <!-- Calificación con Estrellas -->
+                    <div class="mb-8">
+                        <label class="block text-lg font-bold text-gray-900 mb-4">
+                            <i class="fas fa-star text-yellow-400 mr-2"></i>
+                            Tu Calificación
+                        </label>
+                        
+                        <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-6">
+                            <div class="flex justify-center space-x-4 mb-4" id="ratingStars">
+                                {% for i in "12345" %}
+                                <button type="button" 
+                                        onclick="setRating({{ i }})" 
+                                        class="star-btn text-5xl transition-all transform hover:scale-125 {% if i|stringformat:'s' <= calificacion.puntuacion|stringformat:'s' %}text-yellow-400{% else %}text-gray-300{% endif %}">
+                                    <i class="{% if i|stringformat:'s' <= calificacion.puntuacion|stringformat:'s' %}fas{% else %}far{% endif %} fa-star"></i>
+                                </button>
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" name="puntuacion" id="ratingValue" value="{{ calificacion.puntuacion }}" required>
+                            <p class="text-center text-gray-700 font-semibold" id="ratingText">
+                                {% if calificacion.puntuacion == 1 %}⭐ Malo
+                                {% elif calificacion.puntuacion == 2 %}⭐⭐ Regular
+                                {% elif calificacion.puntuacion == 3 %}⭐⭐⭐ Bueno
+                                {% elif calificacion.puntuacion == 4 %}⭐⭐⭐⭐ Muy bueno
+                                {% elif calificacion.puntuacion == 5 %}⭐⭐⭐⭐⭐ Excelente
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Comentario -->
+                    <div class="mb-8">
+                        <label class="block text-lg font-bold text-gray-900 mb-2">
+                            <i class="fas fa-comment text-sky-600 mr-2"></i>
+                            Tu Comentario
+                        </label>
+                        <p class="text-sm text-gray-600 mb-3">
+                            Comparte detalles sobre tu experiencia para ayudar a otros usuarios
+                        </p>
+                        <textarea name="comentario" 
+                                  id="comentario"
+                                  rows="6" 
+                                  maxlength="1000"
+                                  class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none resize-none transition-all"
+                                  placeholder="Describe tu experiencia con este servicio...">{{ calificacion.comentario }}</textarea>
+                        <div class="flex justify-between items-center mt-2">
+                            <p class="text-sm text-gray-500">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Máximo 1000 caracteres
+                            </p>
+                            <p class="text-sm text-gray-600 font-medium">
+                                <span id="charCount">{{ calificacion.comentario|length|default:0 }}</span>/1000
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Nota de Moderación -->
+                    {% if calificacion.moderado %}
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                        <div class="flex items-start">
+                            <i class="fas fa-exclamation-triangle text-yellow-600 mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="text-sm font-semibold text-yellow-800 mb-1">Calificación en revisión</h4>
+                                <p class="text-sm text-yellow-700">
+                                    Tu calificación está siendo revisada por moderación. Asegúrate de que tu comentario sea respetuoso.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Botones de Acción -->
+                    <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200">
+                        <a href="{% url 'calificaciones:mis_calificaciones' %}" 
+                           class="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-all text-center">
+                            <i class="fas fa-times mr-2"></i>
+                            Cancelar
+                        </a>
+                        
+                        <button type="button"
+                                onclick="confirmarEliminar()"
+                                class="px-6 py-3 border-2 border-red-500 text-red-600 rounded-xl font-semibold hover:bg-red-50 transition-all">
+                            <i class="fas fa-trash mr-2"></i>
+                            Eliminar
+                        </button>
+                        
+                        <button type="submit" 
+                                class="flex-1 px-6 py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-semibold transition-all hover:scale-105 shadow-lg">
+                            <i class="fas fa-save mr-2"></i>
+                            Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+        <!-- Tips para una buena reseña -->
+        <div class="mt-8 bg-blue-50 rounded-xl p-6" data-aos="fade-up">
+            <h3 class="text-lg font-bold text-blue-900 mb-4">
+                <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                Tips para una buena reseña
+            </h3>
+            <ul class="space-y-2 text-sm text-blue-800">
+                <li class="flex items-start">
+                    <i class="fas fa-check text-green-600 mr-2 mt-1"></i>
+                    <span>Sé específico sobre lo que te gustó o no del servicio</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check text-green-600 mr-2 mt-1"></i>
+                    <span>Mantén un tono respetuoso y constructivo</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check text-green-600 mr-2 mt-1"></i>
+                    <span>Describe tu experiencia de forma honesta y útil</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check text-green-600 mr-2 mt-1"></i>
+                    <span>Evita lenguaje ofensivo o información personal</span>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal Confirmar Eliminación -->
+<div id="modalEliminar" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" data-aos="zoom-in">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">¿Eliminar calificación?</h3>
+            <p class="text-gray-600">Esta acción no se puede deshacer y tu reseña se eliminará permanentemente.</p>
+        </div>
+        
+        <form method="post" action="{% url 'calificaciones:eliminar_calificacion' calificacion.id %}">
+            {% csrf_token %}
+            <div class="flex space-x-3">
+                <button type="button" 
+                        onclick="cerrarModalEliminar()"
+                        class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit" 
+                        class="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-colors">
+                    Sí, eliminar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Sistema de calificación con estrellas
+let currentRating = {{ calificacion.puntuacion }};
+
+const ratingTexts = {
+    1: '⭐ Malo',
+    2: '⭐⭐ Regular',
+    3: '⭐⭐⭐ Bueno',
+    4: '⭐⭐⭐⭐ Muy bueno',
+    5: '⭐⭐⭐⭐⭐ Excelente'
+};
+
+function setRating(rating) {
+    currentRating = rating;
+    document.getElementById('ratingValue').value = rating;
+    document.getElementById('ratingText').textContent = ratingTexts[rating];
+    
+    const stars = document.querySelectorAll('.star-btn');
+    stars.forEach((star, index) => {
+        const icon = star.querySelector('i');
+        if (index < rating) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            star.classList.remove('text-gray-300');
+            star.classList.add('text-yellow-400');
+        } else {
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            star.classList.remove('text-yellow-400');
+            star.classList.add('text-gray-300');
+        }
+    });
+}
+
+// Hover effect
+document.querySelectorAll('.star-btn').forEach((star, index) => {
+    star.addEventListener('mouseenter', () => {
+        for (let i = 0; i <= index; i++) {
+            document.querySelectorAll('.star-btn')[i].querySelector('i').classList.add('fas');
+            document.querySelectorAll('.star-btn')[i].querySelector('i').classList.remove('far');
+            document.querySelectorAll('.star-btn')[i].classList.add('text-yellow-400');
+            document.querySelectorAll('.star-btn')[i].classList.remove('text-gray-300');
+        }
+    });
+});
+
+document.getElementById('ratingStars').addEventListener('mouseleave', () => {
+    setRating(currentRating);
+});
+
+// Contador de caracteres
+const comentario = document.getElementById('comentario');
+const charCount = document.getElementById('charCount');
+
+comentario.addEventListener('input', function() {
+    charCount.textContent = this.value.length;
+    
+    if (this.value.length > 900) {
+        charCount.classList.add('text-red-600', 'font-bold');
+    } else {
+        charCount.classList.remove('text-red-600', 'font-bold');
+    }
+});
+
+// Modales
+function confirmarEliminar() {
+    document.getElementById('modalEliminar').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarModalEliminar() {
+    document.getElementById('modalEliminar').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+
+document.getElementById('modalEliminar').addEventListener('click', function(e) {
+    if (e.target === this) {
+        cerrarModalEliminar();
+    }
+});
+
+// Validación antes de enviar
+document.getElementById('formEditarCalificacion').addEventListener('submit', function(e) {
+    const rating = document.getElementById('ratingValue').value;
+    
+    if (!rating || rating < 1 || rating > 5) {
+        e.preventDefault();
+        alert('Por favor selecciona una calificación entre 1 y 5 estrellas');
+        return false;
+    }
+});
+</script>
+
+<style>
+.star-btn {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.star-btn:active {
+    transform: scale(0.9);
+}
+
+textarea:focus {
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+</style>
+
+{% endblock %}

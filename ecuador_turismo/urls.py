@@ -19,7 +19,7 @@ urlpatterns = [
     path('servicios/', include('apps.servicios.urls')),
 
     # path('rutas/', include('apps.rutas.urls')),
-    # path('reservas/', include('apps.reservas.urls')),
+    path('reservas/', include('apps.reservas.urls')),
     path('calificaciones/', include('apps.calificaciones.urls')),
     # path('chatbot/', include('apps.chatbot.urls')),
 ]
