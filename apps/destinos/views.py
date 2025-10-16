@@ -6,7 +6,12 @@ from django.core.paginator import Paginator
 from .models import Destino, Categoria, ImagenDestino, AtraccionTuristica
 from apps.calificaciones.models import Calificacion
 from django.contrib import messages
-
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .models import Destino, Categoria
+from .provincias_cantones import get_provincias, get_cantones, get_provincias_cantones_json
+import json
 
 
 def lista_destinos(request):
@@ -252,17 +257,32 @@ def destinos_destacados(request):
 def mapa_destinos(request):
     """
     RF-005: Vista de mapa interactivo con todos los destinos
+    ACTUALIZADO: Serialización correcta para evitar errores de Decimal
     """
     destinos = Destino.objects.filter(activo=True).values(
         'id', 'nombre', 'slug', 'descripcion_corta', 
         'latitud', 'longitud', 'region', 'calificacion_promedio'
     )
     
-    # Convertir a lista para JSON
-    destinos_list = list(destinos)
+    # Convertir a lista y serializar correctamente los valores Decimal
+    destinos_list = []
+    for destino in destinos:
+        destinos_list.append({
+            'id': destino['id'],
+            'nombre': destino['nombre'],
+            'slug': destino['slug'],
+            'descripcion_corta': destino['descripcion_corta'] or '',
+            'latitud': float(destino['latitud']) if destino['latitud'] else None,
+            'longitud': float(destino['longitud']) if destino['longitud'] else None,
+            'region': destino['region'],
+            'calificacion_promedio': float(destino['calificacion_promedio']) if destino['calificacion_promedio'] else 0.0
+        })
+    
+    # Convertir a JSON manualmente para asegurar serialización correcta
+    destinos_json = json.dumps(destinos_list)
     
     context = {
-        'destinos_json': destinos_list,
+        'destinos_json': destinos_json,
     }
     
     return render(request, 'destinos/mapa_destinos.html', context)
@@ -331,13 +351,6 @@ def estadisticas_destino(request, destino_id):
     
     return JsonResponse(stats)
 # Agrega estas funciones al final de tu archivo apps/destinos/views.py
-
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from .models import Destino, Categoria
-from .provincias_cantones import get_provincias, get_cantones, get_provincias_cantones_json
-import json
 
 @login_required
 def crear_destino(request):
@@ -516,32 +529,179 @@ def editar_destino(request, destino_id):
     """
     # Verificar que el usuario sea administrador
     if not request.user.es_administrador():
-        return JsonResponse({
-            'success': False,
-            'message': 'No tienes permisos para editar destinos'
-        }, status=403)
+        messages.error(request, 'No tienes permisos para editar destinos')
+        return redirect('destinos:lista_destinos')
     
     destino = get_object_or_404(Destino, id=destino_id)
     
     if request.method == 'POST':
-        # Aquí irá la lógica para editar el destino
-        return JsonResponse({
-            'success': True,
-            'message': 'Funcionalidad en desarrollo'
-        })
-    
-    # Obtener datos necesarios para el formulario
+        try:
+            # Obtener datos del formulario
+            nombre = request.POST.get('nombre')
+            region = request.POST.get('region')
+            categoria_id = request.POST.get('categoria')
+            provincia = request.POST.get('provincia')
+            ciudad = request.POST.get('ciudad')
+            descripcion = request.POST.get('descripcion')
+            descripcion_corta = request.POST.get('descripcion_corta')
+            latitud = request.POST.get('latitud')
+            longitud = request.POST.get('longitud')
+            altitud = request.POST.get('altitud')
+            clima = request.POST.get('clima')
+            mejor_epoca = request.POST.get('mejor_epoca')
+            precio_min = request.POST.get('precio_promedio_minimo')
+            precio_max = request.POST.get('precio_promedio_maximo')
+            destacado = request.POST.get('destacado') == 'on'
+            activo = request.POST.get('activo') == 'on'
+            imagen_principal = request.FILES.get('imagen_principal')
+
+            # Validaciones
+            if not all([nombre, region, provincia, descripcion, descripcion_corta, latitud, longitud, precio_min, precio_max]):
+                messages.error(request, 'Por favor completa todos los campos obligatorios')
+                return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            # Validar coordenadas
+            try:
+                latitud = float(latitud)
+                longitud = float(longitud)
+                if not (-90 <= latitud <= 90) or not (-180 <= longitud <= 180):
+                    messages.error(request, 'Coordenadas geográficas inválidas')
+                    return redirect('destinos:editar_destino', destino_id=destino.id)
+            except ValueError:
+                messages.error(request, 'Latitud y longitud deben ser valores numéricos')
+                return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            # Validar precios
+            try:
+                precio_min = float(precio_min)
+                precio_max = float(precio_max)
+                if precio_min < 0 or precio_max < 0 or precio_min > precio_max:
+                    messages.error(request, 'Los precios deben ser válidos y el mínimo no puede ser mayor al máximo')
+                    return redirect('destinos:editar_destino', destino_id=destino.id)
+            except ValueError:
+                messages.error(request, 'Los precios deben ser valores numéricos')
+                return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            # Validar altitud (si se proporciona)
+            if altitud:
+                try:
+                    altitud = float(altitud)
+                    if altitud < 0:
+                        messages.error(request, 'La altitud no puede ser negativa')
+                        return redirect('destinos:editar_destino', destino_id=destino.id)
+                except ValueError:
+                    messages.error(request, 'La altitud debe ser un valor numérico')
+                    return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            # Validar descripción corta
+            if len(descripcion_corta) > 300:
+                messages.error(request, 'La descripción corta no puede exceder 300 caracteres')
+                return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            # Validar categoría (si se proporciona)
+            categoria = None
+            if categoria_id:
+                try:
+                    categoria = Categoria.objects.get(id=categoria_id, activo=True)
+                except Categoria.DoesNotExist:
+                    messages.error(request, 'La categoría seleccionada no es válida')
+                    return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            # Validar región
+            if region not in dict(Destino.REGIONES_CHOICES).keys():
+                messages.error(request, 'La región seleccionada no es válida')
+                return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            # Validar provincia y ciudad
+            provincias = get_provincias()
+            if provincia not in provincias:
+                messages.error(request, 'La provincia seleccionada no es válida')
+                return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            if ciudad and ciudad not in get_cantones(provincia):
+                messages.error(request, 'La ciudad/cantón seleccionado no es válido')
+                return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            # Validar imagen (si se proporciona una nueva)
+            if imagen_principal:
+                valid_formats = ['image/jpeg', 'image/png', 'image/webp']
+                if imagen_principal.content_type not in valid_formats:
+                    messages.error(request, 'Formato de imagen no válido. Usa JPG, PNG o WEBP')
+                    return redirect('destinos:editar_destino', destino_id=destino.id)
+                if imagen_principal.size > 5 * 1024 * 1024:  # 5MB
+                    messages.error(request, 'La imagen no puede exceder 5MB')
+                    return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            # Actualizar el destino
+            destino.nombre = nombre
+            destino.region = region
+            destino.categoria = categoria
+            destino.provincia = provincia
+            destino.ciudad = ciudad if ciudad else None
+            destino.descripcion = descripcion
+            destino.descripcion_corta = descripcion_corta
+            destino.latitud = latitud
+            destino.longitud = longitud
+            destino.altitud = altitud if altitud else None
+            destino.clima = clima if clima else None
+            destino.mejor_epoca = mejor_epoca if mejor_epoca else None
+            destino.precio_promedio_minimo = precio_min
+            destino.precio_promedio_maximo = precio_max
+            destino.destacado = destacado
+            destino.activo = activo
+            
+            # Guardar cambios básicos primero
+            destino.save()
+
+            # Actualizar imagen solo si se subió una nueva
+            mensaje_imagen = ""
+            if imagen_principal:
+                try:
+                    # Eliminar imagen anterior si existe y no es la por defecto
+                    if destino.imagen_principal and 'destino_defecto.jpg' not in str(destino.imagen_principal):
+                        try:
+                            destino.imagen_principal.delete(save=False)
+                        except Exception as e:
+                            print(f"No se pudo eliminar imagen anterior: {str(e)}")
+                    
+                    # Django automáticamente usará el SupabaseStorage configurado
+                    destino.imagen_principal = imagen_principal
+                    destino.save(update_fields=['imagen_principal'])
+                    mensaje_imagen = " Imagen actualizada exitosamente."
+                except Exception as e:
+                    # Si falla la subida, informar pero no cancelar la actualización
+                    mensaje_imagen = f" Advertencia: Error al actualizar imagen: {str(e)}"
+                    print(f"Error actualizando imagen en Supabase: {str(e)}")
+
+            messages.success(request, f'Destino "{nombre}" actualizado exitosamente.{mensaje_imagen}')
+            return redirect('destinos:detalle_destino', slug=destino.slug)
+
+        except Exception as e:
+            messages.error(request, f'Error al actualizar el destino: {str(e)}')
+            return redirect('destinos:editar_destino', destino_id=destino.id)
+
+    # GET request: Renderizar formulario con datos actuales
     categorias = Categoria.objects.filter(activo=True)
     regiones = Destino.REGIONES_CHOICES
-    imagenes = destino.imagenes.all()
-    atracciones = destino.atracciones.all()
+    provincias = get_provincias()
+    provincias_cantones_json = get_provincias_cantones_json()
+    
+    # Preparar valores numéricos para evitar problemas de renderizado
+    valores_numericos = {
+        'latitud': str(destino.latitud) if destino.latitud is not None else '',
+        'longitud': str(destino.longitud) if destino.longitud is not None else '',
+        'altitud': str(destino.altitud) if destino.altitud is not None else '',
+        'precio_min': str(destino.precio_promedio_minimo) if destino.precio_promedio_minimo is not None else '',
+        'precio_max': str(destino.precio_promedio_maximo) if destino.precio_promedio_maximo is not None else '',
+    }
     
     context = {
         'destino': destino,
         'categorias': categorias,
         'regiones': regiones,
-        'imagenes': imagenes,
-        'atracciones': atracciones,
+        'provincias': provincias,
+        'provincias_cantones_json': provincias_cantones_json,
+        'valores_numericos': valores_numericos,
         'titulo': f'Editar {destino.nombre}'
     }
     

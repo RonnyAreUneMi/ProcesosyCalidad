@@ -138,9 +138,9 @@
                             <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Surf</span>
                             <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Gastronomía</span>
                         </div>
-                        <button class="w-full py-3 bg-white text-sky-700 rounded-lg font-semibold hover:bg-sky-50 transition-colors">
+                        <a href="{% url 'destinos:lista_destinos' %}?region=costa" class="w-full py-3 bg-white text-sky-700 rounded-lg font-semibold text-center hover:bg-sky-50 transition-colors block">
                             Explorar Costa
-                        </button>
+                        </a>
                     </div>
                 </div>
 
@@ -166,9 +166,9 @@
                             <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Cultura</span>
                             <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Historia</span>
                         </div>
-                        <button class="w-full py-3 bg-white text-slate-700 rounded-lg font-semibold hover:bg-slate-50 transition-colors">
+                        <a href="{% url 'destinos:lista_destinos' %}?region=sierra" class="w-full py-3 bg-white text-slate-700 rounded-lg font-semibold text-center hover:bg-slate-50 transition-colors block">
                             Explorar Sierra
-                        </button>
+                        </a>
                     </div>
                 </div>
 
@@ -194,9 +194,9 @@
                             <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Aventura</span>
                             <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Fauna</span>
                         </div>
-                        <button class="w-full py-3 bg-white text-green-700 rounded-lg font-semibold hover:bg-green-50 transition-colors">
+                        <a href="{% url 'destinos:lista_destinos' %}?region=oriente" class="w-full py-3 bg-white text-green-700 rounded-lg font-semibold text-center hover:bg-green-50 transition-colors block">
                             Explorar Oriente
-                        </button>
+                        </a>
                     </div>
                 </div>
 
@@ -222,15 +222,121 @@
                             <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Buceo</span>
                             <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Tortugas</span>
                         </div>
-                        <button class="w-full py-3 bg-white text-blue-700 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                        <a href="{% url 'destinos:lista_destinos' %}?region=galapagos" class="w-full py-3 bg-white text-blue-700 rounded-lg font-semibold text-center hover:bg-blue-50 transition-colors block">
                             Explorar Galápagos
-                        </button>
+                        </a>
                     </div>
                 </div>
 
             </div>
         </div>
+        <!-- Header -->
+    <div class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold mb-3 flex items-center justify-center">
+                    <i class="fas fa-map-marked-alt mr-3"></i>
+                    Mapa de Destinos Turísticos
+                </h1>
+                <p class="text-xl text-gray-600">
+                    Explora todos los destinos de Ecuador en un mapa interactivo
+                </p>
+            </div>
+        </div>
+    </div>
+    <!-- Controles y Filtros -->
+<div class="bg-white shadow-md sticky top-0 z-40 border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <!-- Contenedor centrado en fila -->
+        <div class="flex flex-wrap justify-center items-center gap-4">
 
+            <!-- Filtros rápidos por región -->
+            <div class="flex flex-wrap gap-2 justify-center">
+                <button onclick="filtrarPorRegion('todos')" 
+                        class="region-filter-btn active px-4 py-2 rounded-lg font-semibold text-sm transition-all"
+                        data-region="todos">
+                    <i class="fas fa-globe-americas mr-1"></i>
+                    Todos
+                </button>
+                <button onclick="filtrarPorRegion('costa')" 
+                        class="region-filter-btn px-4 py-2 rounded-lg font-semibold text-sm transition-all"
+                        data-region="costa">
+                    <i class="fas fa-umbrella-beach mr-1"></i>
+                    Costa
+                </button>
+                <button onclick="filtrarPorRegion('sierra')" 
+                        class="region-filter-btn px-4 py-2 rounded-lg font-semibold text-sm transition-all"
+                        data-region="sierra">
+                    <i class="fas fa-mountain mr-1"></i>
+                    Sierra
+                </button>
+                <button onclick="filtrarPorRegion('oriente')" 
+                        class="region-filter-btn px-4 py-2 rounded-lg font-semibold text-sm transition-all"
+                        data-region="oriente">
+                    <i class="fas fa-tree mr-1"></i>
+                    Oriente
+                </button>
+                <button onclick="filtrarPorRegion('galapagos')" 
+                        class="region-filter-btn px-4 py-2 rounded-lg font-semibold text-sm transition-all"
+                        data-region="galapagos">
+                    <i class="fas fa-fish mr-1"></i>
+                    Galápagos
+                </button>
+            </div>
+
+            <!-- Contador de destinos -->
+            <div class="text-sm font-semibold text-gray-700 flex items-center gap-1">
+                <i class="fas fa-map-pin text-sky-600"></i>
+                <span id="destinosCount">0</span> destinos
+            </div>
+
+        </div>
+    </div>
+     <!-- Contenedor centrado y limitado -->
+    <div class="flex justify-center py-8">
+        <div class="w-full max-w-3xl bg-white rounded-xl shadow-lg overflow-hidden relative" style="height: 450px;">
+            <div id="map" class="w-full h-full"></div>
+            
+            <!-- Loading overlay -->
+            <div id="mapLoading" class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center">
+                <div class="text-center">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mb-4"></div>
+                    <p class="text-gray-600 font-semibold">Cargando mapa...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!-- Estilos adicionales -->
+<style>
+    .region-filter-btn {
+        background-color: #f3f4f6;
+        color: #4b5563;
+    }
+    
+    .region-filter-btn:hover {
+        background-color: #e5e7eb;
+    }
+    
+    .region-filter-btn.active {
+        background-color: #0ea5e9;
+        color: white;
+    }
+
+    /* Estilos para Leaflet popups */
+    .leaflet-popup-content-wrapper {
+        border-radius: 12px;
+        padding: 0;
+    }
+
+    .leaflet-popup-content {
+        margin: 0;
+        min-width: 250px;
+    }
+</style>
         <!-- Por qué elegirnos -->
         <div class="bg-gradient-to-br from-sky-50 to-blue-50 rounded-2xl p-12 mb-20">
             <div class="text-center mb-12">
@@ -279,5 +385,356 @@
         {% endif %}
 
     </div>
+    
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+      crossorigin=""/>
+
+<!-- Leaflet JavaScript -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+
+<script>
+    // ========================================
+    // VARIABLES GLOBALES
+    // ========================================
+    let map = null;
+    let markers = [];
+    let markerLayer = null;
+    let regionActual = 'todos';
+    let destinosData = [];
+
+    // ========================================
+    // DATOS DE DESTINOS DESDE DJANGO
+    // ========================================
+    try {
+        // Los datos ya vienen como JSON string desde el backend
+        destinosData = JSON.parse('{{ destinos_json|safe }}');
+        console.log(`📊 ${destinosData.length} destinos cargados desde la base de datos`);
+        
+        // Validar que hay datos
+        if (!destinosData || destinosData.length === 0) {
+            console.warn('⚠️ No hay destinos en la base de datos');
+        }
+    } catch (error) {
+        console.error('❌ Error al parsear datos de destinos:', error);
+        destinosData = [];
+    }
+
+    // ========================================
+    // ÍCONOS PERSONALIZADOS POR REGIÓN
+    // ========================================
+    const regionIcons = {
+        'costa': L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        }),
+        'sierra': L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        }),
+        'oriente': L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        }),
+        'galapagos': L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        })
+    };
+
+    // ========================================
+    // INICIALIZAR MAPA
+    // ========================================
+    function initMap() {
+        try {
+            console.log('🗺️ Inicializando mapa...');
+            
+            // Centro de Ecuador
+            const ecuadorCenter = [-1.8312, -78.1834];
+
+            // Crear mapa
+            map = L.map('map').setView(ecuadorCenter, 7);
+            console.log('✅ Mapa creado');
+
+            // Añadir capa de tiles (OpenStreetMap)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19,
+                minZoom: 5
+            }).addTo(map);
+            console.log('✅ Tiles añadidos');
+
+            // Crear capa para los marcadores
+            markerLayer = L.layerGroup().addTo(map);
+
+            // Crear marcadores
+            crearMarcadores();
+
+            // Ocultar loading
+            setTimeout(() => {
+                document.getElementById('mapLoading').classList.add('hidden');
+                console.log('✅ Mapa completamente cargado');
+            }, 500);
+
+        } catch (error) {
+            console.error('❌ Error al inicializar el mapa:', error);
+            const loadingDiv = document.getElementById('mapLoading');
+            loadingDiv.innerHTML = `
+                <div class="text-center">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-4xl mb-4"></i>
+                    <p class="text-gray-900 font-semibold mb-2">Error al cargar el mapa</p>
+                    <p class="text-gray-600 text-sm">${error.message}</p>
+                    <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700">
+                        Recargar página
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    // ========================================
+    // CREAR MARCADORES
+    // ========================================
+    // ========================================
+// CREAR MARCADORES
+// ========================================
+function crearMarcadores() {
+    if (markerLayer) markerLayer.clearLayers();
+    markers = [];
+
+    const destinosFiltrados = regionActual === 'todos' 
+        ? destinosData 
+        : destinosData.filter(d => d.region === regionActual);
+
+    const bounds = [];
+
+    destinosFiltrados.forEach(destino => {
+        const lat = parseFloat(destino.latitud);
+        const lng = parseFloat(destino.longitud);
+        if (isNaN(lat) || isNaN(lng)) return;
+
+        const marker = L.marker([lat, lng], {
+            icon: regionIcons[destino.region] || regionIcons['costa'],
+            title: destino.nombre
+        });
+
+        // URL del mapa estático de Google Maps
+        const mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=15&size=120x80&maptype=roadmap&markers=color:red%7C${lat},${lng}&key=TU_API_KEY`;
+
+        const popupContent = `
+        <div style="padding: 12px; max-width: 250px;">
+            <div style="display: flex; gap: 8px; align-items: flex-start;">
+                <img src="${destino.get_imagen_principal|| '/static/images/destinos/destino_defecto.jpg'}" 
+                     alt="${destino.nombre}" 
+                     style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;"/>
+                <div style="flex: 1;">
+                    <h4 style="font-weight: bold; font-size: 16px; margin-bottom: 4px; color: #1f2937;">
+                        ${destino.nombre}
+                    </h4>
+                    <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">
+                        ${destino.descripcion_corta || 'Sin descripción'}
+                    </p>
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                        <span style="color: #f59e0b; font-size: 12px;">
+                            ${'★'.repeat(Math.round(destino.calificacion_promedio || 0))}${'☆'.repeat(5 - Math.round(destino.calificacion_promedio || 0))}
+                        </span>
+                        <span style="font-size: 10px; color: #6b7280;">
+                            ${(destino.calificacion_promedio || 0).toFixed(1)}
+                        </span>
+                    </div>
+                    <a href="/destinos/detalle/${destino.slug}/" 
+                       style="display: inline-block; background-color: #0ea5e9; color: white; 
+                              padding: 4px 8px; border-radius: 6px; text-decoration: none; 
+                              font-size: 12px; font-weight: 600;">
+                        Ver detalles
+                    </a>
+                </div>
+            </div>
+        </div>
+        `;
+
+        marker.bindPopup(popupContent);
+
+        // Evento click para mostrar panel lateral
+        marker.on('click', () => mostrarInfoPanel(destino));
+
+        marker.addTo(markerLayer);
+        markers.push(marker);
+        bounds.push([lat, lng]);
+    });
+
+    document.getElementById('destinosCount').textContent = destinosFiltrados.length;
+
+    if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
+    }
+}
+
+
+    // ========================================
+    // FILTRAR POR REGIÓN
+    // ========================================
+    function filtrarPorRegion(region) {
+        console.log(`🔍 Filtrando por región: ${region}`);
+        regionActual = region;
+
+        // Actualizar botones
+        document.querySelectorAll('.region-filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        const btnActivo = document.querySelector(`[data-region="${region}"]`);
+        if (btnActivo) {
+            btnActivo.classList.add('active');
+        }
+
+        // Recrear marcadores
+        crearMarcadores();
+
+        // Cerrar panel de info
+        cerrarInfoPanel();
+    }
+
+    // ========================================
+    // MOSTRAR PANEL DE INFORMACIÓN
+    // ========================================
+    function mostrarInfoPanel(destino) {
+    const panel = document.getElementById('infoPanel');
+    const content = document.getElementById('infoPanelContent');
+
+    const mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${destino.latitud},${destino.longitud}&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C${destino.latitud},${destino.longitud}&key=TU_API_KEY`;
+
+    const regionIconsHtml = {
+        'costa': '<i class="fas fa-umbrella-beach text-blue-600"></i>',
+        'sierra': '<i class="fas fa-mountain text-green-600"></i>',
+        'oriente': '<i class="fas fa-tree text-yellow-600"></i>',
+        'galapagos': '<i class="fas fa-fish text-red-600"></i>'
+    };
+
+    content.innerHTML = `
+        <div class="space-y-4">
+            <img src="${mapImageUrl}" alt="${destino.nombre}" class="w-full h-48 object-cover rounded-lg"/>
+            <div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">${destino.nombre}</h3>
+                <div class="flex items-center gap-2 text-sm text-gray-600">
+                    ${regionIconsHtml[destino.region] || ''}
+                    <span>${getRegionName(destino.region)}</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="flex text-yellow-500">
+                    ${'★'.repeat(Math.round(destino.calificacion_promedio || 0))}${'☆'.repeat(5 - Math.round(destino.calificacion_promedio || 0))}
+                </div>
+                <span class="text-sm font-semibold text-gray-700">
+                    ${(destino.calificacion_promedio || 0).toFixed(1)} / 5.0
+                </span>
+            </div>
+            <p class="text-gray-600 leading-relaxed">${destino.descripcion_corta || 'Sin descripción disponible'}</p>
+            <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                <div>
+                    <p class="text-xs text-gray-500 mb-1">Latitud</p>
+                    <p class="text-sm font-semibold text-gray-900">${parseFloat(destino.latitud).toFixed(4)}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 mb-1">Longitud</p>
+                    <p class="text-sm font-semibold text-gray-900">${parseFloat(destino.longitud).toFixed(4)}</p>
+                </div>
+            </div>
+            <a href="/destinos/detalle/${destino.slug}/" 
+               class="block w-full text-center px-6 py-3 bg-sky-600 text-white rounded-lg font-semibold hover:bg-sky-700 transition-colors">
+                <i class="fas fa-info-circle mr-2"></i>
+                Ver detalles completos
+            </a>
+        </div>
+    `;
+
+    panel.classList.remove('hidden');
+}
+
+
+    // ========================================
+    // CERRAR PANEL DE INFORMACIÓN
+    // ========================================
+    function cerrarInfoPanel() {
+        const panel = document.getElementById('infoPanel');
+        if (panel) {
+            panel.classList.add('hidden');
+        }
+    }
+
+    // ========================================
+    // OBTENER NOMBRE DE REGIÓN
+    // ========================================
+    function getRegionName(region) {
+        const nombres = {
+            'costa': 'Costa',
+            'sierra': 'Sierra',
+            'oriente': 'Oriente',
+            'galapagos': 'Galápagos'
+        };
+        return nombres[region] || region;
+    }
+
+    // ========================================
+    // EVENTOS
+    // ========================================
+    
+    // Inicializar mapa cuando se cargue la página
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 Página cargada, inicializando mapa...');
+        
+        // Verificar que tenemos datos
+        if (destinosData.length === 0) {
+            console.warn('⚠️ No hay destinos para mostrar');
+            const loadingDiv = document.getElementById('mapLoading');
+            loadingDiv.innerHTML = `
+                <div class="text-center">
+                    <i class="fas fa-map-marked-alt text-gray-400 text-5xl mb-4"></i>
+                    <p class="text-gray-900 font-semibold mb-2">No hay destinos disponibles</p>
+                    <p class="text-gray-600 text-sm mb-4">Crea tu primer destino turístico</p>
+                    {% if user.is_authenticated and user.es_administrador %}
+                    <a href="{% url 'destinos:crear_destino' %}" class="inline-block px-6 py-3 bg-sky-600 text-white rounded-lg hover:bg-sky-700 font-semibold">
+                        <i class="fas fa-plus mr-2"></i>
+                        Crear destino
+                    </a>
+                    {% endif %}
+                </div>
+            `;
+            return;
+        }
+        
+        initMap();
+    });
+
+    // Cerrar panel al hacer clic fuera
+    document.addEventListener('click', (e) => {
+        const panel = document.getElementById('infoPanel');
+        if (panel && !panel.contains(e.target) && !e.target.closest('.leaflet-container')) {
+            if (!e.target.closest('button[data-region]')) {
+                cerrarInfoPanel();
+            }
+        }
+    });
+</script>
+
 </div>
 {% endblock %}

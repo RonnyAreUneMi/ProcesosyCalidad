@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -8,6 +9,8 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.utils import timezone
 from django.http import JsonResponse
+
+from apps.destinos.models import Destino
 from .forms import LoginForm, RegisterForm, PerfilUsuarioForm
 from .models import Usuario, Rol
 
@@ -380,10 +383,32 @@ def home_view(request):
     Vista de página principal
     Redirige según el estado de autenticación
     """
+    destinos = Destino.objects.filter(activo=True).values(
+        'id', 'nombre', 'slug', 'descripcion_corta',
+        'latitud', 'longitud', 'region', 'calificacion_promedio'
+    )
+    
+    destinos_list = []
+    for destino in destinos:
+        destinos_list.append({
+            'id': destino['id'],
+            'nombre': destino['nombre'],
+            'slug': destino['slug'],
+            'descripcion_corta': destino['descripcion_corta'] or '',
+            'latitud': float(destino['latitud']) if destino['latitud'] else None,
+            'longitud': float(destino['longitud']) if destino['longitud'] else None,
+            'region': destino['region'],
+            'calificacion_promedio': float(destino['calificacion_promedio']) if destino['calificacion_promedio'] else 0.0
+        })
+    
+    destinos_json = json.dumps(destinos_list)
+    
     context = {
-        'title': 'Ecuador Turismo - Descubre lo Extraordinario'
+        'title': 'Ecuador Turismo - Descubre lo Extraordinario',
+        'destinos_json': destinos_json,
     }
     return render(request, 'home.html', context)
+
 @login_required
 @require_http_methods(["GET", "POST"])
 def perfil_view(request):

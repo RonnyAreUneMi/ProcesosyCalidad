@@ -1,0 +1,459 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section con Imagen Principal -->
+<div class="relative h-96 bg-gray-900">
+    <img src="{{ destino.get_imagen_principal }}" 
+         alt="{{ destino.nombre }}" 
+         class="w-full h-full object-cover opacity-80">
+    <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-end pb-12">
+            <div class="text-white">
+                <!-- Badges -->
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-sky-500">
+                        <i class="fas fa-map-marker-alt mr-1"></i>
+                        {{ destino.get_region_display }}
+                    </span>
+                    {% if destino.destacado %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-500">
+                        <i class="fas fa-star mr-1"></i>
+                        Destacado
+                    </span>
+                    {% endif %}
+                    {% if destino.categoria %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-500">
+                        <i class="fas fa-tag mr-1"></i>
+                        {{ destino.categoria.nombre }}
+                    </span>
+                    {% endif %}
+                </div>
+                
+                <!-- Título -->
+                <h1 class="text-4xl md:text-5xl font-bold mb-3">
+                    {{ destino.nombre }}
+                </h1>
+                
+                <!-- Ubicación y Calificación -->
+                <div class="flex flex-wrap items-center gap-4 text-lg">
+                    <div class="flex items-center">
+                        <i class="fas fa-map-pin mr-2 text-sky-400"></i>
+                        <span>{{ destino.provincia }}{% if destino.ciudad %}, {{ destino.ciudad }}{% endif %}</span>
+                    </div>
+                    {% if destino.calificacion_promedio > 0 %}
+                    <div class="flex items-center">
+                        <i class="fas fa-star mr-2 text-yellow-400"></i>
+                        <span class="font-semibold">{{ destino.calificacion_promedio|floatformat:1 }}</span>
+                        <span class="text-gray-300 ml-1">({{ destino.total_calificaciones }} opiniones)</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contenido Principal -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Columna Principal -->
+        <div class="lg:col-span-2 space-y-8">
+            
+            <!-- Descripción -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-info-circle text-sky-600 mr-3"></i>
+                    Acerca de este destino
+                </h2>
+                <p class="text-gray-700 text-lg leading-relaxed">
+                    {{ destino.descripcion }}
+                </p>
+            </div>
+
+            <!-- Información del Clima -->
+            {% if destino.clima or destino.mejor_epoca or destino.altitud %}
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-cloud-sun text-sky-600 mr-3"></i>
+                    Clima e Información
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {% if destino.clima %}
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-temperature-high text-blue-600 text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Clima</p>
+                            <p class="text-lg font-semibold text-gray-900">{{ destino.clima }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if destino.altitud %}
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-mountain text-green-600 text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Altitud</p>
+                            <p class="text-lg font-semibold text-gray-900">{{ destino.altitud }} msnm</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if destino.mejor_epoca %}
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-calendar-alt text-yellow-600 text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Mejor Época</p>
+                            <p class="text-lg font-semibold text-gray-900">{{ destino.mejor_epoca }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Atracciones Turísticas -->
+            {% if atracciones %}
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-camera text-sky-600 mr-3"></i>
+                    Atracciones Turísticas
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for atraccion in atracciones %}
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <h3 class="font-bold text-lg text-gray-900 mb-2">{{ atraccion.nombre }}</h3>
+                        <p class="text-gray-600 text-sm mb-3">{{ atraccion.descripcion }}</p>
+                        {% if atraccion.tipo %}
+                        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-sky-100 text-sky-800">
+                            <i class="fas fa-tag mr-1"></i>
+                            {{ atraccion.get_tipo_display }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Galería de Imágenes -->
+            {% if imagenes %}
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-images text-sky-600 mr-3"></i>
+                    Galería de Imágenes
+                </h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {% for imagen in imagenes %}
+                    <div class="relative group cursor-pointer overflow-hidden rounded-lg">
+                        <img src="{{ imagen.imagen.url }}" 
+                             alt="{{ imagen.titulo }}" 
+                             class="w-full h-48 object-cover transform group-hover:scale-110 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity flex items-center justify-center">
+                            <i class="fas fa-search-plus text-white text-2xl opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Servicios Disponibles -->
+            {% if servicios_destino %}
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-concierge-bell text-sky-600 mr-3"></i>
+                    Servicios Disponibles
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for servicio in servicios_destino %}
+                    <a href="{% url 'servicios:detalle_servicio' servicio.slug %}" 
+                       class="block border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-sky-300 transition-all">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-hotel text-sky-600"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <h3 class="font-bold text-gray-900">{{ servicio.nombre }}</h3>
+                                <p class="text-sm text-gray-600 mt-1">{{ servicio.get_tipo_display }}</p>
+                                <div class="flex items-center justify-between mt-2">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-star text-yellow-400 text-sm mr-1"></i>
+                                        <span class="text-sm font-semibold">{{ servicio.calificacion_promedio|floatformat:1 }}</span>
+                                    </div>
+                                    <span class="text-lg font-bold text-sky-600">${{ servicio.precio_base }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Calificaciones y Opiniones -->
+            {% if calificaciones %}
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                    <i class="fas fa-comments text-sky-600 mr-3"></i>
+                    Opiniones de Viajeros
+                </h2>
+                
+                <!-- Resumen de Calificaciones -->
+                {% if total_calificaciones > 0 %}
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <div class="text-4xl font-bold text-gray-900">{{ destino.calificacion_promedio|floatformat:1 }}</div>
+                            <div class="flex items-center mt-1">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= destino.calificacion_promedio %}
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    {% else %}
+                                    <i class="far fa-star text-gray-300"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">{{ total_calificaciones }} opinión{{ total_calificaciones|pluralize:"es" }}</p>
+                        </div>
+                        <div class="flex-1 ml-8">
+                            {% for puntuacion, cantidad in stats_calificaciones.items reversed %}
+                            <div class="flex items-center mb-2">
+                                <span class="text-sm font-medium text-gray-700 w-8">{{ puntuacion }}<i class="fas fa-star text-xs ml-1"></i></span>
+                                <div class="flex-1 mx-3 bg-gray-200 rounded-full h-2">
+                                    {% widthratio cantidad total_calificaciones 100 as porcentaje %}
+                                    <div class="bg-yellow-400 h-2 rounded-full" style="width: {{ porcentaje }}%"></div>
+                                </div>
+                                <span class="text-sm text-gray-600 w-8 text-right">{{ cantidad }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Lista de Opiniones -->
+                <div class="space-y-4">
+                    {% for calificacion in calificaciones %}
+                    <div class="border-b border-gray-200 pb-4 last:border-b-0">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <div class="w-10 h-10 bg-sky-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-sky-600"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="font-semibold text-gray-900">
+                                        {{ calificacion.usuario.get_full_name|default:calificacion.usuario.email }}
+                                    </h4>
+                                    <span class="text-sm text-gray-500">{{ calificacion.fecha_creacion|date:"d M Y" }}</span>
+                                </div>
+                                <div class="flex items-center mt-1">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= calificacion.puntuacion %}
+                                        <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                        {% else %}
+                                        <i class="far fa-star text-gray-300 text-sm"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="ml-2 text-sm text-gray-600">{{ calificacion.servicio.nombre }}</span>
+                                </div>
+                                {% if calificacion.comentario %}
+                                <p class="mt-2 text-gray-700">{{ calificacion.comentario }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Mapa de Ubicación -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                    <i class="fas fa-map text-sky-600 mr-3"></i>
+                    Ubicación
+                </h2>
+                <div id="map" class="w-full h-96 rounded-lg bg-gray-200"></div>
+            </div>
+
+        </div>
+
+        <!-- Sidebar -->
+        <div class="lg:col-span-1 space-y-6">
+            
+            <!-- Tarjeta de Precio -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="text-center mb-6">
+                    <p class="text-sm text-gray-600 mb-2">Rango de precios por día</p>
+                    <div class="flex items-center justify-center">
+                        <span class="text-3xl font-bold text-sky-600">${{ destino.precio_promedio_minimo|floatformat:0 }}</span>
+                        <span class="text-gray-400 mx-2">-</span>
+                        <span class="text-3xl font-bold text-sky-600">${{ destino.precio_promedio_maximo|floatformat:0 }}</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">Precios aproximados por persona</p>
+                </div>
+
+                <div class="space-y-3">
+                    <a href="#" class="block w-full py-3 px-4 bg-sky-600 text-white text-center rounded-lg font-semibold hover:bg-sky-700 transition-colors">
+                        <i class="fas fa-calendar-check mr-2"></i>
+                        Ver Servicios
+                    </a>
+                    <button class="w-full py-3 px-4 border-2 border-sky-600 text-sky-600 text-center rounded-lg font-semibold hover:bg-sky-50 transition-colors">
+                        <a href="{% url 'destinos:lista_destinos' %}" 
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Volver
+                        </a>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Información Adicional -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Información Adicional</h3>
+                <div class="space-y-3">
+                    <div class="flex items-start">
+                        <i class="fas fa-map-marker-alt text-sky-600 mt-1 mr-3"></i>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">Ubicación</p>
+                            <p class="text-sm text-gray-600">{{ destino.provincia }}, {{ destino.get_region_display }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-eye text-sky-600 mt-1 mr-3"></i>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">Visitas</p>
+                            <p class="text-sm text-gray-600">{{ destino.visitas }} visualizacion{{ destino.visitas|pluralize:"es" }}</p>
+                        </div>
+                    </div>
+                    {% if destino.categoria %}
+                    <div class="flex items-start">
+                        <i class="fas fa-tag text-sky-600 mt-1 mr-3"></i>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">Categoría</p>
+                            <p class="text-sm text-gray-600">{{ destino.categoria.nombre }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Destinos Relacionados -->
+            {% if destinos_relacionados %}
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Destinos Similares</h3>
+                <div class="space-y-4">
+                    {% for relacionado in destinos_relacionados %}
+                    <a href="{% url 'destinos:detalle_destino' relacionado.slug %}" 
+                       class="block group">
+                        <div class="flex items-start">
+                            <img src="{{ relacionado.get_imagen_principal }}" 
+                                 alt="{{ relacionado.nombre }}" 
+                                 class="w-20 h-20 object-cover rounded-lg">
+                            <div class="ml-3 flex-1">
+                                <h4 class="font-semibold text-gray-900 group-hover:text-sky-600 transition-colors">
+                                    {{ relacionado.nombre }}
+                                </h4>
+                                <p class="text-sm text-gray-600">{{ relacionado.provincia }}</p>
+                                <div class="flex items-center mt-1">
+                                    <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
+                                    <span class="text-sm font-medium">{{ relacionado.calificacion_promedio|floatformat:1 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Botones de Administrador -->
+            {% if user.is_authenticated and user.es_administrador %}
+            <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                <h3 class="text-sm font-bold text-yellow-900 mb-3 flex items-center">
+                    <i class="fas fa-user-shield mr-2"></i>
+                    Panel de Administrador
+                </h3>
+                <div class="space-y-2">
+                    <a href="{% url 'destinos:editar_destino' destino.id %}" 
+                       class="block w-full py-2 px-3 bg-yellow-600 text-white text-center text-sm rounded-lg font-medium hover:bg-yellow-700 transition-colors">
+                        <i class="fas fa-edit mr-2"></i>
+                        Editar Destino
+                    </a>
+                    <a href="{% url 'destinos:eliminar_destino' destino.id %}" 
+                       class="block w-full py-2 px-3 bg-red-600 text-white text-center text-sm rounded-lg font-medium hover:bg-red-700 transition-colors">
+                        <i class="fas fa-trash mr-2"></i>
+                        Eliminar
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+</div>
+
+<!-- Script de Google Maps -->
+<script>
+function initMap() {
+    const location = { 
+        lat: {{ destino.latitud }}, 
+        lng: {{ destino.longitud }} 
+    };
+    
+    const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 13,
+        center: location,
+        styles: [
+            {
+                featureType: "poi",
+                elementType: "labels",
+                stylers: [{ visibility: "off" }]
+            }
+        ]
+    });
+    
+    const marker = new google.maps.Marker({
+        position: location,
+        map: map,
+        title: "{{ destino.nombre }}",
+        animation: google.maps.Animation.DROP
+    });
+    
+    const infoWindow = new google.maps.InfoWindow({
+        content: `
+            <div style="padding: 10px;">
+                <h3 style="font-weight: bold; margin-bottom: 5px;">{{ destino.nombre }}</h3>
+                <p style="color: #666;">{{ destino.provincia }}{% if destino.ciudad %}, {{ destino.ciudad }}{% endif %}</p>
+            </div>
+        `
+    });
+    
+    marker.addListener("click", () => {
+        infoWindow.open(map, marker);
+    });
+}
+</script>
+<script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap">
+</script>
+
+{% endblock %}
