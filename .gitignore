@@ -26,4 +26,4 @@ staticfiles/
 
 # Directorio de archivos cargados por los usuarios (media)
 # (Si bien la carpeta 'media' existe, ignoramos el contenido para no subir datos grandes)
-media/
+media/.env
