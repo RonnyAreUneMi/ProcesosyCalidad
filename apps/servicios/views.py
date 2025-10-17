@@ -646,83 +646,69 @@ def servicios_por_tipo(request, tipo):
 
 @require_http_methods(["GET"])
 def buscar_servicios_ajax(request):
-    """
-    Vista AJAX para búsqueda de servicios
-    VERSIÓN CORREGIDA: Maneja parámetros opcionales correctamente
-    Usado por el chatbot (RF-007) y búsqueda predictiva
-    """
-    # Obtener parámetros (todos opcionales)
-    query = request.GET.get('q', '').strip()
-    tipo = request.GET.get('tipo', '').strip()
-    region = request.GET.get('region', '').strip()
-    destino_id = request.GET.get('destino', '').strip()
-    precio_max = request.GET.get('precio_max', '').strip()
+    """Vista AJAX para buscar servicios"""
+    q = request.GET.get('q', '')
+    tipo = request.GET.get('tipo', '')
+    region = request.GET.get('region', '')
+    precio_max = request.GET.get('precio_max')
     
-    # Query base
-    servicios = Servicio.objects.filter(
-        activo=True,
-        disponible=True
-    ).select_related('destino', 'categoria', 'proveedor')
-    
-    # Aplicar filtros solo si tienen valor
-    if query:
-        servicios = servicios.filter(
-            Q(nombre__icontains=query) | 
-            Q(descripcion__icontains=query) |
-            Q(destino__nombre__icontains=query)
-        )
-    
-    if tipo:
-        servicios = servicios.filter(tipo=tipo)
-    
-    if region:
-        servicios = servicios.filter(destino__region=region)
-    
-    if destino_id:
-        try:
-            servicios = servicios.filter(destino_id=int(destino_id))
-        except (ValueError, TypeError):
-            pass
-    
-    if precio_max:
-        try:
-            servicios = servicios.filter(precio__lte=float(precio_max))
-        except (ValueError, TypeError):
-            pass
-    
-    # Ordenar por calificación y limitar
-    servicios = servicios.order_by('-calificacion_promedio', '-total_calificaciones')[:15]
-    
-    # Construir respuesta
-    resultados = [{
-        'id': s.id,
-        'nombre': s.nombre,
-        'tipo': s.get_tipo_display(),
-        'tipo_code': s.tipo,
-        'precio': float(s.precio),
-        'destino': s.destino.nombre,
-        'region': s.destino.get_region_display(),
-        'calificacion': float(s.calificacion_promedio),
-        'total_calificaciones': s.total_calificaciones,
-        'capacidad': s.capacidad_maxima,
-        'descripcion_corta': s.descripcion[:150] + '...' if len(s.descripcion) > 150 else s.descripcion,
-        'url': f'/servicios/{s.id}/',
-        'imagen': s.get_imagen_principal() if hasattr(s, 'get_imagen_principal') else None
-    } for s in servicios]
-    
-    return JsonResponse({
-        'success': True,
-        'servicios': resultados,
-        'total_encontrados': len(resultados),
-        'filtros_aplicados': {
-            'query': query or None,
-            'tipo': tipo or None,
-            'region': region or None,
-            'destino_id': destino_id or None,
-            'precio_max': precio_max or None
-        }
-    })
-
+    try:
+        servicios = Servicio.objects.filter(
+            activo=True,
+            disponible=True
+        ).select_related('destino', 'categoria')
+        
+        # Búsqueda general (case-insensitive)
+        if q:
+            servicios = servicios.filter(
+                Q(nombre__icontains=q) |
+                Q(descripcion__icontains=q) |
+                Q(destino__nombre__icontains=q) |
+                Q(destino__provincia__icontains=q)
+            )
+        
+        # Filtro por tipo
+        if tipo:
+            servicios = servicios.filter(tipo=tipo)
+        
+        # Filtro por región (CASE-INSENSITIVE) ✅ CAMBIO AQUÍ
+        if region:
+            servicios = servicios.filter(destino__region__iexact=region)
+        
+        # Filtro por precio
+        if precio_max:
+            try:
+                servicios = servicios.filter(precio__lte=float(precio_max))
+            except ValueError:
+                pass
+        
+        # Ordenar y limitar
+        servicios = servicios.order_by('-calificacion_promedio')[:10]
+        
+        # Serializar resultados
+        resultados = [{
+            'id': s.id,
+            'nombre': s.nombre,
+            'tipo': s.get_tipo_display(),
+            'precio': float(s.precio),
+            'calificacion': float(s.calificacion_promedio),
+            'destino': s.destino.nombre,
+            'region': s.destino.region,
+            'imagen': s.imagen.url if s.imagen else None,
+            'url': f'/servicios/{s.id}/'
+        } for s in servicios]
+        
+        return JsonResponse({
+            'success': True,
+            'servicios': resultados,
+            'total': len(resultados)
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
 
 @require_http_methods(["GET"])
 def estadisticas_servicios_ajax(request):

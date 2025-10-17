@@ -3,10 +3,9 @@
 {% block content %}
 <div class="min-h-screen bg-white">
     
-    <!-- Hero Section con imagen de fondo -->
-    <div class="relative h-[90vh] overflow-hidden">
-        <!-- Background con overlay -->
-        <div class="absolute inset-0 bg-gradient-to-r from-sky-900/90 to-sky-700/70 z-10"></div>
+    <!-- Hero Section -->
+    <div class="relative h-screen overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-slate-900/60 via-blue-900/50 to-cyan-900/60 z-10"></div>
         <img src="https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=1920&q=80" 
              alt="Ecuador" 
              class="absolute inset-0 w-full h-full object-cover">
@@ -14,35 +13,36 @@
         <div class="relative z-20 h-full flex items-center">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
                 <div class="max-w-3xl">
-                    <span class="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-semibold mb-6 border border-white/30">
-                        🇪🇨 Descubre Ecuador
-                    </span>
-                    <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-                        Cuatro mundos en<br/>
-                        <span class="text-sky-300">un solo país</span>
+                    <div class="inline-block mb-6">
+                        <span class="text-xs font-semibold tracking-widest text-cyan-300 uppercase">Descubre Ecuador</span>
+                    </div>
+                    <h1 class="text-7xl md:text-8xl font-light text-white mb-6 leading-[0.95] tracking-tight">
+                        Cuatro mundos<br/>
+                        <span class="font-bold italic bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">en uno solo</span>
                     </h1>
-                    <p class="text-xl text-white/90 mb-8 leading-relaxed">
-                        Desde las playas del Pacífico hasta la Amazonía, pasando por los Andes y las míticas Galápagos. Ecuador te espera.
+                    <p class="text-xl text-white/90 mb-12 leading-relaxed max-w-xl font-light">
+                        Costa, Sierra, Oriente y Galápagos. Un país pequeño con una inmensidad de experiencias.
                     </p>
                     
                     {% if not user.is_authenticated %}
                     <div class="flex flex-wrap gap-4">
-                        <a href="{% url 'usuarios:register' %}" class="px-8 py-4 bg-white text-sky-700 rounded-lg font-bold hover:bg-sky-50 transition-all inline-flex items-center shadow-lg">
+                        <a href="{% url 'usuarios:register' %}" class="group px-8 py-4 bg-white text-slate-900 font-medium hover:bg-slate-100 transition-all inline-flex items-center gap-2">
                             Comenzar ahora
-                            <i class="fas fa-arrow-right ml-2"></i>
+                            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                            </svg>
                         </a>
-                        <a href="{% url 'usuarios:login' %}" class="px-8 py-4 bg-transparent text-white border-2 border-white rounded-lg font-bold hover:bg-white/10 transition-all">
+                        <a href="{% url 'usuarios:login' %}" class="px-8 py-4 border border-white/40 text-white font-medium hover:bg-white/10 transition-all backdrop-blur-sm">
                             Iniciar sesión
                         </a>
                     </div>
                     {% else %}
                     <div class="flex flex-wrap gap-4">
-                        <a href="#regiones" class="px-8 py-4 bg-white text-sky-700 rounded-lg font-bold hover:bg-sky-50 transition-all inline-flex items-center shadow-lg">
+                        <a href="#regiones" class="group px-8 py-4 bg-white text-slate-900 font-medium hover:bg-slate-100 transition-all inline-flex items-center gap-2">
                             Explorar destinos
-                            <i class="fas fa-compass ml-2"></i>
-                        </a>
-                        <a href="#" class="px-8 py-4 bg-transparent text-white border-2 border-white rounded-lg font-bold hover:bg-white/10 transition-all">
-                            Mis reservas
+                            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                            </svg>
                         </a>
                     </div>
                     {% endif %}
@@ -50,482 +50,325 @@
             </div>
         </div>
         
-        <!-- Scroll indicator -->
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 animate-bounce">
-            <i class="fas fa-chevron-down text-white text-2xl"></i>
+        <div class="absolute bottom-12 left-1/2 transform -translate-x-1/2 z-20 animate-bounce">
+            <svg class="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+            </svg>
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <!-- Stats rápidos -->
         {% if user.is_authenticated %}
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20 -mt-32 relative z-30">
-            <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-                <div class="text-3xl font-bold text-sky-600 mb-2">0</div>
-                <div class="text-gray-600 text-sm">Reservas activas</div>
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 -mt-20 relative z-30 mb-32">
+            <div class="bg-white p-6 border border-slate-200 hover:border-cyan-400 transition-colors duration-300">
+                <div class="text-3xl font-light text-slate-900 mb-1">0</div>
+                <div class="text-sm text-slate-600 font-light">Reservas activas</div>
             </div>
-            <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-                <div class="text-3xl font-bold text-sky-600 mb-2">0</div>
-                <div class="text-gray-600 text-sm">Destinos visitados</div>
+            <div class="bg-white p-6 border border-slate-200 hover:border-cyan-400 transition-colors duration-300">
+                <div class="text-3xl font-light text-slate-900 mb-1">0</div>
+                <div class="text-sm text-slate-600 font-light">Destinos visitados</div>
             </div>
-            <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-                <div class="text-3xl font-bold text-sky-600 mb-2">0</div>
-                <div class="text-gray-600 text-sm">Reseñas escritas</div>
+            <div class="bg-white p-6 border border-slate-200 hover:border-cyan-400 transition-colors duration-300">
+                <div class="text-3xl font-light text-slate-900 mb-1">0</div>
+                <div class="text-sm text-slate-600 font-light">Reseñas escritas</div>
             </div>
-            <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-                <div class="text-3xl font-bold text-sky-600 mb-2">0</div>
-                <div class="text-gray-600 text-sm">Puntos acumulados</div>
+            <div class="bg-white p-6 border border-slate-200 hover:border-cyan-400 transition-colors duration-300">
+                <div class="text-3xl font-light text-slate-900 mb-1">0</div>
+                <div class="text-sm text-slate-600 font-light">Puntos acumulados</div>
             </div>
         </div>
+        {% else %}
+        <div class="py-32"></div>
         {% endif %}
 
-        <!-- Buscador -->
-        <div class="bg-gray-50 rounded-2xl p-8 mb-20 border border-gray-200">
-            <h3 class="text-2xl font-bold text-gray-900 mb-6">Busca tu próximo destino</h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="md:col-span-2">
-                    <input type="text" 
-                           placeholder="¿A dónde quieres ir?" 
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none">
-                </div>
-                
-                <select class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none bg-white">
-                    <option value="">Todas las regiones</option>
-                    <option value="costa">Costa</option>
-                    <option value="sierra">Sierra</option>
-                    <option value="oriente">Oriente</option>
-                    <option value="galapagos">Galápagos</option>
-                </select>
-
-                <button class="px-6 py-3 bg-sky-600 text-white rounded-lg font-semibold hover:bg-sky-700 transition-colors">
-                    Buscar
-                </button>
-            </div>
-        </div>
-
-        <!-- Las 4 Regiones con imágenes reales -->
-        <div id="regiones" class="mb-20">
-            <div class="text-center mb-12">
-                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                    Las cuatro regiones del Ecuador
+        <!-- Las 4 Regiones -->
+        <div id="regiones" class="mb-32">
+            <div class="mb-20">
+                <h2 class="text-5xl md:text-6xl font-light text-slate-900 mb-4">
+                    Cuatro <span class="font-bold italic">regiones</span>
                 </h2>
-                <p class="text-xl text-gray-600">Cada una con su propia magia y encanto</p>
+                <p class="text-lg text-slate-600 font-light max-w-2xl">
+                    Cada región con su propia identidad, cultura y paisajes únicos en el mundo.
+                </p>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 <!-- Costa -->
-                <div class="group relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300">
+                <a href="{% url 'destinos:lista_destinos' %}?region=costa" class="group relative overflow-hidden bg-white border border-slate-200 hover:border-cyan-500 transition-all duration-500">
                     <div class="aspect-[4/3] overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80" 
                              alt="Costa Ecuador" 
-                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
                     </div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-sky-900/90 via-sky-900/40 to-transparent"></div>
-                    
-                    <div class="absolute bottom-0 left-0 right-0 p-8 text-white">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent opacity-80 group-hover:opacity-70 transition-opacity duration-500"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-8">
                         <div class="flex items-center gap-3 mb-3">
-                            <span class="text-4xl">🏖️</span>
-                            <h3 class="text-3xl font-bold">Costa</h3>
+                            <div class="w-1 h-12 bg-cyan-400"></div>
+                            <h3 class="text-3xl font-light text-white">Costa</h3>
                         </div>
-                        <p class="text-white/90 mb-4 leading-relaxed">
-                            Playas paradisíacas, clima tropical, gastronomía marina y ciudades vibrantes en el Pacífico ecuatoriano.
+                        <p class="text-white/90 mb-4 leading-relaxed font-light">
+                            Playas paradisíacas, clima tropical y gastronomía marina en el Pacífico ecuatoriano.
                         </p>
-                        <div class="flex gap-2 mb-4">
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Playas</span>
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Surf</span>
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Gastronomía</span>
+                        <div class="flex gap-2 flex-wrap">
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-light border border-white/30">Playas</span>
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-light border border-white/30">Surf</span>
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-light border border-white/30">Gastronomía</span>
                         </div>
-                        <a href="{% url 'destinos:lista_destinos' %}?region=costa" class="w-full py-3 bg-white text-sky-700 rounded-lg font-semibold text-center hover:bg-sky-50 transition-colors block">
-                            Explorar Costa
-                        </a>
                     </div>
-                </div>
+                </a>
 
                 <!-- Sierra -->
-                <div class="group relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300">
+                <a href="{% url 'destinos:lista_destinos' %}?region=sierra" class="group relative overflow-hidden bg-white border border-slate-200 hover:border-emerald-500 transition-all duration-500">
                     <div class="aspect-[4/3] overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1623190003430-bb4dab53f8ba?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8cXVpdG98ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=500" 
+                        <img src="https://images.unsplash.com/photo-1623190003430-bb4dab53f8ba?w=800&q=80" 
                              alt="Sierra Ecuador" 
-                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
                     </div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
-                    
-                    <div class="absolute bottom-0 left-0 right-0 p-8 text-white">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent opacity-80 group-hover:opacity-70 transition-opacity duration-500"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-8">
                         <div class="flex items-center gap-3 mb-3">
-                            <span class="text-4xl">⛰️</span>
-                            <h3 class="text-3xl font-bold">Sierra</h3>
+                            <div class="w-1 h-12 bg-emerald-400"></div>
+                            <h3 class="text-3xl font-light text-white">Sierra</h3>
                         </div>
-                        <p class="text-white/90 mb-4 leading-relaxed">
-                            Majestuosas montañas andinas, volcanes nevados, ciudades coloniales y cultura ancestral milenaria.
+                        <p class="text-white/90 mb-4 leading-relaxed font-light">
+                            Majestuosas montañas andinas, volcanes nevados y ciudades coloniales.
                         </p>
-                        <div class="flex gap-2 mb-4">
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Montañas</span>
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Cultura</span>
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Historia</span>
+                        <div class="flex gap-2 flex-wrap">
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-light border border-white/30">Montañas</span>
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-light border border-white/30">Cultura</span>
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-light border border-white/30">Historia</span>
                         </div>
-                        <a href="{% url 'destinos:lista_destinos' %}?region=sierra" class="w-full py-3 bg-white text-slate-700 rounded-lg font-semibold text-center hover:bg-slate-50 transition-colors block">
-                            Explorar Sierra
-                        </a>
                     </div>
-                </div>
+                </a>
 
                 <!-- Oriente -->
-                <div class="group relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300">
+                <a href="{% url 'destinos:lista_destinos' %}?region=oriente" class="group relative overflow-hidden bg-white border border-slate-200 hover:border-amber-500 transition-all duration-500">
                     <div class="aspect-[4/3] overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=800&q=80" 
                              alt="Oriente Ecuador" 
-                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
                     </div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-green-900/90 via-green-900/40 to-transparent"></div>
-                    
-                    <div class="absolute bottom-0 left-0 right-0 p-8 text-white">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent opacity-80 group-hover:opacity-70 transition-opacity duration-500"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-8">
                         <div class="flex items-center gap-3 mb-3">
-                            <span class="text-4xl">🌴</span>
-                            <h3 class="text-3xl font-bold">Oriente</h3>
+                            <div class="w-1 h-12 bg-amber-400"></div>
+                            <h3 class="text-3xl font-light text-white">Oriente</h3>
                         </div>
-                        <p class="text-white/90 mb-4 leading-relaxed">
-                            La Amazonía ecuatoriana, selva virgen, biodiversidad única, comunidades indígenas y aventura extrema.
+                        <p class="text-white/90 mb-4 leading-relaxed font-light">
+                            La Amazonía ecuatoriana con selva virgen y biodiversidad única.
                         </p>
-                        <div class="flex gap-2 mb-4">
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Selva</span>
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Aventura</span>
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Fauna</span>
+                        <div class="flex gap-2 flex-wrap">
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-light border border-white/30">Selva</span>
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-light border border-white/30">Aventura</span>
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-light border border-white/30">Fauna</span>
                         </div>
-                        <a href="{% url 'destinos:lista_destinos' %}?region=oriente" class="w-full py-3 bg-white text-green-700 rounded-lg font-semibold text-center hover:bg-green-50 transition-colors block">
-                            Explorar Oriente
-                        </a>
                     </div>
-                </div>
+                </a>
 
                 <!-- Galápagos -->
-                <div class="group relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300">
+                <a href="{% url 'destinos:lista_destinos' %}?region=galapagos" class="group relative overflow-hidden bg-white border border-slate-200 hover:border-blue-500 transition-all duration-500">
                     <div class="aspect-[4/3] overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80" 
                              alt="Galápagos Ecuador" 
-                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
                     </div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-blue-900/90 via-blue-900/40 to-transparent"></div>
-                    
-                    <div class="absolute bottom-0 left-0 right-0 p-8 text-white">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent opacity-80 group-hover:opacity-70 transition-opacity duration-500"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-8">
                         <div class="flex items-center gap-3 mb-3">
-                            <span class="text-4xl">🐢</span>
-                            <h3 class="text-3xl font-bold">Galápagos</h3>
+                            <div class="w-1 h-12 bg-blue-400"></div>
+                            <h3 class="text-3xl font-light text-white">Galápagos</h3>
                         </div>
-                        <p class="text-white/90 mb-4 leading-relaxed">
-                            Islas únicas Patrimonio de la Humanidad, fauna endémica extraordinaria y paisajes volcánicos únicos.
+                        <p class="text-white/90 mb-4 leading-relaxed font-light">
+                            Islas Patrimonio de la Humanidad con fauna endémica extraordinaria.
                         </p>
-                        <div class="flex gap-2 mb-4">
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Islas</span>
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Buceo</span>
-                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">Tortugas</span>
+                        <div class="flex gap-2 flex-wrap">
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-light border border-white/30">Islas</span>
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-light border border-white/30">Buceo</span>
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-light border border-white/30">Tortugas</span>
                         </div>
-                        <a href="{% url 'destinos:lista_destinos' %}?region=galapagos" class="w-full py-3 bg-white text-blue-700 rounded-lg font-semibold text-center hover:bg-blue-50 transition-colors block">
-                            Explorar Galápagos
-                        </a>
                     </div>
-                </div>
+                </a>
 
             </div>
         </div>
-        <!-- Header -->
-    <div class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <h1 class="text-4xl font-bold mb-3 flex items-center justify-center">
-                    <i class="fas fa-map-marked-alt mr-3"></i>
-                    Mapa de Destinos Turísticos
-                </h1>
-                <p class="text-xl text-gray-600">
-                    Explora todos los destinos de Ecuador en un mapa interactivo
-                </p>
-            </div>
-        </div>
-    </div>
-    <!-- Controles y Filtros -->
-<div class="bg-white shadow-md sticky top-0 z-40 border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <!-- Contenedor centrado en fila -->
-        <div class="flex flex-wrap justify-center items-center gap-4">
 
-            <!-- Filtros rápidos por región -->
-            <div class="flex flex-wrap gap-2 justify-center">
-                <button onclick="filtrarPorRegion('todos')" 
-                        class="region-filter-btn active px-4 py-2 rounded-lg font-semibold text-sm transition-all"
-                        data-region="todos">
-                    <i class="fas fa-globe-americas mr-1"></i>
-                    Todos
-                </button>
-                <button onclick="filtrarPorRegion('costa')" 
-                        class="region-filter-btn px-4 py-2 rounded-lg font-semibold text-sm transition-all"
-                        data-region="costa">
-                    <i class="fas fa-umbrella-beach mr-1"></i>
-                    Costa
-                </button>
-                <button onclick="filtrarPorRegion('sierra')" 
-                        class="region-filter-btn px-4 py-2 rounded-lg font-semibold text-sm transition-all"
-                        data-region="sierra">
-                    <i class="fas fa-mountain mr-1"></i>
-                    Sierra
-                </button>
-                <button onclick="filtrarPorRegion('oriente')" 
-                        class="region-filter-btn px-4 py-2 rounded-lg font-semibold text-sm transition-all"
-                        data-region="oriente">
-                    <i class="fas fa-tree mr-1"></i>
-                    Oriente
-                </button>
-                <button onclick="filtrarPorRegion('galapagos')" 
-                        class="region-filter-btn px-4 py-2 rounded-lg font-semibold text-sm transition-all"
-                        data-region="galapagos">
-                    <i class="fas fa-fish mr-1"></i>
-                    Galápagos
-                </button>
-            </div>
-
-            <!-- Contador de destinos -->
-            <div class="text-sm font-semibold text-gray-700 flex items-center gap-1">
-                <i class="fas fa-map-pin text-sky-600"></i>
-                <span id="destinosCount">0</span> destinos
-            </div>
-
-        </div>
-    </div>
-     <!-- Contenedor centrado y limitado -->
-    <div class="flex justify-center py-8">
-        <div class="w-full max-w-3xl bg-white rounded-xl shadow-lg overflow-hidden relative" style="height: 450px;">
-            <div id="map" class="w-full h-full"></div>
-            
-            <!-- Loading overlay -->
-            <div id="mapLoading" class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center">
-                <div class="text-center">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mb-4"></div>
-                    <p class="text-gray-600 font-semibold">Cargando mapa...</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-</div>
-
-<!-- Estilos adicionales -->
-<style>
-    .region-filter-btn {
-        background-color: #f3f4f6;
-        color: #4b5563;
-    }
-    
-    .region-filter-btn:hover {
-        background-color: #e5e7eb;
-    }
-    
-    .region-filter-btn.active {
-        background-color: #0ea5e9;
-        color: white;
-    }
-
-    /* Estilos para Leaflet popups */
-    .leaflet-popup-content-wrapper {
-        border-radius: 12px;
-        padding: 0;
-    }
-
-    .leaflet-popup-content {
-        margin: 0;
-        min-width: 250px;
-    }
-</style>
-        <!-- Por qué elegirnos -->
-        <div class="bg-gradient-to-br from-sky-50 to-blue-50 rounded-2xl p-12 mb-20">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                    ¿Por qué reservar con nosotros?
+        <!-- Mapa de destinos -->
+        <div class="mb-32">
+            <div class="mb-12">
+                <h2 class="text-4xl font-light text-slate-900 mb-4">
+                    Mapa de <span class="font-bold italic">destinos</span>
                 </h2>
-                <p class="text-lg text-gray-600">La plataforma de turismo más confiable de Ecuador</p>
+                <p class="text-lg text-slate-600 font-light">Explora todos los lugares turísticos de Ecuador</p>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-sky-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-shield-alt text-white text-2xl"></i>
+
+            <!-- Filtros de región -->
+            <div class="bg-slate-50 border border-slate-200 p-4 mb-6">
+                <div class="flex flex-wrap items-center gap-3">
+                    <button onclick="filtrarPorRegion('todos')" 
+                            class="region-filter-btn active px-5 py-2 font-light text-sm transition-all"
+                            data-region="todos">
+                        Todos
+                    </button>
+                    <button onclick="filtrarPorRegion('costa')" 
+                            class="region-filter-btn px-5 py-2 font-light text-sm transition-all"
+                            data-region="costa">
+                        Costa
+                    </button>
+                    <button onclick="filtrarPorRegion('sierra')" 
+                            class="region-filter-btn px-5 py-2 font-light text-sm transition-all"
+                            data-region="sierra">
+                        Sierra
+                    </button>
+                    <button onclick="filtrarPorRegion('oriente')" 
+                            class="region-filter-btn px-5 py-2 font-light text-sm transition-all"
+                            data-region="oriente">
+                        Oriente
+                    </button>
+                    <button onclick="filtrarPorRegion('galapagos')" 
+                            class="region-filter-btn px-5 py-2 font-light text-sm transition-all"
+                            data-region="galapagos">
+                        Galápagos
+                    </button>
+                    <div class="ml-auto flex items-center gap-2 px-4 py-2 bg-white border border-slate-200">
+                        <svg class="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-sm font-light text-slate-700"><span id="destinosCount">0</span> destinos</span>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Reservas seguras</h3>
-                    <p class="text-gray-600">Pagos protegidos y garantía de satisfacción en todas tus reservas</p>
                 </div>
-                
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-sky-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-headset text-white text-2xl"></i>
+            </div>
+
+            <!-- Mapa -->
+            <div class="relative bg-slate-50 border border-slate-200 overflow-hidden" style="height: 600px;">
+                <div id="map" class="w-full h-full" style="z-index: 1;"></div>
+                <div id="mapLoading" class="absolute inset-0 bg-white flex items-center justify-center" style="z-index: 10;">
+                    <div class="text-center">
+                        <div class="inline-block animate-spin rounded-full h-12 w-12 border-2 border-slate-200 border-t-cyan-600 mb-3"></div>
+                        <p class="text-slate-600 font-light">Cargando mapa...</p>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Soporte 24/7</h3>
-                    <p class="text-gray-600">Asistencia disponible en todo momento para ayudarte en tu viaje</p>
-                </div>
-                
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-sky-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-medal text-white text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Mejor precio</h3>
-                    <p class="text-gray-600">Ofertas exclusivas y los mejores precios del mercado garantizados</p>
                 </div>
             </div>
         </div>
 
         <!-- CTA Final -->
         {% if not user.is_authenticated %}
-        <div class="bg-sky-600 rounded-2xl p-12 text-center text-white">
-            <h2 class="text-3xl md:text-4xl font-bold mb-4">Comienza tu aventura hoy</h2>
-            <p class="text-xl mb-8 text-sky-100">Únete a miles de viajeros que exploran Ecuador con nosotros</p>
-            <a href="{% url 'usuarios:register' %}" class="inline-block px-8 py-4 bg-white text-sky-700 rounded-lg font-bold hover:bg-sky-50 transition-colors">
+        <div class="bg-slate-900 p-20 text-center text-white mb-32">
+            <h2 class="text-4xl md:text-5xl font-light mb-4">Comienza tu <span class="font-bold italic">aventura</span></h2>
+            <p class="text-xl mb-10 text-slate-300 font-light max-w-2xl mx-auto">
+                Únete a miles de viajeros que exploran Ecuador con nosotros
+            </p>
+            <a href="{% url 'usuarios:register' %}" class="inline-block px-10 py-4 bg-white text-slate-900 font-medium hover:bg-slate-100 transition-all">
                 Crear cuenta gratis
             </a>
         </div>
         {% endif %}
 
     </div>
-    
+</div>
 
-<!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
       crossorigin=""/>
-
-<!-- Leaflet JavaScript -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
 
+<style>
+.region-filter-btn {
+    background-color: transparent;
+    color: #64748b;
+    border: 1px solid transparent;
+}
+.region-filter-btn:hover {
+    color: #334155;
+    border-color: #e2e8f0;
+}
+.region-filter-btn.active {
+    background-color: #0891b2;
+    color: white;
+    border-color: #0891b2;
+}
+.leaflet-popup-content-wrapper {
+    padding: 0;
+    border: 1px solid #e2e8f0;
+}
+.leaflet-popup-content {
+    margin: 0;
+    min-width: 280px;
+}
+.leaflet-container {
+    background: #f8fafc;
+}
+</style>
+
 <script>
-    // ========================================
-    // VARIABLES GLOBALES
-    // ========================================
-    let map = null;
-    let markers = [];
-    let markerLayer = null;
-    let regionActual = 'todos';
-    let destinosData = [];
+let map, markers = [], markerLayer, regionActual = 'todos', destinosData = [];
 
-    // ========================================
-    // DATOS DE DESTINOS DESDE DJANGO
-    // ========================================
+try {
+    destinosData = JSON.parse('{{ destinos_json|safe }}');
+} catch (error) {
+    console.error('Error al parsear destinos:', error);
+    destinosData = [];
+}
+
+const regionIcons = {
+    costa: L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    }),
+    sierra: L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    }),
+    oriente: L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    }),
+    galapagos: L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    })
+};
+
+function initMap() {
     try {
-        // Los datos ya vienen como JSON string desde el backend
-        destinosData = JSON.parse('{{ destinos_json|safe }}');
-        console.log(`📊 ${destinosData.length} destinos cargados desde la base de datos`);
-        
-        // Validar que hay datos
-        if (!destinosData || destinosData.length === 0) {
-            console.warn('⚠️ No hay destinos en la base de datos');
-        }
+        map = L.map('map').setView([-1.8312, -78.1834], 7);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap',
+            maxZoom: 19,
+            minZoom: 6
+        }).addTo(map);
+        markerLayer = L.layerGroup().addTo(map);
+        crearMarcadores();
+        setTimeout(() => document.getElementById('mapLoading').classList.add('hidden'), 500);
     } catch (error) {
-        console.error('❌ Error al parsear datos de destinos:', error);
-        destinosData = [];
+        console.error('Error al inicializar mapa:', error);
     }
+}
 
-    // ========================================
-    // ÍCONOS PERSONALIZADOS POR REGIÓN
-    // ========================================
-    const regionIcons = {
-        'costa': L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        }),
-        'sierra': L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        }),
-        'oriente': L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        }),
-        'galapagos': L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        })
-    };
-
-    // ========================================
-    // INICIALIZAR MAPA
-    // ========================================
-    function initMap() {
-        try {
-            console.log('🗺️ Inicializando mapa...');
-            
-            // Centro de Ecuador
-            const ecuadorCenter = [-1.8312, -78.1834];
-
-            // Crear mapa
-            map = L.map('map').setView(ecuadorCenter, 7);
-            console.log('✅ Mapa creado');
-
-            // Añadir capa de tiles (OpenStreetMap)
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-                maxZoom: 19,
-                minZoom: 5
-            }).addTo(map);
-            console.log('✅ Tiles añadidos');
-
-            // Crear capa para los marcadores
-            markerLayer = L.layerGroup().addTo(map);
-
-            // Crear marcadores
-            crearMarcadores();
-
-            // Ocultar loading
-            setTimeout(() => {
-                document.getElementById('mapLoading').classList.add('hidden');
-                console.log('✅ Mapa completamente cargado');
-            }, 500);
-
-        } catch (error) {
-            console.error('❌ Error al inicializar el mapa:', error);
-            const loadingDiv = document.getElementById('mapLoading');
-            loadingDiv.innerHTML = `
-                <div class="text-center">
-                    <i class="fas fa-exclamation-triangle text-red-600 text-4xl mb-4"></i>
-                    <p class="text-gray-900 font-semibold mb-2">Error al cargar el mapa</p>
-                    <p class="text-gray-600 text-sm">${error.message}</p>
-                    <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700">
-                        Recargar página
-                    </button>
-                </div>
-            `;
-        }
-    }
-
-    // ========================================
-    // CREAR MARCADORES
-    // ========================================
-    // ========================================
-// CREAR MARCADORES
-// ========================================
 function crearMarcadores() {
     if (markerLayer) markerLayer.clearLayers();
     markers = [];
-
-    const destinosFiltrados = regionActual === 'todos' 
-        ? destinosData 
-        : destinosData.filter(d => d.region === regionActual);
-
+    const destinosFiltrados = regionActual === 'todos' ? destinosData : destinosData.filter(d => d.region === regionActual);
     const bounds = [];
 
     destinosFiltrados.forEach(destino => {
@@ -534,50 +377,41 @@ function crearMarcadores() {
         if (isNaN(lat) || isNaN(lng)) return;
 
         const marker = L.marker([lat, lng], {
-            icon: regionIcons[destino.region] || regionIcons['costa'],
+            icon: regionIcons[destino.region] || regionIcons.costa,
             title: destino.nombre
         });
 
-        // URL del mapa estático de Google Maps
-        const mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=15&size=120x80&maptype=roadmap&markers=color:red%7C${lat},${lng}&key=TU_API_KEY`;
-
         const popupContent = `
-        <div style="padding: 12px; max-width: 250px;">
-            <div style="display: flex; gap: 8px; align-items: flex-start;">
-                <img src="${destino.get_imagen_principal|| '/static/images/destinos/destino_defecto.jpg'}" 
+        <div style="padding: 16px;">
+            <div style="margin-bottom: 12px;">
+                <img src="${destino.get_imagen_principal || '/static/images/destinos/destino_defecto.jpg'}" 
                      alt="${destino.nombre}" 
-                     style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;"/>
-                <div style="flex: 1;">
-                    <h4 style="font-weight: bold; font-size: 16px; margin-bottom: 4px; color: #1f2937;">
-                        ${destino.nombre}
-                    </h4>
-                    <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">
-                        ${destino.descripcion_corta || 'Sin descripción'}
-                    </p>
-                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
-                        <span style="color: #f59e0b; font-size: 12px;">
-                            ${'★'.repeat(Math.round(destino.calificacion_promedio || 0))}${'☆'.repeat(5 - Math.round(destino.calificacion_promedio || 0))}
-                        </span>
-                        <span style="font-size: 10px; color: #6b7280;">
-                            ${(destino.calificacion_promedio || 0).toFixed(1)}
-                        </span>
-                    </div>
-                    <a href="/destinos/detalle/${destino.slug}/" 
-                       style="display: inline-block; background-color: #0ea5e9; color: white; 
-                              padding: 4px 8px; border-radius: 6px; text-decoration: none; 
-                              font-size: 12px; font-weight: 600;">
-                        Ver detalles
-                    </a>
-                </div>
+                     style="width: 100%; height: 160px; object-fit: cover;"/>
             </div>
+            <h4 style="font-weight: 400; font-size: 18px; margin-bottom: 8px; color: #0f172a;">
+                ${destino.nombre}
+            </h4>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 10px; line-height: 1.5; font-weight: 300;">
+                ${destino.descripcion_corta || 'Sin descripción'}
+            </p>
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 12px;">
+                <span style="color: #f59e0b; font-size: 14px;">
+                    ${'★'.repeat(Math.round(destino.calificacion_promedio || 0))}${'☆'.repeat(5 - Math.round(destino.calificacion_promedio || 0))}
+                </span>
+                <span style="font-size: 12px; color: #64748b; font-weight: 300;">
+                    ${(destino.calificacion_promedio || 0).toFixed(1)}
+                </span>
+            </div>
+            <a href="/destinos/detalle/${destino.slug}/" 
+               style="display: block; background: #0891b2; color: white; 
+                      padding: 10px; text-align: center; text-decoration: none; 
+                      font-size: 13px; font-weight: 400;">
+                Ver detalles
+            </a>
         </div>
         `;
 
         marker.bindPopup(popupContent);
-
-        // Evento click para mostrar panel lateral
-        marker.on('click', () => mostrarInfoPanel(destino));
-
         marker.addTo(markerLayer);
         markers.push(marker);
         bounds.push([lat, lng]);
@@ -590,151 +424,35 @@ function crearMarcadores() {
     }
 }
 
-
-    // ========================================
-    // FILTRAR POR REGIÓN
-    // ========================================
-    function filtrarPorRegion(region) {
-        console.log(`🔍 Filtrando por región: ${region}`);
-        regionActual = region;
-
-        // Actualizar botones
-        document.querySelectorAll('.region-filter-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        const btnActivo = document.querySelector(`[data-region="${region}"]`);
-        if (btnActivo) {
-            btnActivo.classList.add('active');
-        }
-
-        // Recrear marcadores
-        crearMarcadores();
-
-        // Cerrar panel de info
-        cerrarInfoPanel();
-    }
-
-    // ========================================
-    // MOSTRAR PANEL DE INFORMACIÓN
-    // ========================================
-    function mostrarInfoPanel(destino) {
-    const panel = document.getElementById('infoPanel');
-    const content = document.getElementById('infoPanelContent');
-
-    const mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${destino.latitud},${destino.longitud}&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C${destino.latitud},${destino.longitud}&key=TU_API_KEY`;
-
-    const regionIconsHtml = {
-        'costa': '<i class="fas fa-umbrella-beach text-blue-600"></i>',
-        'sierra': '<i class="fas fa-mountain text-green-600"></i>',
-        'oriente': '<i class="fas fa-tree text-yellow-600"></i>',
-        'galapagos': '<i class="fas fa-fish text-red-600"></i>'
-    };
-
-    content.innerHTML = `
-        <div class="space-y-4">
-            <img src="${mapImageUrl}" alt="${destino.nombre}" class="w-full h-48 object-cover rounded-lg"/>
-            <div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-2">${destino.nombre}</h3>
-                <div class="flex items-center gap-2 text-sm text-gray-600">
-                    ${regionIconsHtml[destino.region] || ''}
-                    <span>${getRegionName(destino.region)}</span>
-                </div>
-            </div>
-            <div class="flex items-center gap-2">
-                <div class="flex text-yellow-500">
-                    ${'★'.repeat(Math.round(destino.calificacion_promedio || 0))}${'☆'.repeat(5 - Math.round(destino.calificacion_promedio || 0))}
-                </div>
-                <span class="text-sm font-semibold text-gray-700">
-                    ${(destino.calificacion_promedio || 0).toFixed(1)} / 5.0
-                </span>
-            </div>
-            <p class="text-gray-600 leading-relaxed">${destino.descripcion_corta || 'Sin descripción disponible'}</p>
-            <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
-                <div>
-                    <p class="text-xs text-gray-500 mb-1">Latitud</p>
-                    <p class="text-sm font-semibold text-gray-900">${parseFloat(destino.latitud).toFixed(4)}</p>
-                </div>
-                <div>
-                    <p class="text-xs text-gray-500 mb-1">Longitud</p>
-                    <p class="text-sm font-semibold text-gray-900">${parseFloat(destino.longitud).toFixed(4)}</p>
-                </div>
-            </div>
-            <a href="/destinos/detalle/${destino.slug}/" 
-               class="block w-full text-center px-6 py-3 bg-sky-600 text-white rounded-lg font-semibold hover:bg-sky-700 transition-colors">
-                <i class="fas fa-info-circle mr-2"></i>
-                Ver detalles completos
-            </a>
-        </div>
-    `;
-
-    panel.classList.remove('hidden');
+function filtrarPorRegion(region) {
+    regionActual = region;
+    document.querySelectorAll('.region-filter-btn').forEach(btn => btn.classList.remove('active'));
+    const btnActivo = document.querySelector(`[data-region="${region}"]`);
+    if (btnActivo) btnActivo.classList.add('active');
+    crearMarcadores();
 }
 
-
-    // ========================================
-    // CERRAR PANEL DE INFORMACIÓN
-    // ========================================
-    function cerrarInfoPanel() {
-        const panel = document.getElementById('infoPanel');
-        if (panel) {
-            panel.classList.add('hidden');
-        }
+document.addEventListener('DOMContentLoaded', function() {
+    if (destinosData.length === 0) {
+        const loadingDiv = document.getElementById('mapLoading');
+        loadingDiv.innerHTML = `
+            <div class="text-center">
+                <svg class="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                </svg>
+                <p class="text-slate-900 font-light mb-2 text-lg">No hay destinos disponibles</p>
+                <p class="text-slate-600 text-sm mb-4 font-light">Crea tu primer destino turístico</p>
+                {% if user.is_authenticated and user.es_administrador %}
+                <a href="{% url 'destinos:crear_destino' %}" class="inline-block px-8 py-3 bg-slate-900 text-white hover:bg-slate-800 font-light">
+                    Crear destino
+                </a>
+                {% endif %}
+            </div>
+        `;
+        return;
     }
-
-    // ========================================
-    // OBTENER NOMBRE DE REGIÓN
-    // ========================================
-    function getRegionName(region) {
-        const nombres = {
-            'costa': 'Costa',
-            'sierra': 'Sierra',
-            'oriente': 'Oriente',
-            'galapagos': 'Galápagos'
-        };
-        return nombres[region] || region;
-    }
-
-    // ========================================
-    // EVENTOS
-    // ========================================
-    
-    // Inicializar mapa cuando se cargue la página
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 Página cargada, inicializando mapa...');
-        
-        // Verificar que tenemos datos
-        if (destinosData.length === 0) {
-            console.warn('⚠️ No hay destinos para mostrar');
-            const loadingDiv = document.getElementById('mapLoading');
-            loadingDiv.innerHTML = `
-                <div class="text-center">
-                    <i class="fas fa-map-marked-alt text-gray-400 text-5xl mb-4"></i>
-                    <p class="text-gray-900 font-semibold mb-2">No hay destinos disponibles</p>
-                    <p class="text-gray-600 text-sm mb-4">Crea tu primer destino turístico</p>
-                    {% if user.is_authenticated and user.es_administrador %}
-                    <a href="{% url 'destinos:crear_destino' %}" class="inline-block px-6 py-3 bg-sky-600 text-white rounded-lg hover:bg-sky-700 font-semibold">
-                        <i class="fas fa-plus mr-2"></i>
-                        Crear destino
-                    </a>
-                    {% endif %}
-                </div>
-            `;
-            return;
-        }
-        
-        initMap();
-    });
-
-    // Cerrar panel al hacer clic fuera
-    document.addEventListener('click', (e) => {
-        const panel = document.getElementById('infoPanel');
-        if (panel && !panel.contains(e.target) && !e.target.closest('.leaflet-container')) {
-            if (!e.target.closest('button[data-region]')) {
-                cerrarInfoPanel();
-            }
-        }
-    });
+    initMap();
+});
 </script>
 
-</div>
 {% endblock %}

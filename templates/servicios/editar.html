@@ -1,0 +1,519 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-sky-50 py-12">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Header -->
+        <div class="mb-8">
+            <nav class="mb-4">
+                <ol class="flex items-center space-x-2 text-sm">
+                    <li><a href="{% url 'home' %}" class="text-gray-600 hover:text-sky-600 transition-colors">Inicio</a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 text-xs"></i></li>
+                    <li><a href="{% url 'servicios:listar_servicios' %}" class="text-gray-600 hover:text-sky-600 transition-colors">Servicios</a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 text-xs"></i></li>
+                    <li class="text-sky-600 font-medium">Editar Servicio</li>
+                </ol>
+            </nav>
+            
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-xl">
+                    <i class="fas fa-edit text-white text-3xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-4xl font-bold text-gray-900">Editar Servicio</h1>
+                    <p class="text-gray-600 mt-1">Actualiza la información de tu servicio</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario -->
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Información Básica -->
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <div class="flex items-center mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-sky-400 to-blue-500 rounded-xl flex items-center justify-center mr-3 shadow-lg">
+                        <i class="fas fa-info-circle text-white"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900">Información Básica</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Nombre -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Nombre del Servicio <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" 
+                               name="nombre" 
+                               required
+                               value="{{ servicio.nombre }}"
+                               class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                               placeholder="Ej: Tour Islas Galápagos 5 días">
+                    </div>
+
+                    <!-- Tipo de Servicio -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Tipo de Servicio <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <select name="tipo" 
+                                    required
+                                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all appearance-none bg-white cursor-pointer">
+                                <option value="">Selecciona un tipo</option>
+                                {% for tipo_code, tipo_nombre in tipos_servicio %}
+                                <option value="{{ tipo_code }}" {% if servicio.tipo == tipo_code %}selected{% endif %}>
+                                    {{ tipo_nombre }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                        </div>
+                    </div>
+
+                    <!-- Precio -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Precio (USD) <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">$</span>
+                            <input type="number" 
+                                   name="precio" 
+                                   required
+                                   min="0"
+                                   step="0.01"
+                                   value="{{ servicio.precio }}"
+                                   class="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                   placeholder="0.00">
+                        </div>
+                    </div>
+
+                    <!-- Capacidad Máxima -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Capacidad Máxima <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-users absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="number" 
+                                   name="capacidad_maxima" 
+                                   required
+                                   min="1"
+                                   value="{{ servicio.capacidad_maxima }}"
+                                   class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                   placeholder="1">
+                        </div>
+                    </div>
+
+                    <!-- Disponibilidad -->
+                    <div class="flex items-center space-x-3 md:col-span-1">
+                        <input type="checkbox" 
+                               name="disponible" 
+                               id="disponible"
+                               {% if servicio.disponible %}checked{% endif %}
+                               class="w-6 h-6 text-sky-600 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 cursor-pointer">
+                        <label for="disponible" class="text-sm font-semibold text-gray-700 cursor-pointer">
+                            Servicio disponible
+                        </label>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Descripción <span class="text-red-500">*</span>
+                        </label>
+                        <textarea name="descripcion" 
+                                  required
+                                  rows="5"
+                                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all resize-none"
+                                  placeholder="Describe detalladamente tu servicio, incluye qué está incluido, itinerario, etc.">{{ servicio.descripcion }}</textarea>
+                        <p class="text-xs text-gray-500 mt-2">
+                            <i class="fas fa-lightbulb mr-1"></i>
+                            Una buena descripción aumenta las reservas
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ubicación -->
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <div class="flex items-center mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center mr-3 shadow-lg">
+                        <i class="fas fa-map-marker-alt text-white"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900">Ubicación</h2>
+                </div>
+
+                <div class="grid grid-cols-1 gap-6">
+                    <!-- Destino -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Destino <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-location-dot absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                            <select name="destino" 
+                                    required
+                                    class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all appearance-none bg-white cursor-pointer">
+                                <option value="">Selecciona un destino</option>
+                                {% for destino in destinos %}
+                                <option value="{{ destino.id }}" {% if servicio.destino.id == destino.id %}selected{% endif %}>
+                                    {{ destino.nombre }} - {{ destino.get_region_display }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            La categoría se tomará automáticamente del destino seleccionado
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Imágenes Actuales -->
+            {% if servicio.imagenes.exists %}
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <div class="flex items-center mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-xl flex items-center justify-center mr-3 shadow-lg">
+                        <i class="fas fa-image text-white"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900">Imágenes Actuales</h2>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="imagenesActuales">
+                    {% for imagen in servicio.imagenes.all %}
+                    <div class="relative group" data-imagen-id="{{ imagen.id }}">
+                        <div class="aspect-square rounded-xl overflow-hidden shadow-lg">
+                            <img src="{{ imagen.imagen.url }}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="absolute top-2 right-2">
+                            <button type="button" 
+                                    onclick="eliminarImagen({{ imagen.id }})"
+                                    class="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        {% if imagen.orden == 0 %}
+                        <div class="absolute bottom-2 left-2">
+                            <span class="px-3 py-1 bg-yellow-400 text-yellow-900 rounded-full text-xs font-bold shadow-lg">
+                                <i class="fas fa-star mr-1"></i>Principal
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Nuevas Imágenes -->
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <div class="flex items-center mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center mr-3 shadow-lg">
+                        <i class="fas fa-plus text-white"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900">Agregar Nuevas Imágenes</h2>
+                </div>
+
+                <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-sky-500 transition-colors cursor-pointer bg-gray-50 hover:bg-sky-50" onclick="document.getElementById('imagenes').click()">
+                    <i class="fas fa-cloud-upload-alt text-6xl text-gray-400 mb-4"></i>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Arrastra imágenes o haz clic para seleccionar</h3>
+                    <p class="text-sm text-gray-500 mb-4">PNG, JPG o WEBP (máx. 5MB por imagen)</p>
+                    <input type="file" 
+                           name="imagenes" 
+                           id="imagenes"
+                           multiple
+                           accept="image/*"
+                           class="hidden"
+                           onchange="previsualizarImagenes(this)">
+                    <button type="button" 
+                            onclick="document.getElementById('imagenes').click()"
+                            class="px-6 py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                        <i class="fas fa-folder-open mr-2"></i>
+                        Seleccionar Imágenes
+                    </button>
+                </div>
+
+                <!-- Preview de nuevas imágenes -->
+                <div id="imagenesPreview" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 hidden"></div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="flex items-center justify-between space-x-4">
+                <a href="{% url 'servicios:detalle_servicio' servicio.id %}" 
+                   class="px-8 py-4 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-all inline-flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Cancelar
+                </a>
+                
+                <button type="submit" 
+                        class="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-2xl hover:scale-105 transition-all inline-flex items-center">
+                    <i class="fas fa-save mr-2"></i>
+                    Guardar Cambios
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script>
+// Eliminar imagen existente (AJAX)
+function eliminarImagen(imagenId) {
+    if (!confirm('¿Estás seguro de eliminar esta imagen?')) return;
+    
+    fetch(`/servicios/imagen/${imagenId}/eliminar/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.querySelector(`[data-imagen-id="${imagenId}"]`).remove();
+            mostrarNotificacion('Imagen eliminada exitosamente', 'success');
+        } else {
+            mostrarNotificacion('Error al eliminar la imagen', 'error');
+        }
+    })
+    .catch(error => {
+        mostrarNotificacion('Error al eliminar la imagen', 'error');
+    });
+}
+
+// Previsualizar nuevas imágenes
+function previsualizarImagenes(input) {
+    const preview = document.getElementById('imagenesPreview');
+    preview.innerHTML = '';
+    preview.classList.remove('hidden');
+    
+    if (input.files) {
+        Array.from(input.files).forEach((file, index) => {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'relative group';
+                div.innerHTML = `
+                    <div class="aspect-square rounded-xl overflow-hidden shadow-lg">
+                        <img src="${e.target.result}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="absolute top-2 right-2">
+                        <button type="button" 
+                                onclick="eliminarImagenPreview(this, ${index})"
+                                class="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="absolute bottom-2 left-2">
+                        <span class="px-3 py-1 bg-green-400 text-green-900 rounded-full text-xs font-bold shadow-lg">
+                            <i class="fas fa-plus-circle mr-1"></i>Nueva
+                        </span>
+                    </div>
+                `;
+                preview.appendChild(div);
+            }
+            
+            reader.readAsDataURL(file);
+        });
+    }
+}
+
+function eliminarImagenPreview(button, index) {
+    const input = document.getElementById('imagenes');
+    const dt = new DataTransfer();
+    
+    Array.from(input.files).forEach((file, i) => {
+        if (i !== index) {
+            dt.items.add(file);
+        }
+    });
+    
+    input.files = dt.files;
+    previsualizarImagenes(input);
+}
+
+// Drag and drop
+const dropZone = document.querySelector('.border-dashed');
+if (dropZone) {
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            dropZone.classList.add('border-sky-500', 'bg-sky-50');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            dropZone.classList.remove('border-sky-500', 'bg-sky-50');
+        });
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        const files = e.dataTransfer.files;
+        document.getElementById('imagenes').files = files;
+        previsualizarImagenes(document.getElementById('imagenes'));
+    });
+}
+
+// Validación del formulario
+document.querySelector('form').addEventListener('submit', function(e) {
+    const nombre = document.querySelector('[name="nombre"]').value.trim();
+    const tipo = document.querySelector('[name="tipo"]').value;
+    const precio = document.querySelector('[name="precio"]').value;
+    const destino = document.querySelector('[name="destino"]').value;
+    const descripcion = document.querySelector('[name="descripcion"]').value.trim();
+    
+    if (!nombre || !tipo || !precio || !destino || !descripcion) {
+        e.preventDefault();
+        mostrarNotificacion('Por favor completa todos los campos obligatorios', 'error');
+        return false;
+    }
+    
+    if (parseFloat(precio) <= 0) {
+        e.preventDefault();
+        mostrarNotificacion('El precio debe ser mayor a 0', 'error');
+        return false;
+    }
+    
+    const btn = this.querySelector('button[type="submit"]');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Guardando...';
+    btn.disabled = true;
+});
+
+function mostrarNotificacion(mensaje, tipo) {
+    const notificacion = document.createElement('div');
+    notificacion.className = `fixed top-4 right-4 px-6 py-4 rounded-xl shadow-2xl z-50 transform transition-all duration-300 ${
+        tipo === 'success' ? 'bg-green-500' : 'bg-red-500'
+    } text-white font-semibold`;
+    notificacion.innerHTML = `
+        <div class="flex items-center space-x-3">
+            <i class="fas fa-${tipo === 'success' ? 'check-circle' : 'exclamation-circle'} text-xl"></i>
+            <span>${mensaje}</span>
+        </div>
+    `;
+    document.body.appendChild(notificacion);
+    
+    setTimeout(() => {
+        notificacion.style.transform = 'translateX(400px)';
+        setTimeout(() => notificacion.remove(), 300);
+    }, 3000);
+}
+
+// Contador de caracteres
+const descripcionTextarea = document.querySelector('[name="descripcion"]');
+if (descripcionTextarea) {
+    const contadorDiv = document.createElement('div');
+    contadorDiv.className = 'text-right text-xs text-gray-500 mt-1';
+    contadorDiv.innerHTML = `<span id="charCount">${descripcionTextarea.value.length}</span> / 1000 caracteres`;
+    descripcionTextarea.parentNode.appendChild(contadorDiv);
+    
+    descripcionTextarea.addEventListener('input', function() {
+        const count = this.value.length;
+        document.getElementById('charCount').textContent = count;
+        
+        if (count > 1000) {
+            this.value = this.value.substring(0, 1000);
+            document.getElementById('charCount').textContent = 1000;
+        }
+    });
+}
+</script>
+
+<style>
+input:focus, 
+textarea:focus, 
+select:focus {
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.border-dashed {
+    transition: all 0.3s ease;
+}
+
+textarea::-webkit-scrollbar {
+    width: 8px;
+}
+
+textarea::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #0ea5e9, #3b82f6);
+    border-radius: 10px;
+}
+
+textarea::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #0284c7, #2563eb);
+}
+
+::selection {
+    background-color: rgba(14, 165, 233, 0.3);
+    color: inherit;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.fa-spin {
+    animation: spin 1s linear infinite;
+}
+
+input[type="checkbox"] {
+    transition: all 0.2s ease;
+}
+
+input[type="checkbox"]:checked {
+    background-color: #0ea5e9;
+    border-color: #0ea5e9;
+}
+
+select {
+    background-image: none;
+}
+
+button {
+    position: relative;
+    overflow: hidden;
+}
+
+button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+button:active::after {
+    width: 300px;
+    height: 300px;
+}
+</style>
+{% endblock %}

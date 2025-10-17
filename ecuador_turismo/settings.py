@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'apps.rutas',
     'apps.reservas',
     'apps.calificaciones',
-    'apps.chatbot',  # ✅ Ya está agregada
+    'apps.chatbot',
 ]
 
 MIDDLEWARE = [
@@ -85,25 +85,39 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
         'PORT': config('DB_PORT'),
+        'OPTIONS': {
+            'sslmode': 'require',  # Fuerza SSL
+            'connect_timeout': 10,  # Timeout de 10 segundos
+            'options': '-c statement_timeout=30000'  # 30 segundos para queries
+        },
+        'CONN_MAX_AGE': 600,  # Reutiliza conexiones por 10 minutos
     }
 }
 
+
 # ============================================
-# ✅ AGREGAR ESTA SECCIÓN: AI CONFIGURATION
+# ✅ OPENAI CONFIGURATION (GPT-4)
 # ============================================
 OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
-GROQ_API_KEY = config('GROQ_API_KEY', default='')
 
-# Validar que al menos una key esté configurada
-if not OPENAI_API_KEY and not GROQ_API_KEY and DEBUG:
+# Validar que la key esté configurada
+if not OPENAI_API_KEY and DEBUG:
     import warnings
     warnings.warn(
-        "⚠️  Ni OPENAI_API_KEY ni GROQ_API_KEY están configuradas. El chatbot no funcionará.",
+        "⚠️  OPENAI_API_KEY no está configurada. El chatbot no funcionará.\n"
+        "   Agrega tu API key en el archivo .env:\n"
+        "   OPENAI_API_KEY=sk-proj-...",
         RuntimeWarning
     )
+
+# Configuración opcional de modelo (puedes cambiarlo aquí)
+OPENAI_MODEL = config('OPENAI_MODEL', default='gpt-4-turbo-preview')
+# Opciones: 'gpt-4-turbo-preview', 'gpt-4o', 'gpt-4', 'gpt-3.5-turbo'
+
 # ============================================
 
-# Otras variables de entorno
+
+# Supabase Configuration
 SUPABASE_URL = config('SUPABASE_URL')
 SUPABASE_ANON_KEY = config('SUPABASE_ANON_KEY')
 SUPABASE_BUCKET_NAME = config('SUPABASE_BUCKET_NAME')

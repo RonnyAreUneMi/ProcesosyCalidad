@@ -672,9 +672,135 @@ def editar_destino(request, destino_id):
     destino = get_object_or_404(Destino, id=destino_id)
     
     if request.method == 'POST':
-        # Similar al crear pero actualizando
-        # [Código de validación y actualización igual que antes]
-        pass
+        try:
+            # Obtener datos del formulario
+            nombre = request.POST.get('nombre', '').strip()
+            region = request.POST.get('region', '').strip()
+            categoria_id = request.POST.get('categoria', '').strip()
+            provincia = request.POST.get('provincia', '').strip()
+            ciudad = request.POST.get('ciudad', '').strip()
+            descripcion = request.POST.get('descripcion', '').strip()
+            descripcion_corta = request.POST.get('descripcion_corta', '').strip()
+            latitud = request.POST.get('latitud', '').strip()
+            longitud = request.POST.get('longitud', '').strip()
+            altitud = request.POST.get('altitud', '').strip()
+            clima = request.POST.get('clima', '').strip()
+            mejor_epoca = request.POST.get('mejor_epoca', '').strip()
+            precio_min = request.POST.get('precio_promedio_minimo', '').strip()
+            precio_max = request.POST.get('precio_promedio_maximo', '').strip()
+            destacado = request.POST.get('destacado') == 'on'
+            activo = request.POST.get('activo') == 'on'
+            imagen_principal = request.FILES.get('imagen_principal')
+
+            # Validaciones
+            if not all([nombre, region, provincia, descripcion, descripcion_corta, latitud, longitud, precio_min, precio_max]):
+                messages.error(request, 'Por favor completa todos los campos obligatorios')
+                return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            # Validar coordenadas
+            try:
+                latitud = float(latitud)
+                longitud = float(longitud)
+                if not (-90 <= latitud <= 90) or not (-180 <= longitud <= 180):
+                    messages.error(request, 'Coordenadas geográficas inválidas')
+                    return redirect('destinos:editar_destino', destino_id=destino.id)
+            except ValueError:
+                messages.error(request, 'Latitud y longitud deben ser valores numéricos')
+                return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            # Validar precios
+            try:
+                precio_min = float(precio_min)
+                precio_max = float(precio_max)
+                if precio_min < 0 or precio_max < 0 or precio_min > precio_max:
+                    messages.error(request, 'Los precios deben ser válidos y el mínimo no puede ser mayor al máximo')
+                    return redirect('destinos:editar_destino', destino_id=destino.id)
+            except ValueError:
+                messages.error(request, 'Los precios deben ser valores numéricos')
+                return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            # Validar altitud
+            altitud_final = None
+            if altitud:
+                try:
+                    altitud_final = int(altitud)
+                    if altitud_final < 0:
+                        messages.error(request, 'La altitud no puede ser negativa')
+                        return redirect('destinos:editar_destino', destino_id=destino.id)
+                except ValueError:
+                    messages.error(request, 'La altitud debe ser un valor numérico')
+                    return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            # Validar descripción corta
+            if len(descripcion_corta) > 300:
+                messages.error(request, 'La descripción corta no puede exceder 300 caracteres')
+                return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            # Validar categoría
+            categoria = None
+            if categoria_id:
+                try:
+                    categoria = Categoria.objects.get(id=int(categoria_id), activo=True)
+                except (Categoria.DoesNotExist, ValueError):
+                    messages.error(request, 'La categoría seleccionada no es válida')
+                    return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            # Validar región
+            if region not in dict(Destino.REGIONES_CHOICES).keys():
+                messages.error(request, 'La región seleccionada no es válida')
+                return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            # Validar provincia
+            provincias = get_provincias()
+            if provincia not in provincias:
+                messages.error(request, 'La provincia seleccionada no es válida')
+                return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            # Validar ciudad
+            if ciudad and ciudad not in get_cantones(provincia):
+                messages.error(request, 'La ciudad/cantón seleccionado no es válido')
+                return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            # Validar imagen si se proporcionó una nueva
+            if imagen_principal:
+                valid_formats = ['image/jpeg', 'image/png', 'image/webp']
+                if imagen_principal.content_type not in valid_formats:
+                    messages.error(request, 'Formato de imagen no válido. Usa JPG, PNG o WEBP')
+                    return redirect('destinos:editar_destino', destino_id=destino.id)
+                if imagen_principal.size > 5 * 1024 * 1024:  # 5MB
+                    messages.error(request, 'La imagen no puede exceder 5MB')
+                    return redirect('destinos:editar_destino', destino_id=destino.id)
+
+            # Actualizar el destino
+            destino.nombre = nombre
+            destino.region = region
+            destino.categoria = categoria
+            destino.provincia = provincia
+            destino.ciudad = ciudad if ciudad else None
+            destino.descripcion = descripcion
+            destino.descripcion_corta = descripcion_corta
+            destino.latitud = latitud
+            destino.longitud = longitud
+            destino.altitud = altitud_final
+            destino.clima = clima if clima else None
+            destino.mejor_epoca = mejor_epoca if mejor_epoca else None
+            destino.precio_promedio_minimo = precio_min
+            destino.precio_promedio_maximo = precio_max
+            destino.destacado = destacado
+            destino.activo = activo
+
+            # Actualizar imagen si se proporcionó una nueva
+            if imagen_principal:
+                destino.imagen_principal = imagen_principal
+
+            destino.save()
+
+            messages.success(request, f'Destino "{nombre}" actualizado exitosamente')
+            return redirect('destinos:detalle_destino', slug=destino.slug)
+
+        except Exception as e:
+            messages.error(request, f'Error al actualizar el destino: {str(e)}')
+            return redirect('destinos:editar_destino', destino_id=destino.id)
     
     # GET request
     categorias = Categoria.objects.filter(activo=True)

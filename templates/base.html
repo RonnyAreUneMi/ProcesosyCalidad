@@ -5,38 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Ecuador Turismo - Descubre lo Extraordinario{% endblock %}</title>
     
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- AOS Animation Library -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
     
     <style>
-        /* Paleta de colores ecuatorianos profesionales */
+        /* === COLORES ECUADOR === */
         :root {
-            --ecuador-yellow: #FFD700;
-            --ecuador-blue: #0033A0;
-            --ecuador-red: #CE1126;
-            --primary: #0052A3;          /* Azul Ecuador más suave */
-            --primary-dark: #003875;     /* Azul oscuro */
-            --primary-light: #4A90E2;    /* Azul claro */
-            --accent-yellow: #F4C430;    /* Amarillo suave */
-            --accent-red: #D64545;       /* Rojo suave */
+            --primary: #0052A3;
+            --primary-dark: #003875;
+            --primary-light: #4A90E2;
+            --accent-yellow: #FFC400;
+            --accent-red: #CE1126;
             --dark: #1a2332;
             --light: #f0f4f8;
         }
         
-        /* Gradientes profesionales con colores ecuatorianos */
+        /* === GRADIENTES === */
         .gradient-bg {
             background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
         }
         
         .gradient-ecuador {
-            background: linear-gradient(135deg, #0052A3 0%, #003875 50%, #F4C430 100%);
+            background: linear-gradient(135deg, #0052A3 0%, #FFC400 50%, #CE1126 100%);
         }
         
         .gradient-text {
@@ -46,6 +38,7 @@
             background-clip: text;
         }
         
+        /* === BOTONES === */
         .btn-primary {
             background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
             transition: all 0.3s ease;
@@ -58,18 +51,18 @@
         }
         
         .btn-ecuador {
-            background: linear-gradient(135deg, #F4C430 0%, #FFD700 100%);
+            background: linear-gradient(135deg, #FFC400 0%, #FFD700 100%);
             color: #003875;
             transition: all 0.3s ease;
         }
         
         .btn-ecuador:hover {
-            background: linear-gradient(135deg, #FFD700 0%, #F4C430 100%);
+            background: linear-gradient(135deg, #FFD700 0%, #FFC400 100%);
             transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(244, 196, 48, 0.4);
+            box-shadow: 0 8px 16px rgba(255, 196, 0, 0.4);
         }
         
-        /* Card effects */
+        /* === CARDS === */
         .card-hover {
             transition: all 0.3s ease;
         }
@@ -79,93 +72,45 @@
             box-shadow: 0 12px 24px rgba(0, 82, 163, 0.15);
         }
         
-        /* Animaciones sutiles */
+        /* === ANIMACIONES === */
         @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        .slide-down {
-            animation: slideDown 0.3s ease-out;
-        }
+        .slide-down { animation: slideDown 0.3s ease-out; }
         
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
         
-        .fade-in {
-            animation: fadeIn 0.4s ease-out;
-        }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
         
         @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
         
-        .slide-in-right {
-            animation: slideInRight 0.3s ease-out;
-        }
+        .slide-in-right { animation: slideInRight 0.3s ease-out; }
         
-        /* Backdrop blur */
-        .backdrop-blur-custom {
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
-        
-        /* Custom scrollbar profesional */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        
+        /* === SCROLLBAR ECUADOR (Amarillo-Azul-Rojo) === */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
+            background: linear-gradient(180deg, #FFC400 0%, #0052A3 50%, #CE1126 100%);
             border-radius: 5px;
         }
+        ::-webkit-scrollbar-thumb:hover { background: #003875; }
         
-        ::-webkit-scrollbar-thumb:hover {
-            background: #003875;
-        }
+        /* === MENSAJES === */
+        .message-success { background: linear-gradient(135deg, #059669 0%, #047857 100%); }
+        .message-error { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); }
+        .message-warning { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); }
+        .message-info { background: linear-gradient(135deg, #0052A3 0%, #003875 100%); }
         
-        /* Message styles profesionales */
-        .message-success {
-            background: linear-gradient(135deg, #059669 0%, #047857 100%);
-        }
+        .mobile-menu-enter { animation: slideDown 0.3s ease-out; }
         
-        .message-error {
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-        }
-        
-        .message-warning {
-            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-        }
-        
-        .message-info {
-            background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
-        }
-        
-        /* Mobile menu animation */
-        .mobile-menu-enter {
-            animation: slideDown 0.3s ease-out;
-        }
-        
-        /* Badge styles */
         .badge {
             padding: 4px 12px;
             border-radius: 9999px;
@@ -174,78 +119,114 @@
             display: inline-block;
         }
         
-        /* Loading spinner */
-        .spinner {
-            border: 3px solid rgba(0, 82, 163, 0.2);
+        /* === LOADER ECUADOR === */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        
+        .loader-overlay.active {
+            display: flex;
+            pointer-events: all;
+        }
+        
+        .loader-ecuador {
+            width: 50px;
+            height: 50px;
+            border: 4px solid transparent;
             border-radius: 50%;
             border-top-color: #0052A3;
-            width: 24px;
-            height: 24px;
+            border-right-color: #FFC400;
+            border-bottom-color: #CE1126;
             animation: spin 1s linear infinite;
         }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-
-        /* Pulse animation para badge del carrito */
+        
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
         }
         
-        .pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        /* Chatbot Styles */
+        .pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        
+        /* === CHATBOT === */
         .chatbot-container {
             position: fixed;
             bottom: 24px;
             right: 24px;
             z-index: 1000;
         }
-
+        
+        /* Animación de parpadeo para el borde */
+        @keyframes borderPulse {
+            0%, 100% { 
+                border-color: #FFC400;
+                box-shadow: 0 4px 20px rgba(255, 196, 0, 0.4);
+            }
+            33% { 
+                border-color: #0052A3;
+                box-shadow: 0 4px 20px rgba(0, 82, 163, 0.4);
+            }
+            66% { 
+                border-color: #CE1126;
+                box-shadow: 0 4px 20px rgba(206, 17, 38, 0.4);
+            }
+        }
+        
         .chatbot-button {
-            width: 60px;
-            height: 60px;
+            position: relative;
+            width: 64px;
+            height: 64px;
             border-radius: 50%;
-            background: transparent;
+            background: white;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             transition: all 0.3s ease;
-            padding: 0;
+            border: 3px solid #FFC400;
+            animation: borderPulse 3s ease-in-out infinite;
         }
-
+        
         .chatbot-button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+            transform: scale(1.1) translateY(-2px);
+            animation-play-state: paused;
+            box-shadow: 0 8px 30px rgba(0, 82, 163, 0.4);
         }
-
+        
+        .chatbot-button img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
         .chatbot-button i {
             color: #0052A3;
             font-size: 28px;
         }
-
-        .chatbot-button img {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
+        
         .chatbot-window {
             position: absolute;
-            bottom: 80px;
+            bottom: 85px;
             right: 0;
             width: 380px;
             height: 550px;
             background: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            border-radius: 20px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -253,14 +234,15 @@
             transform: scale(0.9) translateY(20px);
             pointer-events: none;
             transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
         }
-
+        
         .chatbot-window.active {
             opacity: 1;
             transform: scale(1) translateY(0);
             pointer-events: all;
         }
-
+        
         .chatbot-header {
             background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
             color: white;
@@ -268,31 +250,38 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            border-bottom: 3px solid #FFC400;
         }
-
+        
         .chatbot-messages {
             flex: 1;
             padding: 20px;
             overflow-y: auto;
             background: #f8fafc;
         }
-
+        
+        /* Scrollbar del chat con colores Ecuador (Amarillo-Azul-Rojo) */
+        .chatbot-messages::-webkit-scrollbar { width: 6px; }
+        .chatbot-messages::-webkit-scrollbar-track { background: #e2e8f0; }
+        .chatbot-messages::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #FFC400 0%, #0052A3 50%, #CE1126 100%);
+            border-radius: 3px;
+        }
+        
         .chatbot-input-area {
             padding: 16px;
             background: white;
             border-top: 1px solid #e2e8f0;
         }
-
+        
         .chat-message {
             margin-bottom: 16px;
             display: flex;
             gap: 8px;
         }
-
-        .chat-message.user {
-            flex-direction: row-reverse;
-        }
-
+        
+        .chat-message.user { flex-direction: row-reverse; }
+        
         .chat-avatar {
             width: 32px;
             height: 32px;
@@ -304,17 +293,17 @@
             font-weight: 600;
             flex-shrink: 0;
         }
-
+        
         .chat-message.bot .chat-avatar {
             background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
             color: white;
         }
-
+        
         .chat-message.user .chat-avatar {
-            background: linear-gradient(135deg, #F4C430 0%, #FFD700 100%);
+            background: linear-gradient(135deg, #FFC400 0%, #FFD700 100%);
             color: #003875;
         }
-
+        
         .chat-bubble {
             max-width: 75%;
             padding: 12px 16px;
@@ -322,40 +311,25 @@
             line-height: 1.5;
             font-size: 14px;
         }
-
+        
         .chat-message.bot .chat-bubble {
             background: white;
             color: #1e293b;
             border-bottom-left-radius: 4px;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
-
+        
         .chat-message.user .chat-bubble {
             background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
             color: white;
             border-bottom-right-radius: 4px;
         }
-
-        @media (max-width: 640px) {
-            .chatbot-window {
-                width: calc(100vw - 32px);
-                height: calc(100vh - 120px);
-                bottom: 80px;
-                right: 16px;
-            }
-
-            .chatbot-container {
-                bottom: 16px;
-                right: 16px;
-            }
-        }
-
-        /* Badge de notificación del chatbot */
+        
         .chatbot-badge {
             position: absolute;
             top: -4px;
             right: -4px;
-            background: #D64545;
+            background: #CE1126;
             color: white;
             border-radius: 50%;
             width: 20px;
@@ -367,11 +341,30 @@
             font-weight: 700;
             border: 2px solid white;
         }
+        
+        @media (max-width: 640px) {
+            .chatbot-window {
+                width: calc(100vw - 32px);
+                height: calc(100vh - 120px);
+                bottom: 85px;
+                right: 16px;
+            }
+            
+            .chatbot-container {
+                bottom: 16px;
+                right: 16px;
+            }
+        }
     </style>
     
     {% block extra_css %}{% endblock %}
 </head>
 <body class="bg-gray-50 min-h-screen">
+    
+    <!-- Loader Ecuador -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader-ecuador"></div>
+    </div>
     
     <!-- Header / Navbar -->
     <header class="bg-white shadow-md sticky top-0 z-50 border-b border-gray-200">
@@ -404,17 +397,14 @@
                     </a>
                     
                     {% if user.is_authenticated %}
-                        <!-- Carrito (solo para turistas) -->
                         {% if user.rol.nombre == 'turista' %}
                             <a href="{% url 'reservas:ver_carrito' %}" class="relative p-2 hover:bg-blue-50 rounded-lg transition ml-2" title="Carrito de compras">
                                 <i class="fas fa-shopping-cart text-gray-700 text-lg"></i>
-                                <span id="carritoCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold pulse">
-                                    0
-                                </span>
+                                <span id="carritoCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold pulse">0</span>
                             </a>
                         {% endif %}
                         
-                        <!-- Dropdown de usuario -->
+                        <!-- Dropdown usuario -->
                         <div class="relative ml-3" x-data="{ open: false }">
                             <button @click="open = !open" class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
                                 <div class="w-8 h-8 gradient-bg rounded-full flex items-center justify-center text-white font-semibold text-sm">
@@ -424,79 +414,56 @@
                                 <i class="fas fa-chevron-down text-xs text-gray-400"></i>
                             </button>
                             
-                            <div x-show="open" 
-                                 @click.away="open = false"
-                                 x-transition:enter="transition ease-out duration-200"
-                                 x-transition:enter-start="opacity-0 scale-95"
-                                 x-transition:enter-end="opacity-100 scale-100"
-                                 class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-1 slide-down">
-                                
+                            <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-1 slide-down">
                                 <div class="px-4 py-3 border-b border-gray-100">
                                     <p class="text-sm font-semibold text-gray-900">{{ user.nombre }}</p>
                                     <p class="text-xs text-gray-500 mt-1">{{ user.correo }}</p>
                                     {% if user.rol %}
                                         <span class="inline-block mt-2 px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700">
-                                            {% if user.rol.nombre == 'turista' %}
-                                                <i class="fas fa-user mr-1"></i>Turista
-                                            {% elif user.rol.nombre == 'proveedor' %}
-                                                <i class="fas fa-briefcase mr-1"></i>Proveedor
-                                            {% elif user.rol.nombre == 'administrador' %}
-                                                <i class="fas fa-user-shield mr-1"></i>Administrador
-                                            {% endif %}
+                                            {% if user.rol.nombre == 'turista' %}<i class="fas fa-user mr-1"></i>Turista
+                                            {% elif user.rol.nombre == 'proveedor' %}<i class="fas fa-briefcase mr-1"></i>Proveedor
+                                            {% elif user.rol.nombre == 'administrador' %}<i class="fas fa-user-shield mr-1"></i>Administrador{% endif %}
                                         </span>
                                     {% endif %}
                                 </div>
                                 
                                 <a href="{% url 'usuarios:perfil' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                    <i class="fas fa-user-circle mr-3 text-blue-600 w-4"></i>
-                                    Mi Perfil
+                                    <i class="fas fa-user-circle mr-3 text-blue-600 w-4"></i>Mi Perfil
                                 </a>
                                 
                                 {% if user.rol.nombre == 'turista' %}
                                     <a href="{% url 'reservas:mis_reservas' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                        <i class="fas fa-calendar-check mr-3 text-blue-600 w-4"></i>
-                                        Mis Reservas
+                                        <i class="fas fa-calendar-check mr-3 text-blue-600 w-4"></i>Mis Reservas
                                     </a>
                                     <a href="{% url 'reservas:ver_carrito' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                        <i class="fas fa-shopping-cart mr-3 text-blue-600 w-4"></i>
-                                        Mi Carrito
+                                        <i class="fas fa-shopping-cart mr-3 text-blue-600 w-4"></i>Mi Carrito
                                     </a>
                                 {% elif user.rol.nombre == 'proveedor' %}
                                     <a href="{% url 'reservas:reservas_proveedor' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                        <i class="fas fa-calendar-alt mr-3 text-blue-600 w-4"></i>
-                                        Gestionar Reservas
+                                        <i class="fas fa-calendar-alt mr-3 text-blue-600 w-4"></i>Gestionar Reservas
                                     </a>
                                     <a href="{% url 'servicios:mis_servicios' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                        <i class="fas fa-briefcase mr-3 text-blue-600 w-4"></i>
-                                        Mis Servicios
+                                        <i class="fas fa-briefcase mr-3 text-blue-600 w-4"></i>Mis Servicios
                                     </a>
                                 {% elif user.rol.nombre == 'administrador' %}
                                     <a href="{% url 'usuarios:listar_usuarios' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                        <i class="fas fa-users-cog mr-3 text-blue-600 w-4"></i>
-                                        Gestión de Usuarios
+                                        <i class="fas fa-users-cog mr-3 text-blue-600 w-4"></i>Gestión de Usuarios
                                     </a>
                                     <a href="/admin/" target="_blank" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                        <i class="fas fa-cog mr-3 text-gray-600 w-4"></i>
-                                        Panel Django
+                                        <i class="fas fa-cog mr-3 text-gray-600 w-4"></i>Panel Django
                                     </a>
                                 {% endif %}
                                 
                                 <div class="border-t border-gray-100 my-1"></div>
                                 
                                 <a href="{% url 'usuarios:logout' %}" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
-                                    <i class="fas fa-sign-out-alt mr-3 w-4"></i>
-                                    Cerrar Sesión
+                                    <i class="fas fa-sign-out-alt mr-3 w-4"></i>Cerrar Sesión
                                 </a>
                             </div>
                         </div>
                     {% else %}
-                        <!-- Usuario no autenticado -->
-                        <a href="{% url 'usuarios:login' %}" class="ml-4 px-4 py-2 text-blue-700 border border-blue-700 rounded-lg hover:bg-blue-50 transition font-medium">
-                            Iniciar Sesión
-                        </a>
-                        <a href="{% url 'usuarios:register' %}" class="px-4 py-2 btn-primary text-white rounded-lg font-medium shadow-sm">
-                            Registrarse
-                        </a>
+                        <a href="{% url 'usuarios:login' %}" class="ml-4 px-4 py-2 text-blue-700 border border-blue-700 rounded-lg hover:bg-blue-50 transition font-medium">Iniciar Sesión</a>
+                        <a href="{% url 'usuarios:register' %}" class="px-4 py-2 btn-primary text-white rounded-lg font-medium shadow-sm">Registrarse</a>
                     {% endif %}
                 </nav>
                 
@@ -547,38 +514,28 @@
                     <a href="{% url 'usuarios:perfil' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
                         <i class="fas fa-user-circle mr-2"></i>Mi Perfil
                     </a>
-                    
                     <a href="{% url 'usuarios:logout' %}" class="block py-2 text-red-600 hover:bg-red-50 rounded-lg px-3 transition">
                         <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
                     </a>
                 {% else %}
-                    <a href="{% url 'usuarios:login' %}" class="block py-2 text-blue-700 hover:bg-blue-50 rounded-lg px-3 transition font-medium">
-                        Iniciar Sesión
-                    </a>
-                    <a href="{% url 'usuarios:register' %}" class="block py-2 gradient-bg text-white rounded-lg px-3 font-medium">
-                        Registrarse
-                    </a>
+                    <a href="{% url 'usuarios:login' %}" class="block py-2 text-blue-700 hover:bg-blue-50 rounded-lg px-3 transition font-medium">Iniciar Sesión</a>
+                    <a href="{% url 'usuarios:register' %}" class="block py-2 gradient-bg text-white rounded-lg px-3 font-medium">Registrarse</a>
                 {% endif %}
             </div>
         </div>
     </header>
     
-    <!-- Messages / Notifications -->
+    <!-- Mensajes -->
     {% if messages %}
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             {% for message in messages %}
                 <div class="{% if message.tags == 'error' %}message-error{% elif message.tags == 'success' %}message-success{% elif message.tags == 'warning' %}message-warning{% else %}message-info{% endif %} text-white px-6 py-4 rounded-lg shadow-lg mb-3 fade-in flex items-center justify-between">
                     <div class="flex items-center space-x-3">
                         <div class="flex-shrink-0">
-                            {% if message.tags == 'error' %}
-                                <i class="fas fa-exclamation-circle text-xl"></i>
-                            {% elif message.tags == 'success' %}
-                                <i class="fas fa-check-circle text-xl"></i>
-                            {% elif message.tags == 'warning' %}
-                                <i class="fas fa-exclamation-triangle text-xl"></i>
-                            {% else %}
-                                <i class="fas fa-info-circle text-xl"></i>
-                            {% endif %}
+                            {% if message.tags == 'error' %}<i class="fas fa-exclamation-circle text-xl"></i>
+                            {% elif message.tags == 'success' %}<i class="fas fa-check-circle text-xl"></i>
+                            {% elif message.tags == 'warning' %}<i class="fas fa-exclamation-triangle text-xl"></i>
+                            {% else %}<i class="fas fa-info-circle text-xl"></i>{% endif %}
                         </div>
                         <p class="font-medium">{{ message }}</p>
                     </div>
@@ -590,27 +547,23 @@
         </div>
     {% endif %}
     
-    <!-- Main Content -->
+    <!-- Contenido Principal -->
     <main class="flex-grow">
         {% block content %}{% endblock %}
     </main>
     
     <!-- Chatbot Flotante -->
     <div class="chatbot-container">
-        <!-- Botón del Chatbot -->
         <div class="chatbot-button" onclick="toggleChatbot()" id="chatbotButton" title="Asistente Virtual">
             <img src="/media/bot.png" alt="Chatbot" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
             <i class="fas fa-robot" style="display: none;"></i>
-            <!-- Badge de notificación (opcional) -->
             <span class="chatbot-badge" id="chatbotBadge" style="display: none;">1</span>
         </div>
 
-        <!-- Ventana del Chatbot -->
         <div class="chatbot-window" id="chatbotWindow">
-            <!-- Header -->
             <div class="chatbot-header">
                 <div class="flex items-center space-x-3">
-                    <img src="/media/bot.png" alt="Bot Avatar" class="w-10 h-10 rounded-full border-2 border-white object-cover" onerror="this.src='https://ui-avatars.com/api/?name=Bot&background=0052A3&color=fff&bold=true'">
+                    <img src="/media/bot.png" alt="Bot" class="w-10 h-10 rounded-full border-2 border-white object-cover" onerror="this.src='https://ui-avatars.com/api/?name=Bot&background=0052A3&color=fff&bold=true'">
                     <div>
                         <h3 class="font-semibold text-white">Asistente Virtual</h3>
                         <p class="text-xs text-blue-200">Ecuador Turismo</p>
@@ -621,31 +574,14 @@
                 </button>
             </div>
 
-            <!-- Mensajes -->
-            <div class="chatbot-messages" id="chatbotMessages">
-                <div class="chat-message bot slide-in-right">
-                    <div class="chat-avatar">
-                        <img src="/media/bot.png" alt="Bot" class="w-full h-full rounded-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-robot\'></i>'">
-                    </div>
-                    <div class="chat-bubble">
-                        ¡Hola! 👋 Soy tu asistente virtual de Ecuador Turismo. ¿En qué puedo ayudarte hoy?
-                    </div>
-                </div>
-            </div>
+            <div class="chatbot-messages" id="chatbotMessages"></div>
 
-            <!-- Input Area -->
             <div class="chatbot-input-area">
                 <div class="flex space-x-2">
-                    <input 
-                        type="text" 
-                        id="chatbotInput" 
-                        placeholder="Escribe tu mensaje..." 
-                        class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        onkeypress="handleChatKeyPress(event)"
-                    >
-                    <button 
-                        onclick="sendChatMessage()" 
-                        class="btn-primary text-white px-4 py-2 rounded-lg hover:opacity-90 transition">
+                    <input type="text" id="chatbotInput" placeholder="Escribe tu mensaje..." 
+                           class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           onkeypress="handleChatKeyPress(event)">
+                    <button onclick="sendChatMessage()" class="btn-primary text-white px-4 py-2 rounded-lg hover:opacity-90 transition">
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
@@ -653,465 +589,324 @@
         </div>
     </div>
     
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white mt-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <!-- About -->
+    <!-- Footer Compacto UNEMI -->
+    <footer class="bg-gray-900 text-white mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Brand -->
                 <div>
-                    <div class="flex items-center space-x-2 mb-4">
-                        <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center text-white font-bold">
-                            ET
-                        </div>
-                        <h3 class="text-lg font-bold">Ecuador Turismo</h3>
+                    <div class="flex items-center space-x-2 mb-3">
+                        <div class="w-9 h-9 gradient-bg rounded-lg flex items-center justify-center text-white font-bold text-sm">ET</div>
+                        <h3 class="text-base font-bold">Ecuador Turismo</h3>
                     </div>
-                    <p class="text-gray-400 text-sm leading-relaxed">
-                        Plataforma oficial para descubrir y reservar experiencias turísticas en las cuatro regiones naturales de Ecuador.
-                    </p>
+                    <p class="text-gray-400 text-sm">Descubre las maravillas de las cuatro regiones naturales de Ecuador.</p>
                 </div>
                 
-                <!-- Quick Links -->
+                <!-- Enlaces -->
                 <div>
-                    <h4 class="font-semibold mb-4 text-white">Enlaces Rápidos</h4>
-                    <ul class="space-y-2 text-sm">
+                    <h4 class="font-semibold mb-3 text-sm">Enlaces</h4>
+                    <ul class="space-y-1 text-sm">
                         <li><a href="{% url 'destinos:lista_destinos' %}" class="text-gray-400 hover:text-yellow-400 transition">Destinos</a></li>
                         <li><a href="{% url 'servicios:listar_servicios' %}" class="text-gray-400 hover:text-yellow-400 transition">Servicios</a></li>
                         <li><a href="{% url 'destinos:mapa_destinos' %}" class="text-gray-400 hover:text-yellow-400 transition">Rutas</a></li>
-                        {% if user.is_authenticated and user.rol.nombre == 'turista' %}
-                            <li><a href="{% url 'reservas:mis_reservas' %}" class="text-gray-400 hover:text-yellow-400 transition">Mis Reservas</a></li>
-                        {% endif %}
                     </ul>
                 </div>
                 
-                <!-- Regions -->
+                <!-- Contacto -->
                 <div>
-                    <h4 class="font-semibold mb-4 text-white">Regiones</h4>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="{% url 'servicios:listar_servicios' %}?region=costa" class="text-gray-400 hover:text-yellow-400 transition">Costa</a></li>
-                        <li><a href="{% url 'servicios:listar_servicios' %}?region=sierra" class="text-gray-400 hover:text-yellow-400 transition">Sierra</a></li>
-                        <li><a href="{% url 'servicios:listar_servicios' %}?region=oriente" class="text-gray-400 hover:text-yellow-400 transition">Oriente</a></li>
-                        <li><a href="{% url 'servicios:listar_servicios' %}?region=galapagos" class="text-gray-400 hover:text-yellow-400 transition">Galápagos</a></li>
+                    <h4 class="font-semibold mb-3 text-sm">Contacto</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li class="flex items-center"><i class="fas fa-envelope mr-2 text-yellow-400 text-xs"></i>info@ecuadorturismo.ec</li>
+                        <li class="flex items-center"><i class="fas fa-phone mr-2 text-yellow-400 text-xs"></i>+593 2 123 4567</li>
                     </ul>
-                </div>
-                
-                <!-- Contact -->
-                <div>
-                    <h4 class="font-semibold mb-4 text-white">Contacto</h4>
-                    <ul class="space-y-3 text-sm text-gray-400">
-                        <li class="flex items-center">
-                            <i class="fas fa-envelope mr-2 text-yellow-400"></i>
-                            info@ecuadorturismo.ec
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-phone mr-2 text-yellow-400"></i>
-                            +593 2 123 4567
-                        </li>
-                        <li class="flex space-x-3 pt-2">
-                            <a href="#" class="w-9 h-9 bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center transition">
-                                <i class="fab fa-facebook-f"></i>
-                            </a>
-                            <a href="#" class="w-9 h-9 bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center transition">
-                                <i class="fab fa-instagram"></i>
-                            </a>
-                            <a href="#" class="w-9 h-9 bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center transition">
-                                <i class="fab fa-twitter"></i>
-                            </a>
-                        </li>
-                    </ul>
+                    <div class="flex space-x-2 mt-3">
+                        <a href="#" class="w-8 h-8 bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center transition text-sm">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-8 h-8 bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center transition text-sm">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-8 h-8 bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center transition text-sm">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
             
-            <div class="border-t border-gray-800 mt-10 pt-8 text-center text-sm text-gray-400">
-                <p>&copy; 2025 Ecuador Turismo. Todos los derechos reservados.</p>
-                <p class="mt-2">Sistema desarrollado con Django Framework</p>
+            <div class="border-t border-gray-800 mt-6 pt-6 text-center">
+                <p class="text-gray-400 text-xs">&copy; 2025 Ecuador Turismo. Todos los derechos reservados.</p>
+                <p class="text-gray-500 text-xs mt-1">Proyecto Académico - Universidad Estatal de Milagro (UNEMI)</p>
             </div>
         </div>
     </footer>
     
- <!-- Alpine.js para dropdowns -->
+    <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    
-    <!-- Scripts -->
-    <script>
-        // ====================================
-        // INICIALIZACIÓN Y CONFIGURACIÓN
-        // ====================================
-        
-        // Initialize AOS
-        AOS.init({
-            duration: 600,
-            once: true,
-            offset: 80,
-            easing: 'ease-out'
-        });
-        
-        // Mobile menu toggle
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            menu.classList.toggle('hidden');
-        }
-        
-        // Auto-hide messages after 5 seconds
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                const messages = document.querySelectorAll('[class*="message-"]');
-                messages.forEach(function(message) {
-                    message.style.transition = 'opacity 0.4s ease';
-                    message.style.opacity = '0';
-                    setTimeout(() => message.remove(), 400);
-                });
-            }, 5000);
-            
-            // Actualizar contador del carrito al cargar la página
-            actualizarContadorCarrito();
-            
-            // Cargar historial del chatbot
-            cargarHistorialChat();
-            
-            // Configurar limpieza al cerrar sesión
-            configurarLimpiezaAlCerrarSesion();
-        });
-        
-        // Smooth scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-        
-        // ====================================
-        // FUNCIÓN PARA ACTUALIZAR CONTADOR DEL CARRITO
-        // ====================================
-        function actualizarContadorCarrito() {
-            {% if user.is_authenticated and user.rol.nombre == 'turista' %}
-                fetch('{% url "reservas:ver_carrito" %}')
-                    .then(response => response.text())
-                    .then(html => {
-                        // Parsear el HTML para obtener la cantidad de items
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        
-                        // Buscar elementos con información del carrito
-                        const cantidadTexto = doc.body.textContent;
-                        const match = cantidadTexto.match(/Tienes (\d+) servicio/);
-                        
-                        if (match && match[1]) {
-                            const cantidad = parseInt(match[1]);
-                            const badge = document.getElementById('carritoCount');
-                            if (badge) {
-                                badge.textContent = cantidad;
-                                badge.style.display = cantidad > 0 ? 'flex' : 'none';
-                            }
-                        }
-                    })
-                    .catch(error => {
-                        console.log('No se pudo actualizar el contador del carrito');
-                    });
-            {% endif %}
-        }
-        
-        // Actualizar contador cada 30 segundos si está en una página de servicios
-        {% if user.is_authenticated and user.rol.nombre == 'turista' %}
-            setInterval(actualizarContadorCarrito, 30000);
-        {% endif %}
-
-        // ====================================
-        // CHATBOT CON GPT-4 Y GESTIÓN DE HISTORIAL
-        // ====================================
-        
-        const CHAT_HISTORY_KEY = 'ecuadorTurismoChatHistory';
-        let isProcessing = false;
-        
-        // Cargar historial al iniciar
-        function cargarHistorialChat() {
-            const historial = obtenerHistorialChat();
-            const messagesContainer = document.getElementById('chatbotMessages');
-            
-            messagesContainer.innerHTML = '';
-            
-            if (historial.length === 0) {
-                // Mensaje de bienvenida por defecto
-                addChatMessage(
-                    '¡Hola! 👋 Soy Guía Ecuador, tu asistente virtual. Puedo ayudarte a:\n\n' +
-                    '🔍 Buscar servicios turísticos\n' +
-                    '📊 Comparar opciones\n' +
-                    '💰 Encontrar las mejores ofertas\n' +
-                    '🗺️ Recomendar destinos\n\n' +
-                    '¿Qué te gustaría explorar hoy?',
-                    'bot',
-                    false
-                );
-            } else {
-                // Renderizar historial guardado
-                historial.forEach(msg => {
-                    addChatMessage(msg.content, msg.role === 'user' ? 'user' : 'bot', false);
-                });
-            }
-        }
-        
-        function obtenerHistorialChat() {
-            const historialStr = sessionStorage.getItem(CHAT_HISTORY_KEY);
-            return historialStr ? JSON.parse(historialStr) : [];
-        }
-        
-        function guardarMensajeHistorial(content, role) {
-            const historial = obtenerHistorialChat();
-            historial.push({ 
-                content, 
-                role, 
-                timestamp: Date.now() 
-            });
-            
-            // Limitar a últimos 30 mensajes
-            if (historial.length > 30) {
-                historial.splice(0, historial.length - 30);
-            }
-            
-            sessionStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(historial));
-        }
-        
-        function toggleChatbot() {
-            const chatbotWindow = document.getElementById('chatbotWindow');
-            const chatbotBadge = document.getElementById('chatbotBadge');
-            
-            chatbotWindow.classList.toggle('active');
-            
-            if (chatbotWindow.classList.contains('active')) {
-                chatbotBadge.style.display = 'none';
-                document.getElementById('chatbotInput').focus();
-            }
-        }
-        
-        async function sendChatMessage() {
-            if (isProcessing) return;
-            
-            const input = document.getElementById('chatbotInput');
-            const message = input.value.trim();
-            
-            if (message === '') return;
-            
-            // Prevenir múltiples envíos
-            isProcessing = true;
-            input.disabled = true;
-            
-            // Agregar mensaje del usuario
-            addChatMessage(message, 'user', true);
-            guardarMensajeHistorial(message, 'user');
-            
-            // Limpiar input
-            input.value = '';
-            
-            // Mostrar indicador de escritura
-            const typingId = mostrarIndicadorEscritura();
-            
-            try {
-                const historial = obtenerHistorialChat();
-                
-                const response = await fetch('/chatbot/message/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
-                    },
-                    body: JSON.stringify({
-                        message: message,
-                        history: historial
-                    })
-                });
-                
-                removerIndicadorEscritura(typingId);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    addChatMessage(data.response, 'bot', true);
-                    guardarMensajeHistorial(data.response, 'assistant');
-                } else {
-                    addChatMessage(
-                        '😔 Lo siento, ocurrió un error. Por favor intenta de nuevo.',
-                        'bot',
-                        true
-                    );
-                }
-                
-            } catch (error) {
-                removerIndicadorEscritura(typingId);
-                console.error('Error en chatbot:', error);
-                addChatMessage(
-                    '❌ No pude conectarme al servidor. Verifica tu conexión e intenta nuevamente.',
-                    'bot',
-                    true
-                );
-            } finally {
-                isProcessing = false;
-                input.disabled = false;
-                input.focus();
-            }
-        }
-        
-        function addChatMessage(text, sender, animate = true) {
-            const messagesContainer = document.getElementById('chatbotMessages');
-            
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `chat-message ${sender}${animate ? ' slide-in-right' : ''}`;
-            
-            const avatarDiv = document.createElement('div');
-            avatarDiv.className = 'chat-avatar';
-            
-            if (sender === 'bot') {
-                const botImg = document.createElement('img');
-                botImg.src = '/media/bot.png';
-                botImg.alt = 'Bot';
-                botImg.className = 'w-full h-full rounded-full object-cover';
-                botImg.onerror = function() {
-                    this.style.display = 'none';
-                    this.parentElement.innerHTML = '<i class="fas fa-robot"></i>';
-                };
-                avatarDiv.appendChild(botImg);
-            } else {
-                const userInitial = '{{ user.nombre|slice:":1"|upper }}'.toUpperCase() || 'U';
-                avatarDiv.textContent = userInitial;
-            }
-            
-            const bubbleDiv = document.createElement('div');
-            bubbleDiv.className = 'chat-bubble';
-            
-            // Convertir markdown y preservar saltos de línea
-            const htmlText = convertirMarkdownAHTML(text);
-            bubbleDiv.innerHTML = htmlText;
-            
-            messageDiv.appendChild(avatarDiv);
-            messageDiv.appendChild(bubbleDiv);
-            
-            messagesContainer.appendChild(messageDiv);
-            
-            // Scroll suave al último mensaje
-            messagesContainer.scrollTo({
-                top: messagesContainer.scrollHeight,
-                behavior: 'smooth'
-            });
-        }
-        
-        function convertirMarkdownAHTML(text) {
-            // Convertir saltos de línea a <br>
-            let html = text.replace(/\n/g, '<br>');
-            
-            // Convertir enlaces [texto](url) a <a>
-            html = html.replace(
-                /\[([^\]]+)\]\(([^)]+)\)/g,
-                '<a href="$2" class="text-blue-600 hover:underline font-medium" target="_blank">$1 <i class="fas fa-external-link-alt text-xs"></i></a>'
-            );
-            
-            // Convertir **negrita** a <strong>
-            html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-            
-            // Convertir emojis de estrella a HTML
-            html = html.replace(/⭐/g, '<span class="text-yellow-400">⭐</span>');
-            
-            return html;
-        }
-        
-        function mostrarIndicadorEscritura() {
-            const messagesContainer = document.getElementById('chatbotMessages');
-            
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'chat-message bot slide-in-right';
-            typingDiv.id = 'typing-indicator-' + Date.now();
-            
-            const avatarDiv = document.createElement('div');
-            avatarDiv.className = 'chat-avatar';
-            avatarDiv.innerHTML = '<i class="fas fa-robot"></i>';
-            
-            const bubbleDiv = document.createElement('div');
-            bubbleDiv.className = 'chat-bubble';
-            bubbleDiv.innerHTML = `
-                <div class="flex space-x-1">
-                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
-                </div>
-            `;
-            
-            typingDiv.appendChild(avatarDiv);
-            typingDiv.appendChild(bubbleDiv);
-            
-            messagesContainer.appendChild(typingDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            
-            return typingDiv.id;
-        }
-        
-        function removerIndicadorEscritura(id) {
-            const indicator = document.getElementById(id);
-            if (indicator) {
-                indicator.remove();
-            }
-        }
-        
-        function handleChatKeyPress(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                sendChatMessage();
-            }
-        }
-        
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        
-        function configurarLimpiezaAlCerrarSesion() {
-            {% if user.is_authenticated %}
-            const logoutLinks = document.querySelectorAll('a[href="{% url "usuarios:logout" %}"]');
-            logoutLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    // Limpiar historial
-                    sessionStorage.removeItem(CHAT_HISTORY_KEY);
-                    
-                    // Notificar al backend (opcional)
-                    fetch('/chatbot/limpiar/', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': getCookie('csrftoken')
-                        }
-                    }).catch(err => console.log('Error limpiando:', err));
-                });
-            });
-            {% endif %}
-        }
-        
-        // Badge de notificación después de 15 segundos
-        setTimeout(() => {
-            const chatbotWindow = document.getElementById('chatbotWindow');
-            const chatbotBadge = document.getElementById('chatbotBadge');
-            
-            if (!chatbotWindow.classList.contains('active')) {
-                chatbotBadge.style.display = 'flex';
-            }
-        }, 15000);
-    </script>
     
     {% block extra_js %}{% endblock %}
 </body>
 </html>
+<script>
+// ===== INICIALIZACIÓN =====
+AOS.init({ duration: 600, once: true, offset: 80, easing: 'ease-out' });
+
+// Mobile menu toggle
+function toggleMobileMenu() {
+    document.getElementById('mobileMenu').classList.toggle('hidden');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-hide mensajes después de 5s
+    setTimeout(() => {
+        document.querySelectorAll('[class*="message-"]').forEach(msg => {
+            msg.style.transition = 'opacity 0.4s ease';
+            msg.style.opacity = '0';
+            setTimeout(() => msg.remove(), 400);
+        });
+    }, 5000);
+    
+    actualizarContadorCarrito();
+    cargarHistorialChat();
+    configurarLimpiezaAlCerrarSesion();
+});
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+
+// ===== LOADER =====
+function mostrarLoader() { document.getElementById('loaderOverlay').classList.add('active'); }
+function ocultarLoader() { document.getElementById('loaderOverlay').classList.remove('active'); }
+
+// ===== CONTADOR CARRITO =====
+function actualizarContadorCarrito() {
+    {% if user.is_authenticated and user.rol.nombre == 'turista' %}
+        fetch('{% url "reservas:ver_carrito" %}')
+            .then(res => res.text())
+            .then(html => {
+                const match = html.match(/Tienes (\d+) servicio/);
+                if (match && match[1]) {
+                    const cantidad = parseInt(match[1]);
+                    const badge = document.getElementById('carritoCount');
+                    if (badge) {
+                        badge.textContent = cantidad;
+                        badge.style.display = cantidad > 0 ? 'flex' : 'none';
+                    }
+                }
+            })
+            .catch(err => console.log('Carrito no disponible'));
+    {% endif %}
+}
+
+{% if user.is_authenticated and user.rol.nombre == 'turista' %}
+    setInterval(actualizarContadorCarrito, 30000);
+{% endif %}
+
+// ===== CHATBOT GPT-4 + HISTORIAL =====
+const CHAT_HISTORY_KEY = 'ecuadorTurismoChatHistory';
+let isProcessing = false;
+
+function cargarHistorialChat() {
+    const historial = obtenerHistorialChat();
+    const container = document.getElementById('chatbotMessages');
+    container.innerHTML = '';
+    
+    if (historial.length === 0) {
+        addChatMessage(
+            '¡Hola! 👋 Soy tu asistente de Ecuador Turismo.\n\n' +
+            '🔍 Buscar servicios\n📊 Comparar opciones\n💰 Ofertas\n🗺️ Recomendar destinos\n\n' +
+            '¿Qué deseas explorar?',
+            'bot', false
+        );
+    } else {
+        historial.forEach(msg => addChatMessage(msg.content, msg.role === 'user' ? 'user' : 'bot', false));
+    }
+}
+
+function obtenerHistorialChat() {
+    const stored = sessionStorage.getItem(CHAT_HISTORY_KEY);
+    return stored ? JSON.parse(stored) : [];
+}
+
+function guardarMensajeHistorial(content, role) {
+    const historial = obtenerHistorialChat();
+    historial.push({ content, role, timestamp: Date.now() });
+    if (historial.length > 30) historial.splice(0, historial.length - 30);
+    sessionStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(historial));
+}
+
+function toggleChatbot() {
+    const chatbotWindow = document.getElementById('chatbotWindow');
+    const chatbotBadge = document.getElementById('chatbotBadge');
+    chatbotWindow.classList.toggle('active');
+    
+    if (chatbotWindow.classList.contains('active')) {
+        chatbotBadge.style.display = 'none';
+        document.getElementById('chatbotInput').focus();
+    }
+}
+
+async function sendChatMessage() {
+    if (isProcessing) return;
+    
+    const input = document.getElementById('chatbotInput');
+    const message = input.value.trim();
+    if (!message) return;
+    
+    isProcessing = true;
+    input.disabled = true;
+    
+    addChatMessage(message, 'user', true);
+    guardarMensajeHistorial(message, 'user');
+    input.value = '';
+    
+    const typingId = mostrarIndicadorEscritura();
+    
+    try {
+        const historial = obtenerHistorialChat();
+        const response = await fetch('/chatbot/message/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ message: message, history: historial })
+        });
+        
+        removerIndicadorEscritura(typingId);
+        
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            addChatMessage(data.response, 'bot', true);
+            guardarMensajeHistorial(data.response, 'assistant');
+        } else {
+            addChatMessage('😔 Error: ' + (data.error || 'Desconocido'), 'bot', true);
+        }
+        
+    } catch (error) {
+        removerIndicadorEscritura(typingId);
+        addChatMessage(`❌ Error: ${error.message}`, 'bot', true);
+    } finally {
+        isProcessing = false;
+        input.disabled = false;
+        input.focus();
+    }
+}
+
+function addChatMessage(text, sender, animate = true) {
+    const container = document.getElementById('chatbotMessages');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `chat-message ${sender}${animate ? ' slide-in-right' : ''}`;
+    
+    const avatarDiv = document.createElement('div');
+    avatarDiv.className = 'chat-avatar';
+    
+    if (sender === 'bot') {
+        const img = document.createElement('img');
+        img.src = '/media/bot.png';
+        img.alt = 'Bot';
+        img.className = 'w-full h-full rounded-full object-cover';
+        img.onerror = function() {
+            this.style.display = 'none';
+            this.parentElement.innerHTML = '<i class="fas fa-robot"></i>';
+        };
+        avatarDiv.appendChild(img);
+    } else {
+        avatarDiv.textContent = '{{ user.nombre|slice:":1"|upper }}'.toUpperCase() || 'U';
+    }
+    
+    const bubbleDiv = document.createElement('div');
+    bubbleDiv.className = 'chat-bubble';
+    bubbleDiv.innerHTML = convertirMarkdownAHTML(text);
+    
+    msgDiv.appendChild(avatarDiv);
+    msgDiv.appendChild(bubbleDiv);
+    container.appendChild(msgDiv);
+    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+}
+
+function convertirMarkdownAHTML(text) {
+    let html = text.replace(/\n/g, '<br>');
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-600 hover:underline font-medium" target="_blank">$1 <i class="fas fa-external-link-alt text-xs"></i></a>');
+    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/⭐/g, '<span class="text-yellow-400">⭐</span>');
+    return html;
+}
+
+function mostrarIndicadorEscritura() {
+    const container = document.getElementById('chatbotMessages');
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'chat-message bot slide-in-right';
+    typingDiv.id = 'typing-indicator-' + Date.now();
+    
+    const avatarDiv = document.createElement('div');
+    avatarDiv.className = 'chat-avatar';
+    avatarDiv.innerHTML = '<i class="fas fa-robot"></i>';
+    
+    const bubbleDiv = document.createElement('div');
+    bubbleDiv.className = 'chat-bubble';
+    bubbleDiv.innerHTML = '<div class="flex space-x-1"><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div></div>';
+    
+    typingDiv.appendChild(avatarDiv);
+    typingDiv.appendChild(bubbleDiv);
+    container.appendChild(typingDiv);
+    container.scrollTop = container.scrollHeight;
+    return typingDiv.id;
+}
+
+function removerIndicadorEscritura(id) {
+    const indicator = document.getElementById(id);
+    if (indicator) indicator.remove();
+}
+
+function handleChatKeyPress(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendChatMessage();
+    }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function configurarLimpiezaAlCerrarSesion() {
+    {% if user.is_authenticated %}
+    document.querySelectorAll('a[href="{% url "usuarios:logout" %}"]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            sessionStorage.removeItem(CHAT_HISTORY_KEY);
+            fetch('/chatbot/limpiar/', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCookie('csrftoken') }
+            }).catch(err => console.log('Limpieza fallida'));
+        });
+    });
+    {% endif %}
+}
+
+// Badge del chatbot después de 15s
+setTimeout(() => {
+    const chatbotWindow = document.getElementById('chatbotWindow');
+    const chatbotBadge = document.getElementById('chatbotBadge');
+    if (!chatbotWindow.classList.contains('active')) chatbotBadge.style.display = 'flex';
+}, 15000);
+</script>

@@ -1,4 +1,4 @@
-# apps/chatbot/views.py - VERSIÓN ROBUSTA CON APRENDIZAJE
+# apps/chatbot/views.py - VERSIÓN CON OPENAI GPT-4
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.conf import settings
@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 import hashlib
 
 
-# SISTEMA DE APRENDIZAJE Y MEMORIA      d
+# SISTEMA DE APRENDIZAJE Y MEMORIA
 
 class ChatbotMemory:
     """
@@ -181,20 +181,21 @@ class ContextValidator:
         
         return params
 
+
 # INICIALIZACIÓN Y HERRAMIENTAS
 
-def get_groq_client():
-    """Inicializa el cliente de Groq de forma lazy"""
-    from groq import Groq
+def get_openai_client():
+    """Inicializa el cliente de OpenAI de forma lazy"""
+    from openai import OpenAI
     
-    api_key = settings.GROQ_API_KEY
+    api_key = settings.OPENAI_API_KEY
     if not api_key:
         raise ValueError(
-            "❌ GROQ_API_KEY no configurada. "
-            "Obtén una gratis en https://console.groq.com/keys"
+            "❌ OPENAI_API_KEY no configurada. "
+            "Verifica tu archivo .env"
         )
     
-    return Groq(api_key=api_key)
+    return OpenAI(api_key=api_key)
 
 
 TOOLS = [
@@ -353,20 +354,26 @@ Ayudar a turistas con información REAL y VERIFICADA de nuestra base de datos.
    - 🏞️ DESTINOS = Ciudades, lugares, provincias, atractivos (lugares que se VISITAN)
    
 2. **USA LA HERRAMIENTA CORRECTA:**
-   - Usuario pregunta por hoteles/tours/restaurantes → `buscar_servicios`
+   - Usuario pregunta por hoteles/tours/restaurantes/comedores → `buscar_servicios` con tipo='gastronomia'
    - Usuario pregunta por ciudades/lugares/qué visitar → `buscar_destinos`
-   - Usuario dice "en Quito" → Primero busca el destino, luego servicios en ese destino
+   - Usuario menciona una REGIÓN (costa/sierra/oriente/galapagos) → SIEMPRE usa el parámetro `region`
+   - Ejemplo: "restaurantes en la sierra" → buscar_servicios(tipo='gastronomia', region='sierra')
 
-3. **NUNCA INVENTES DATOS:**
+3. **BÚSQUEDA POR REGIÓN:**
+   - Las regiones válidas son SOLO: costa, sierra, oriente, galapagos (en MINÚSCULAS)
+   - Si el usuario dice "la sierra", "en la costa", etc. → usa 'sierra', 'costa' sin artículos
+   - SIEMPRE combina región con tipo cuando el usuario lo especifica
+
+4. **NUNCA INVENTES DATOS:**
    - Solo habla de lo que retornan las herramientas
    - Si no hay resultados, di claramente "No encontré..."
    - NO menciones lugares/servicios que no aparecen en los resultados
 
-4. **SIEMPRE USA HERRAMIENTAS ANTES DE RESPONDER:**
+5. **SIEMPRE USA HERRAMIENTAS ANTES DE RESPONDER:**
    - Consulta específica → Buscar primero, responder después
    - Duda entre opciones → Mejor usar 2 herramientas que adivinar
 
-5. **FORMATO DE RESPUESTA:**
+6. **FORMATO DE RESPUESTA:**
    ```
    ✅ CON RESULTADOS:
    "¡Encontré [N] opciones!
@@ -383,7 +390,7 @@ Ayudar a turistas con información REAL y VERIFICADA de nuestra base de datos.
    ¿Te interesaría ver [alternativa real]?"
    ```
 
-6. **MANEJO DE AMBIGÜEDAD:**
+7. **MANEJO DE AMBIGÜEDAD:**
    - Si no estás seguro → Pregunta al usuario
    - "¿Buscas hoteles EN Quito o información SOBRE Quito?"
 
@@ -392,6 +399,7 @@ Ayudar a turistas con información REAL y VERIFICADA de nuestra base de datos.
 - Inventar precios o datos
 - Confundir servicios con destinos
 - Responder sin usar herramientas
+- Ignorar el parámetro region cuando el usuario lo menciona
 
 ✅ **PERMITIDO:**
 - Usar 2+ herramientas si es necesario
@@ -501,12 +509,13 @@ def ejecutar_funcion(nombre_funcion, parametros, request=None):
         print(traceback.format_exc())
         return {"error": str(e), "success": False}
 
+
 # VISTA PRINCIPAL DEL CHATBOT
 
 @require_http_methods(["POST"])
 def chatbot_message(request):
     """
-    Procesa mensajes del chatbot con sistema de aprendizaje
+    Procesa mensajes del chatbot con sistema de aprendizaje usando OpenAI GPT-4
     """
     try:
         data = json.loads(request.body)
@@ -557,24 +566,24 @@ def chatbot_message(request):
             "content": mensaje_usuario
         })
     
-        # PRIMERA LLAMADA A GROQ
-        client = get_groq_client()
+        # PRIMERA LLAMADA A OPENAI
+        client = get_openai_client()
         
-        respuesta_groq = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+        respuesta_openai = client.chat.completions.create(
+            model="gpt-4-turbo-preview",  # Cambia a gpt-4o si tienes acceso
             messages=mensajes,
             tools=TOOLS,
             tool_choice="auto",
-            temperature=0.6,  # Menos creativo, más preciso
-            max_tokens=450
+            temperature=0.6,
+            max_tokens=500
         )
         
-        mensaje_asistente = respuesta_groq.choices[0].message
+        mensaje_asistente = respuesta_openai.choices[0].message
         
         # PROCESAR HERRAMIENTAS
+        resultados_herramientas = []
+        
         if mensaje_asistente.tool_calls:
-            resultados_herramientas = []
-            
             for tool_call in mensaje_asistente.tool_calls:
                 nombre_funcion = tool_call.function.name
                 
@@ -623,10 +632,10 @@ def chatbot_message(request):
             ]
             
             respuesta_final = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
+                model="gpt-4-turbo-preview",
                 messages=mensajes_con_resultados,
                 temperature=0.7,
-                max_tokens=450
+                max_tokens=500
             )
             
             respuesta_texto = respuesta_final.choices[0].message.content
@@ -650,7 +659,8 @@ def chatbot_message(request):
         print(traceback.format_exc())
         
         # Registrar error
-        ChatbotMemory.registrar_error(mensaje_usuario, error_msg)
+        if 'mensaje_usuario' in locals():
+            ChatbotMemory.registrar_error(mensaje_usuario, error_msg)
         
         return JsonResponse({
             'success': False,

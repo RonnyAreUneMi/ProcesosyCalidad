@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.utils import timezone
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from apps.usuarios.models import Usuario
 from apps.servicios.models import Servicio
 
@@ -140,12 +140,20 @@ class Reserva(models.Model):
                 random.choices(string.ascii_uppercase + string.digits, k=10)
             )
         
-        # Calcular totales usando Decimal
+        # Calcular totales usando Decimal con cuantización
         TASA_IVA = Decimal('0.12')  # 12% IVA
         self.precio_unitario = self.servicio.precio
-        self.subtotal = self.precio_unitario * self.cantidad_personas
-        self.impuestos = self.subtotal * TASA_IVA
-        self.costo_total = self.subtotal + self.impuestos
+        
+        # Cuantizar cada operación para evitar pérdida de precisión
+        self.subtotal = (self.precio_unitario * self.cantidad_personas).quantize(
+            Decimal('0.01'), rounding=ROUND_HALF_UP
+        )
+        self.impuestos = (self.subtotal * TASA_IVA).quantize(
+            Decimal('0.01'), rounding=ROUND_HALF_UP
+        )
+        self.costo_total = (self.subtotal + self.impuestos).quantize(
+            Decimal('0.01'), rounding=ROUND_HALF_UP
+        )
         
         super().save(*args, **kwargs)
     
@@ -218,14 +226,17 @@ class ItemCarrito(models.Model):
         return f"{self.servicio.nombre} - {self.cantidad_personas} persona(s)"
     
     def get_subtotal(self):
-        """Calcula el subtotal del item"""
-        return self.servicio.precio * self.cantidad_personas
+        """Calcula el subtotal del item con precisión"""
+        subtotal = self.servicio.precio * self.cantidad_personas
+        return subtotal.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
     
     def get_impuestos(self):
-        """Calcula los impuestos (12% IVA)"""
+        """Calcula los impuestos (12% IVA) con precisión"""
         TASA_IVA = Decimal('0.12')
-        return self.get_subtotal() * TASA_IVA
+        impuestos = self.get_subtotal() * TASA_IVA
+        return impuestos.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
     
     def get_total(self):
-        """Calcula el total del item"""
-        return self.get_subtotal() + self.get_impuestos()
+        """Calcula el total del item con precisión"""
+        total = self.get_subtotal() + self.get_impuestos()
+        return total.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)

@@ -410,13 +410,16 @@
 </div>
 
 <script>
+// Reemplaza el script al final de tu template con este código corregido
+
 function confirmarEliminacion(id, nombre) {
     const modal = document.getElementById('modalEliminar');
     const form = document.getElementById('formEliminar');
     const mensaje = document.getElementById('mensajeEliminar');
     
     mensaje.textContent = `¿Estás seguro de eliminar el destino "${nombre}"? Esta acción no se puede deshacer.`;
-    form.action = `/destinos/eliminar/${id}/`;
+    // CORRECCIÓN: Usar la URL correcta según tus patrones de URL
+    form.action = `/destinos/admin/${id}/eliminar/`;
     
     modal.classList.remove('hidden');
 }
@@ -428,6 +431,13 @@ function cerrarModalEliminar() {
 // Cerrar modal al hacer clic fuera
 document.getElementById('modalEliminar').addEventListener('click', function(e) {
     if (e.target === this) {
+        cerrarModalEliminar();
+    }
+});
+
+// Cerrar modal con tecla ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
         cerrarModalEliminar();
     }
 });
