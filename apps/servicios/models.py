@@ -1,5 +1,6 @@
 from django.db import models
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
+from django.core.exceptions import ValidationError
 from apps.destinos.models import Destino, Categoria
 from apps.usuarios.models import Usuario
 
@@ -8,6 +9,7 @@ class Servicio(models.Model):
     """
     Modelo para servicios turísticos (alojamiento, tours, actividades)
     RF-003: Sistema de Reservas con Cálculo Dinámico
+    Incluye geolocalización y horarios de atención
     """
     ALOJAMIENTO = 'alojamiento'
     TOUR = 'tour'
@@ -23,6 +25,7 @@ class Servicio(models.Model):
         (RESTAURANTE, 'Restaurante'),
     ]
     
+    # Información básica
     nombre = models.CharField(
         max_length=200,
         verbose_name='Nombre del Servicio'
@@ -62,6 +65,84 @@ class Servicio(models.Model):
         related_name='servicios_proveedor',
         limit_choices_to={'rol__nombre': 'proveedor'},
         verbose_name='Proveedor'
+    )
+    
+    # === GEOLOCALIZACIÓN ===
+    direccion = models.CharField(
+        max_length=500,
+        verbose_name='Dirección Completa',
+        help_text='Ej: Charles Darwin Ave., Puerto Ayora 200102 Ecuador'
+    )
+    
+
+    latitud = models.DecimalField(
+        max_digits=10,  
+        decimal_places=8,
+        validators=[
+            MinValueValidator(-90),
+            MaxValueValidator(90)
+        ],
+        verbose_name='Latitud',
+        help_text='Coordenada latitud (-90 a 90)',
+        null=False,
+        blank=False
+    )
+
+    longitud = models.DecimalField(
+        max_digits=11,  
+        decimal_places=8,
+        validators=[
+            MinValueValidator(-180),
+            MaxValueValidator(180)
+        ],
+        verbose_name='Longitud',
+        help_text='Coordenada longitud (-180 a 180)',
+        null=False,
+        blank=False
+    )
+    zona_referencia = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        verbose_name='Zona de Referencia',
+        help_text='Ej: Cerca del muelle principal, Frente al parque central'
+    )
+        
+    # === INFORMACIÓN DE CONTACTO ===
+    telefono_validator = RegexValidator(
+        regex=r'^\+?1?\d{9,15}$',
+        message="El número de teléfono debe estar en formato: '+593981234567' o '0981234567'"
+    )
+    telefono = models.CharField(
+        validators=[telefono_validator],
+        max_length=17,
+        verbose_name='Teléfono de Contacto',
+        help_text='Formato: +593981234567'
+    )
+    telefono_alternativo = models.CharField(
+        validators=[telefono_validator],
+        max_length=17,
+        blank=True,
+        null=True,
+        verbose_name='Teléfono Alternativo'
+    )
+    email_contacto = models.EmailField(
+        verbose_name='Email de Contacto',
+        help_text='Email para consultas y reservas'
+    )
+    sitio_web = models.URLField(
+        blank=True,
+        null=True,
+        verbose_name='Sitio Web',
+        help_text='URL del sitio web (opcional)'
+    )
+    whatsapp = models.CharField(
+        validators=[telefono_validator],
+        max_length=17,
+        blank=True,
+        null=True,
+        verbose_name='WhatsApp',
+        help_text='Número de WhatsApp (opcional)'
     )
     
     # Disponibilidad
@@ -111,15 +192,31 @@ class Servicio(models.Model):
             models.Index(fields=['tipo']),
             models.Index(fields=['destino']),
             models.Index(fields=['disponible']),
+            models.Index(fields=['latitud', 'longitud']),
         ]
     
     def __str__(self):
         return f"{self.nombre} - {self.get_tipo_display()}"
     
+    def clean(self):
+        """Validación personalizada"""
+        super().clean()
+        
+        # Validar que latitud y longitud sean válidas para Ecuador
+        if self.latitud:
+            if not (-5 <= self.latitud <= 2):
+                raise ValidationError({
+                    'latitud': 'La latitud debe estar dentro del rango de Ecuador (-5° a 2°)'
+                })
+        
+        if self.longitud:
+            if not (-92 <= self.longitud <= -75):
+                raise ValidationError({
+                    'longitud': 'La longitud debe estar dentro del rango de Ecuador (-92° a -75°)'
+                })
+    
     def actualizar_calificacion(self):
-        """
-        Actualizar la calificación promedio del servicio
-        """
+        """Actualizar la calificación promedio del servicio"""
         from django.db.models import Avg, Count
         from apps.calificaciones.models import Calificacion
         
@@ -134,6 +231,125 @@ class Servicio(models.Model):
         self.calificacion_promedio = round(stats['promedio'] or 0, 2)
         self.total_calificaciones = stats['total'] or 0
         self.save(update_fields=['calificacion_promedio', 'total_calificaciones'])
+    
+    def get_coordenadas(self):
+        """Retorna las coordenadas como diccionario"""
+        return {
+            'lat': float(self.latitud),
+            'lng': float(self.longitud)
+        }
+    
+    def get_url_google_maps(self):
+        """Genera URL de Google Maps"""
+        return f"https://www.google.com/maps?q={self.latitud},{self.longitud}"
+    
+    def esta_abierto_ahora(self):
+        """Verifica si el servicio está abierto en este momento"""
+        from datetime import datetime
+        ahora = datetime.now()
+        dia_semana = ahora.weekday()  # 0=Lunes, 6=Domingo
+        hora_actual = ahora.time()
+        
+        # Determinar si es fin de semana (sábado=5, domingo=6)
+        es_fin_de_semana = dia_semana >= 5
+        
+        # Obtener el horario correspondiente según el día
+        if es_fin_de_semana:
+            horario = self.horarios.filter(activo=True, tipo_horario='sabado_domingo').first()
+        else:
+            horario = self.horarios.filter(activo=True, tipo_horario='lunes_viernes').first()
+        
+        # Si no hay horario definido, considerar cerrado
+        if not horario:
+            return False
+        
+        # Si está marcado como cerrado
+        if horario.cerrado:
+            return False
+        
+        # Verificar si la hora actual está dentro del rango
+        return horario.hora_apertura <= hora_actual <= horario.hora_cierre
+
+
+class HorarioAtencion(models.Model):
+    """
+    Modelo para horarios de atención del servicio
+    Separado en días laborables (L-V) y fines de semana (S-D)
+    """
+    LUNES_VIERNES = 'lunes_viernes'
+    SABADO_DOMINGO = 'sabado_domingo'
+    
+    TIPO_HORARIO_CHOICES = [
+        (LUNES_VIERNES, 'Lunes a Viernes'),
+        (SABADO_DOMINGO, 'Sábado y Domingo'),
+    ]
+    
+    servicio = models.ForeignKey(
+        Servicio,
+        on_delete=models.CASCADE,
+        related_name='horarios',
+        verbose_name='Servicio'
+    )
+    tipo_horario = models.CharField(
+        max_length=20,
+        choices=TIPO_HORARIO_CHOICES,
+        verbose_name='Tipo de Horario'
+    )
+    hora_apertura = models.TimeField(
+        verbose_name='Hora de Apertura',
+        help_text='Formato 24 horas: 08:00'
+    )
+    hora_cierre = models.TimeField(
+        verbose_name='Hora de Cierre',
+        help_text='Formato 24 horas: 23:00'
+    )
+    cerrado = models.BooleanField(
+        default=False,
+        verbose_name='Cerrado',
+        help_text='Marcar si el servicio está cerrado en este horario'
+    )
+    notas = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        verbose_name='Notas',
+        help_text='Ej: Horario extendido en temporada alta'
+    )
+    activo = models.BooleanField(
+        default=True,
+        verbose_name='Activo'
+    )
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Fecha de Creación'
+    )
+    
+    class Meta:
+        db_table = 'horarios_atencion'
+        verbose_name = 'Horario de Atención'
+        verbose_name_plural = 'Horarios de Atención'
+        ordering = ['tipo_horario', 'hora_apertura']
+        unique_together = ['servicio', 'tipo_horario']
+    
+    def __str__(self):
+        if self.cerrado:
+            return f"{self.servicio.nombre} - {self.get_tipo_horario_display()}: CERRADO"
+        return f"{self.servicio.nombre} - {self.get_tipo_horario_display()}: {self.hora_apertura.strftime('%H:%M')} - {self.hora_cierre.strftime('%H:%M')}"
+    
+    def clean(self):
+        """Validación personalizada"""
+        super().clean()
+        
+        if not self.cerrado and self.hora_apertura >= self.hora_cierre:
+            raise ValidationError({
+                'hora_cierre': 'La hora de cierre debe ser posterior a la hora de apertura'
+            })
+    
+    def get_horario_formateado(self):
+        """Retorna el horario en formato legible"""
+        if self.cerrado:
+            return "Cerrado"
+        return f"{self.hora_apertura.strftime('%H:%M')} - {self.hora_cierre.strftime('%H:%M')}"
 
 
 class ImagenServicio(models.Model):
@@ -155,6 +371,11 @@ class ImagenServicio(models.Model):
         blank=True,
         null=True,
         verbose_name='Título'
+    )
+    descripcion = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Descripción de la Imagen'
     )
     es_principal = models.BooleanField(
         default=False,

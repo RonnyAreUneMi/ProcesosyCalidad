@@ -55,7 +55,6 @@ class Calificacion(models.Model):
         verbose_name = 'Calificación'
         verbose_name_plural = 'Calificaciones'
         ordering = ['-fecha_creacion']
-        # Un usuario solo puede calificar un servicio una vez
         unique_together = [['usuario', 'servicio']]
         indexes = [
             models.Index(fields=['servicio', 'activo']),
@@ -67,27 +66,52 @@ class Calificacion(models.Model):
     
     def save(self, *args, **kwargs):
         """
-        Al guardar, actualizar la calificación promedio del servicio
+        Al guardar, actualizar las calificaciones del servicio y destino
         """
         super().save(*args, **kwargs)
-        self.servicio.actualizar_calificacion()
         
-        # También actualizar la calificación del destino asociado
-        if hasattr(self.servicio, 'destino'):
-            self.servicio.destino.actualizar_calificacion()
+        # Solo actualizar si no es una actualización parcial de campos específicos
+        if 'update_fields' not in kwargs:
+            self._actualizar_calificaciones()
     
     def delete(self, *args, **kwargs):
         """
-        Al eliminar, actualizar la calificación promedio del servicio
+        Al eliminar, actualizar las calificaciones del servicio y destino
         """
         servicio = self.servicio
-        destino = servicio.destino if hasattr(servicio, 'destino') else None
+        destino = servicio.destino if hasattr(servicio, 'destino') and servicio.destino else None
         
         super().delete(*args, **kwargs)
         
-        servicio.actualizar_calificacion()
+        # Actualizar después de eliminar
+        if servicio:
+            try:
+                servicio.actualizar_calificacion()
+            except Exception:
+                pass
+        
         if destino:
-            destino.actualizar_calificacion()
+            try:
+                destino.actualizar_calificacion()
+            except Exception:
+                pass
+    
+    def _actualizar_calificaciones(self):
+        """
+        Método auxiliar para actualizar servicio y destino en cascada
+        """
+        try:
+            # Actualizar servicio
+            self.servicio.actualizar_calificacion()
+            
+            # Actualizar destino si existe
+            if hasattr(self.servicio, 'destino') and self.servicio.destino:
+                self.servicio.destino.actualizar_calificacion()
+        except Exception as e:
+            # Log el error pero no fallar la transacción principal
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error actualizando calificaciones en cascada: {str(e)}")
 
 
 class RespuestaCalificacion(models.Model):

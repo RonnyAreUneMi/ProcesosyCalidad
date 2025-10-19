@@ -6,10 +6,11 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.db import transaction
-from .models import Servicio, ImagenServicio
+from decimal import Decimal, InvalidOperation
+from .models import Servicio, ImagenServicio, HorarioAtencion
 from apps.destinos.models import Destino, Categoria
 from apps.usuarios.models import Usuario
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 
 def rol_requerido(roles_permitidos):
@@ -42,22 +43,18 @@ def listar_servicios(request):
     Vista para listar servicios con filtros y búsqueda mejorados
     RF-002: Búsqueda y Filtrado por Región
     """
-    # Query base - ANTES de aplicar filtros para estadísticas
     servicios_base = Servicio.objects.filter(activo=True, disponible=True)
     
-    # Calcular estadísticas por tipo ANTES de filtrar
     stats_por_tipo = {
         'alojamiento': servicios_base.filter(tipo='alojamiento').count(),
         'tour': servicios_base.filter(tipo='tour').count(),
         'actividad': servicios_base.filter(tipo='actividad').count(),
         'transporte': servicios_base.filter(tipo='transporte').count(),
-        'gastronomia': servicios_base.filter(tipo='gastronomia').count(),
+        'restaurante': servicios_base.filter(tipo='restaurante').count(),
     }
     
-    # Ahora aplicamos los filtros para la búsqueda
-    servicios = servicios_base.select_related('destino', 'categoria', 'proveedor')
+    servicios = servicios_base.select_related('destino', 'categoria', 'proveedor').prefetch_related('horarios')
     
-    # Obtener parámetros de filtro
     tipo = request.GET.get('tipo')
     destino_id = request.GET.get('destino')
     categoria_id = request.GET.get('categoria')
@@ -66,11 +63,10 @@ def listar_servicios(request):
     precio_max = request.GET.get('precio_max')
     calificacion_min = request.GET.get('calificacion')
     busqueda = request.GET.get('q')
+    abierto_ahora = request.GET.get('abierto_ahora') == 'on'
     
-    # Contador de filtros aplicados
     filtros_activos = 0
     
-    # Aplicar filtros de manera más flexible
     if tipo:
         servicios = servicios.filter(tipo=tipo)
         filtros_activos += 1
@@ -87,7 +83,6 @@ def listar_servicios(request):
         servicios = servicios.filter(destino__region=region)
         filtros_activos += 1
     
-    # Filtros de precio - permitir cualquier valor
     if precio_min:
         try:
             precio_min_val = float(precio_min)
@@ -115,18 +110,26 @@ def listar_servicios(request):
             messages.warning(request, 'Calificación inválida')
             calificacion_min = None
     
-    # Búsqueda por texto - MÁS FLEXIBLE
+    if abierto_ahora:
+        servicios_abiertos = []
+        for s in servicios:
+            if s.esta_abierto_ahora():
+                servicios_abiertos.append(s.id)
+        servicios = servicios.filter(id__in=servicios_abiertos)
+        filtros_activos += 1
+    
     if busqueda:
         servicios = servicios.filter(
             Q(nombre__icontains=busqueda) |
             Q(descripcion__icontains=busqueda) |
+            Q(direccion__icontains=busqueda) |
+            Q(zona_referencia__icontains=busqueda) |
             Q(destino__nombre__icontains=busqueda) |
             Q(destino__descripcion__icontains=busqueda) |
             Q(categoria__nombre__icontains=busqueda)
         )
         filtros_activos += 1
     
-    # Ordenamiento
     orden = request.GET.get('orden', 'calificacion')
     opciones_orden = {
         'precio_asc': 'precio',
@@ -137,16 +140,13 @@ def listar_servicios(request):
     }
     servicios = servicios.order_by(opciones_orden.get(orden, '-calificacion_promedio'))
     
-    # Paginación
     paginator = Paginator(servicios, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    # Datos para filtros
     destinos = Destino.objects.filter(activo=True).order_by('nombre')
     categorias = Categoria.objects.filter(activo=True).order_by('nombre')
     
-    # Regiones de Ecuador
     REGIONES = [
         ('costa', 'Costa'),
         ('sierra', 'Sierra'),
@@ -154,7 +154,6 @@ def listar_servicios(request):
         ('galapagos', 'Galápagos'),
     ]
     
-    # Construir query string para paginación
     filtros_query = ''
     params = []
     if busqueda:
@@ -173,6 +172,8 @@ def listar_servicios(request):
         params.append(f'precio_max={precio_max}')
     if calificacion_min:
         params.append(f'calificacion={calificacion_min}')
+    if abierto_ahora:
+        params.append('abierto_ahora=on')
     if orden:
         params.append(f'orden={orden}')
     
@@ -185,9 +186,9 @@ def listar_servicios(request):
         'categorias': categorias,
         'regiones': REGIONES,
         'tipos_servicio': Servicio.TIPO_SERVICIO_CHOICES,
-        'total_resultados': servicios_base.count(),  # Total general
-        'resultados_filtrados': page_obj.paginator.count,  # Resultados después de filtrar
-        'stats_por_tipo': stats_por_tipo,  # Estadísticas por tipo
+        'total_resultados': servicios_base.count(),
+        'resultados_filtrados': page_obj.paginator.count,
+        'stats_por_tipo': stats_por_tipo,
         'filtros_activos': filtros_activos,
         'filtros_query': filtros_query,
         'filtros_aplicados': {
@@ -200,16 +201,18 @@ def listar_servicios(request):
             'calificacion': calificacion_min,
             'busqueda': busqueda,
             'orden': orden,
+            'abierto_ahora': abierto_ahora,
         }
     }
     
     return render(request, 'servicios/listar.html', context)
 
+
 def detalle_servicio(request, servicio_id):
     """
-    Vista para mostrar el detalle de un servicio
-    Relacionado con RF-003: Sistema de Reservas y RF-006: Calificaciones
-    VERSIÓN CORREGIDA con integración completa
+    Vista para mostrar el detalle completo de un servicio
+    Incluye: ubicación, horarios, contacto, calificaciones
+    RF-003: Sistema de Reservas y RF-006: Calificaciones
     """
     servicio = get_object_or_404(
         Servicio.objects.select_related('destino', 'categoria', 'proveedor'),
@@ -217,12 +220,16 @@ def detalle_servicio(request, servicio_id):
         activo=True
     )
     
-    # Obtener imágenes del servicio ordenadas
     imagenes = servicio.imagenes.all()
     imagen_principal = imagenes.filter(es_principal=True).first()
     imagenes_secundarias = imagenes.filter(es_principal=False)
     
-    # Variables para calificaciones (valores por defecto)
+    horarios = servicio.horarios.filter(activo=True).order_by('tipo_horario')
+    horario_semana = horarios.filter(tipo_horario='lunes_viernes').first()
+    horario_fin_semana = horarios.filter(tipo_horario='sabado_domingo').first()
+    
+    esta_abierto = servicio.esta_abierto_ahora()
+    
     calificaciones_lista = []
     stats_calificaciones = {
         '5': 0,
@@ -235,17 +242,14 @@ def detalle_servicio(request, servicio_id):
     ya_califico = False
     calificacion_usuario = None
     
-    # Intentar obtener calificaciones solo si el modelo existe
     try:
         from apps.calificaciones.models import Calificacion
         
-        # CORRECCIÓN: Obtener el QuerySet completo primero
         calificaciones_queryset = Calificacion.objects.filter(
             servicio=servicio,
             activo=True
         ).select_related('usuario').prefetch_related('respuesta')
         
-        # Calcular estadísticas ANTES del slice (sobre el QuerySet completo)
         stats_calificaciones = {
             '5': calificaciones_queryset.filter(puntuacion=5).count(),
             '4': calificaciones_queryset.filter(puntuacion=4).count(),
@@ -254,14 +258,10 @@ def detalle_servicio(request, servicio_id):
             '1': calificaciones_queryset.filter(puntuacion=1).count(),
         }
         
-        # AHORA sí aplicar slice para mostrar solo las últimas 10
         calificaciones_lista = list(calificaciones_queryset.order_by('-fecha_creacion')[:10])
         
-        # Verificar permisos del usuario autenticado
         if request.user.is_authenticated:
-            # Solo verificar si es turista
             if hasattr(request.user, 'rol') and request.user.rol.nombre == 'turista':
-                # Verificar si tiene reservas completadas
                 try:
                     from apps.reservas.models import Reserva
                     tiene_reserva_completada = Reserva.objects.filter(
@@ -270,11 +270,9 @@ def detalle_servicio(request, servicio_id):
                         estado='completada'
                     ).exists()
                 except ImportError:
-                    # Si no existe el modelo de reservas, no permitir calificar
                     tiene_reserva_completada = False
                 
                 if tiene_reserva_completada:
-                    # Verificar si ya calificó
                     calificacion_usuario = Calificacion.objects.filter(
                         usuario=request.user,
                         servicio=servicio,
@@ -285,17 +283,14 @@ def detalle_servicio(request, servicio_id):
                     puede_calificar = not ya_califico
                     
     except ImportError:
-        # El modelo Calificacion aún no existe, usar valores por defecto
         pass
     
-    # Servicios relacionados del mismo destino
     servicios_relacionados = Servicio.objects.filter(
         destino=servicio.destino,
         activo=True,
         disponible=True
     ).exclude(id=servicio.id).order_by('-calificacion_promedio')[:4]
     
-    # Verificar si el servicio está en el carrito (si existe el modelo)
     en_carrito = False
     cantidad_en_carrito = 0
     if request.user.is_authenticated:
@@ -311,11 +306,18 @@ def detalle_servicio(request, servicio_id):
                 cantidad_en_carrito = item_carrito.cantidad_personas
         except ImportError:
             pass
+    
     fecha_minima = (date.today() + timedelta(days=1)).isoformat()
+    
     context = {
         'servicio': servicio,
         'imagen_principal': imagen_principal,
         'imagenes_secundarias': imagenes_secundarias,
+        'horario_semana': horario_semana,
+        'horario_fin_semana': horario_fin_semana,
+        'esta_abierto': esta_abierto,
+        'coordenadas': servicio.get_coordenadas(),
+        'url_google_maps': servicio.get_url_google_maps(),
         'calificaciones': calificaciones_lista,
         'stats_calificaciones': stats_calificaciones,
         'total_calificaciones': sum(stats_calificaciones.values()),
@@ -336,12 +338,42 @@ def detalle_servicio(request, servicio_id):
 def crear_servicio(request):
     """
     Vista para crear un nuevo servicio
+    Incluye: ubicación geográfica, horarios, contacto
     Solo para proveedores y administradores
     """
     if request.method == 'POST':
         try:
+            # ========== DATOS DE UBICACIÓN ==========
+            direccion = request.POST.get('direccion')
+            latitud_str = request.POST.get('latitud')
+            longitud_str = request.POST.get('longitud')
+            zona_referencia = request.POST.get('zona_referencia', '')
+            
+            # Validar que las coordenadas no estén vacías
+            if not latitud_str or not longitud_str:
+                messages.error(request, 'Las coordenadas son obligatorias. Por favor, selecciona la ubicación en el mapa.')
+                return redirect('servicios:crear_servicio')
+            
+            # Convertir y validar coordenadas
+            try:
+                lat = Decimal(str(latitud_str))
+                lng = Decimal(str(longitud_str))
+                
+                # Validar rangos de Ecuador
+                if not (Decimal('-5') <= lat <= Decimal('2')):
+                    messages.error(request, f'La latitud debe estar entre -5° y 2° (rango de Ecuador). Valor recibido: {lat}')
+                    return redirect('servicios:crear_servicio')
+                    
+                if not (Decimal('-92') <= lng <= Decimal('-75')):
+                    messages.error(request, f'La longitud debe estar entre -92° y -75° (rango de Ecuador). Valor recibido: {lng}')
+                    return redirect('servicios:crear_servicio')
+                    
+            except (ValueError, TypeError, InvalidOperation) as e:
+                messages.error(request, f'Coordenadas inválidas: {latitud_str}, {longitud_str}')
+                return redirect('servicios:crear_servicio')
+            
             with transaction.atomic():
-                # Obtener datos del formulario
+                # ========== DATOS BÁSICOS ==========
                 nombre = request.POST.get('nombre')
                 descripcion = request.POST.get('descripcion')
                 tipo = request.POST.get('tipo')
@@ -351,15 +383,37 @@ def crear_servicio(request):
                 capacidad_maxima = request.POST.get('capacidad_maxima', 1)
                 disponible = request.POST.get('disponible') == 'on'
                 
+                # ========== CONTACTO ==========
+                telefono = request.POST.get('telefono')
+                telefono_alternativo = request.POST.get('telefono_alternativo', '')
+                email_contacto = request.POST.get('email_contacto')
+                sitio_web = request.POST.get('sitio_web', '')
+                whatsapp = request.POST.get('whatsapp', '')
+                
+                # ========== HORARIOS ==========
+                hora_apertura_semana = request.POST.get('hora_apertura_semana')
+                hora_cierre_semana = request.POST.get('hora_cierre_semana')
+                cerrado_semana = request.POST.get('cerrado_semana') == 'on'
+                notas_semana = request.POST.get('notas_semana', '')
+                
+                hora_apertura_finde = request.POST.get('hora_apertura_finde')
+                hora_cierre_finde = request.POST.get('hora_cierre_finde')
+                cerrado_finde = request.POST.get('cerrado_finde') == 'on'
+                notas_finde = request.POST.get('notas_finde', '')
+                
                 # Validaciones básicas
-                if not all([nombre, descripcion, tipo, precio, destino_id]):
+                campos_obligatorios = [
+                    nombre, descripcion, tipo, precio, destino_id,
+                    direccion, telefono, email_contacto
+                ]
+                
+                if not all(campos_obligatorios):
                     messages.error(request, 'Todos los campos obligatorios deben ser completados')
                     return redirect('servicios:crear_servicio')
                 
-                # Obtener el destino
+                # Obtener relaciones
                 destino = get_object_or_404(Destino, id=destino_id, activo=True)
                 
-                # Obtener la categoría si se proporcionó
                 categoria = None
                 if categoria_id:
                     categoria = get_object_or_404(Categoria, id=categoria_id, activo=True)
@@ -368,25 +422,14 @@ def crear_servicio(request):
                 if request.user.rol.nombre == 'proveedor':
                     proveedor = request.user
                 else:
-                    # Si es administrador, debe asignar a un proveedor específico
                     proveedor_id = request.POST.get('proveedor_id')
                     if proveedor_id:
                         proveedor = get_object_or_404(Usuario, id=proveedor_id, rol__nombre='proveedor')
                     else:
                         messages.error(request, 'Debe seleccionar un proveedor')
-                        # Recargar el formulario con los datos
-                        destinos = Destino.objects.filter(activo=True).order_by('nombre')
-                        categorias = Categoria.objects.filter(activo=True).order_by('nombre')
-                        proveedores = Usuario.objects.filter(rol__nombre='proveedor', is_active=True)
-                        context = {
-                            'destinos': destinos,
-                            'categorias': categorias,
-                            'tipos_servicio': Servicio.TIPO_SERVICIO_CHOICES,
-                            'proveedores': proveedores,
-                        }
-                        return render(request, 'servicios/crear.html', context)
+                        return redirect('servicios:crear_servicio')
                 
-                # Crear el servicio
+                # ========== CREAR EL SERVICIO ==========
                 servicio = Servicio.objects.create(
                     nombre=nombre,
                     descripcion=descripcion,
@@ -396,10 +439,58 @@ def crear_servicio(request):
                     categoria=categoria,
                     proveedor=proveedor,
                     capacidad_maxima=capacidad_maxima,
-                    disponible=disponible
+                    disponible=disponible,
+                    direccion=direccion,
+                    latitud=lat,
+                    longitud=lng,
+                    zona_referencia=zona_referencia if zona_referencia else None,
+                    telefono=telefono,
+                    telefono_alternativo=telefono_alternativo if telefono_alternativo else None,
+                    email_contacto=email_contacto,
+                    sitio_web=sitio_web if sitio_web else None,
+                    whatsapp=whatsapp if whatsapp else None,
                 )
                 
-                # Procesar imágenes si se subieron
+                # ========== CREAR HORARIOS ==========
+                if not cerrado_semana and hora_apertura_semana and hora_cierre_semana:
+                    HorarioAtencion.objects.create(
+                        servicio=servicio,
+                        tipo_horario='lunes_viernes',
+                        hora_apertura=hora_apertura_semana,
+                        hora_cierre=hora_cierre_semana,
+                        cerrado=False,
+                        notas=notas_semana if notas_semana else None
+                    )
+                elif cerrado_semana:
+                    HorarioAtencion.objects.create(
+                        servicio=servicio,
+                        tipo_horario='lunes_viernes',
+                        hora_apertura='00:00',
+                        hora_cierre='00:00',
+                        cerrado=True,
+                        notas=notas_semana if notas_semana else None
+                    )
+                
+                if not cerrado_finde and hora_apertura_finde and hora_cierre_finde:
+                    HorarioAtencion.objects.create(
+                        servicio=servicio,
+                        tipo_horario='sabado_domingo',
+                        hora_apertura=hora_apertura_finde,
+                        hora_cierre=hora_cierre_finde,
+                        cerrado=False,
+                        notas=notas_finde if notas_finde else None
+                    )
+                elif cerrado_finde:
+                    HorarioAtencion.objects.create(
+                        servicio=servicio,
+                        tipo_horario='sabado_domingo',
+                        hora_apertura='00:00',
+                        hora_cierre='00:00',
+                        cerrado=True,
+                        notas=notas_finde if notas_finde else None
+                    )
+                
+                # ========== PROCESAR IMÁGENES ==========
                 imagenes = request.FILES.getlist('imagenes')
                 for idx, imagen in enumerate(imagenes):
                     ImagenServicio.objects.create(
@@ -420,7 +511,6 @@ def crear_servicio(request):
     destinos = Destino.objects.filter(activo=True).order_by('nombre')
     categorias = Categoria.objects.filter(activo=True).order_by('nombre')
     
-    # Si es administrador, cargar lista de proveedores
     proveedores = None
     if request.user.rol.nombre == 'administrador':
         proveedores = Usuario.objects.filter(rol__nombre='proveedor', is_active=True).order_by('nombre')
@@ -440,10 +530,10 @@ def crear_servicio(request):
 def editar_servicio(request, servicio_id):
     """
     Vista para editar un servicio existente
+    ✅ CORREGIDO: Muestra correctamente precio y coordenadas en el formulario
     """
     servicio = get_object_or_404(Servicio, id=servicio_id)
     
-    # Verificar permisos: proveedor solo edita sus servicios
     if request.user.rol.nombre == 'proveedor' and servicio.proveedor != request.user:
         messages.error(request, 'No tienes permiso para editar este servicio')
         return redirect('servicios:listar_servicios')
@@ -451,6 +541,7 @@ def editar_servicio(request, servicio_id):
     if request.method == 'POST':
         try:
             with transaction.atomic():
+                # Actualizar datos básicos
                 servicio.nombre = request.POST.get('nombre')
                 servicio.descripcion = request.POST.get('descripcion')
                 servicio.tipo = request.POST.get('tipo')
@@ -458,6 +549,46 @@ def editar_servicio(request, servicio_id):
                 servicio.capacidad_maxima = request.POST.get('capacidad_maxima', 1)
                 servicio.disponible = request.POST.get('disponible') == 'on'
                 
+                # Actualizar ubicación y contacto
+                servicio.direccion = request.POST.get('direccion')
+                servicio.zona_referencia = request.POST.get('zona_referencia', '') or None
+                servicio.telefono = request.POST.get('telefono')
+                servicio.telefono_alternativo = request.POST.get('telefono_alternativo', '') or None
+                servicio.email_contacto = request.POST.get('email_contacto')
+                servicio.sitio_web = request.POST.get('sitio_web', '') or None
+                servicio.whatsapp = request.POST.get('whatsapp', '') or None
+                
+                # ✅ CORREGIDO: Actualizar coordenadas con validación
+                latitud_str = request.POST.get('latitud')
+                longitud_str = request.POST.get('longitud')
+                
+                if latitud_str and longitud_str:
+                    try:
+                        # Convertir a string primero para evitar problemas de precisión
+                        lat = Decimal(str(latitud_str).strip())
+                        lng = Decimal(str(longitud_str).strip())
+                        
+                        # Validar rangos
+                        if not (Decimal('-5') <= lat <= Decimal('2')):
+                            messages.error(request, f'La latitud debe estar entre -5° y 2° (Ecuador). Valor: {lat}')
+                            return redirect('servicios:editar_servicio', servicio_id=servicio.id)
+                            
+                        if not (Decimal('-92') <= lng <= Decimal('-75')):
+                            messages.error(request, f'La longitud debe estar entre -92° y -75° (Ecuador). Valor: {lng}')
+                            return redirect('servicios:editar_servicio', servicio_id=servicio.id)
+                        
+                        # ✅ Asignar coordenadas (Django las guardará con 8 decimales)
+                        servicio.latitud = lat
+                        servicio.longitud = lng
+                        
+                    except (ValueError, InvalidOperation) as e:
+                        messages.error(request, f'Coordenadas inválidas: {latitud_str}, {longitud_str}')
+                        return redirect('servicios:editar_servicio', servicio_id=servicio.id)
+                else:
+                    messages.error(request, 'Las coordenadas son obligatorias')
+                    return redirect('servicios:editar_servicio', servicio_id=servicio.id)
+                
+                # Actualizar destino y categoría
                 destino_id = request.POST.get('destino')
                 servicio.destino = get_object_or_404(Destino, id=destino_id, activo=True)
                 
@@ -468,6 +599,57 @@ def editar_servicio(request, servicio_id):
                     servicio.categoria = None
                 
                 servicio.save()
+                
+                # Actualizar horarios
+                HorarioAtencion.objects.filter(servicio=servicio).delete()
+                
+                hora_apertura_semana = request.POST.get('hora_apertura_semana')
+                hora_cierre_semana = request.POST.get('hora_cierre_semana')
+                cerrado_semana = request.POST.get('cerrado_semana') == 'on'
+                notas_semana = request.POST.get('notas_semana', '')
+                
+                if not cerrado_semana and hora_apertura_semana and hora_cierre_semana:
+                    HorarioAtencion.objects.create(
+                        servicio=servicio,
+                        tipo_horario='lunes_viernes',
+                        hora_apertura=hora_apertura_semana,
+                        hora_cierre=hora_cierre_semana,
+                        cerrado=False,
+                        notas=notas_semana if notas_semana else None
+                    )
+                elif cerrado_semana:
+                    HorarioAtencion.objects.create(
+                        servicio=servicio,
+                        tipo_horario='lunes_viernes',
+                        hora_apertura='00:00',
+                        hora_cierre='00:00',
+                        cerrado=True,
+                        notas=notas_semana if notas_semana else None
+                    )
+                
+                hora_apertura_finde = request.POST.get('hora_apertura_finde')
+                hora_cierre_finde = request.POST.get('hora_cierre_finde')
+                cerrado_finde = request.POST.get('cerrado_finde') == 'on'
+                notas_finde = request.POST.get('notas_finde', '')
+                
+                if not cerrado_finde and hora_apertura_finde and hora_cierre_finde:
+                    HorarioAtencion.objects.create(
+                        servicio=servicio,
+                        tipo_horario='sabado_domingo',
+                        hora_apertura=hora_apertura_finde,
+                        hora_cierre=hora_cierre_finde,
+                        cerrado=False,
+                        notas=notas_finde if notas_finde else None
+                    )
+                elif cerrado_finde:
+                    HorarioAtencion.objects.create(
+                        servicio=servicio,
+                        tipo_horario='sabado_domingo',
+                        hora_apertura='00:00',
+                        hora_cierre='00:00',
+                        cerrado=True,
+                        notas=notas_finde if notas_finde else None
+                    )
                 
                 # Procesar nuevas imágenes
                 imagenes = request.FILES.getlist('imagenes')
@@ -480,20 +662,41 @@ def editar_servicio(request, servicio_id):
                             orden=ultima_orden + idx
                         )
                 
-                messages.success(request, 'Servicio actualizado exitosamente')
+                messages.success(request, '✅ Servicio actualizado exitosamente')
                 return redirect('servicios:detalle_servicio', servicio_id=servicio.id)
             
         except Exception as e:
-            messages.error(request, f'Error al actualizar el servicio: {str(e)}')
+            messages.error(request, f'❌ Error al actualizar el servicio: {str(e)}')
+            import traceback
+            print(traceback.format_exc())
     
+    # ✅ GET - Mostrar formulario con datos (CORREGIDO)
     destinos = Destino.objects.filter(activo=True).order_by('nombre')
     categorias = Categoria.objects.filter(activo=True).order_by('nombre')
     
+    horarios = servicio.horarios.filter(activo=True)
+    horario_semana = horarios.filter(tipo_horario='lunes_viernes').first()
+    horario_fin_semana = horarios.filter(tipo_horario='sabado_domingo').first()
+    
+    # ✅ CRÍTICO: Convertir coordenadas a float para el template
+    coordenadas = {
+        'lat': float(servicio.latitud),
+        'lng': float(servicio.longitud)
+    }
+    
+    # ✅ Datos completos para el formulario
     context = {
         'servicio': servicio,
         'destinos': destinos,
         'categorias': categorias,
         'tipos_servicio': Servicio.TIPO_SERVICIO_CHOICES,
+        'horario_semana': horario_semana,
+        'horario_fin_semana': horario_fin_semana,
+        'coordenadas': coordenadas,
+        # ✅ NUEVO: Valores individuales para los inputs
+        'latitud_valor': str(servicio.latitud),  # String para mantener precisión
+        'longitud_valor': str(servicio.longitud),
+        'precio_valor': str(servicio.precio),
     }
     
     return render(request, 'servicios/editar.html', context)
@@ -507,7 +710,6 @@ def eliminar_servicio(request, servicio_id):
     """
     servicio = get_object_or_404(Servicio, id=servicio_id)
     
-    # Verificar permisos
     if request.user.rol.nombre == 'proveedor' and servicio.proveedor != request.user:
         messages.error(request, 'No tienes permiso para eliminar este servicio')
         return redirect('servicios:listar_servicios')
@@ -530,7 +732,7 @@ def mis_servicios(request):
     """
     servicios = Servicio.objects.filter(
         proveedor=request.user
-    ).select_related('destino', 'categoria').order_by('-fecha_creacion')
+    ).select_related('destino', 'categoria').prefetch_related('horarios').order_by('-fecha_creacion')
     
     # Estadísticas
     total_servicios = servicios.count()
@@ -627,7 +829,7 @@ def servicios_por_tipo(request, tipo):
         tipo=tipo,
         activo=True,
         disponible=True
-    ).select_related('destino', 'categoria', 'proveedor').order_by('-calificacion_promedio')
+    ).select_related('destino', 'categoria', 'proveedor').prefetch_related('horarios').order_by('-calificacion_promedio')
     
     # Paginación
     paginator = Paginator(servicios, 12)
@@ -646,23 +848,29 @@ def servicios_por_tipo(request, tipo):
 
 @require_http_methods(["GET"])
 def buscar_servicios_ajax(request):
-    """Vista AJAX para buscar servicios"""
+    """
+    Vista AJAX para buscar servicios
+    Incluye búsqueda por ubicación y horarios
+    """
     q = request.GET.get('q', '')
     tipo = request.GET.get('tipo', '')
     region = request.GET.get('region', '')
     precio_max = request.GET.get('precio_max')
+    abierto_ahora = request.GET.get('abierto_ahora') == 'true'
     
     try:
         servicios = Servicio.objects.filter(
             activo=True,
             disponible=True
-        ).select_related('destino', 'categoria')
+        ).select_related('destino', 'categoria').prefetch_related('horarios')
         
-        # Búsqueda general (case-insensitive)
+        # Búsqueda general (incluye ubicación)
         if q:
             servicios = servicios.filter(
                 Q(nombre__icontains=q) |
                 Q(descripcion__icontains=q) |
+                Q(direccion__icontains=q) |
+                Q(zona_referencia__icontains=q) |
                 Q(destino__nombre__icontains=q) |
                 Q(destino__provincia__icontains=q)
             )
@@ -671,7 +879,7 @@ def buscar_servicios_ajax(request):
         if tipo:
             servicios = servicios.filter(tipo=tipo)
         
-        # Filtro por región (CASE-INSENSITIVE) ✅ CAMBIO AQUÍ
+        # Filtro por región
         if region:
             servicios = servicios.filter(destino__region__iexact=region)
         
@@ -681,6 +889,14 @@ def buscar_servicios_ajax(request):
                 servicios = servicios.filter(precio__lte=float(precio_max))
             except ValueError:
                 pass
+        
+        # Filtro de abierto ahora
+        if abierto_ahora:
+            servicios_abiertos = []
+            for s in servicios:
+                if s.esta_abierto_ahora():
+                    servicios_abiertos.append(s.id)
+            servicios = servicios.filter(id__in=servicios_abiertos)
         
         # Ordenar y limitar
         servicios = servicios.order_by('-calificacion_promedio')[:10]
@@ -694,8 +910,13 @@ def buscar_servicios_ajax(request):
             'calificacion': float(s.calificacion_promedio),
             'destino': s.destino.nombre,
             'region': s.destino.region,
-            'imagen': s.imagen.url if s.imagen else None,
-            'url': f'/servicios/{s.id}/'
+            'direccion': s.direccion,
+            'telefono': s.telefono,
+            'latitud': float(s.latitud),
+            'longitud': float(s.longitud),
+            'esta_abierto': s.esta_abierto_ahora(),
+            'url': f'/servicios/{s.id}/',
+            'url_google_maps': s.get_url_google_maps(),
         } for s in servicios]
         
         return JsonResponse({
@@ -709,6 +930,7 @@ def buscar_servicios_ajax(request):
             'success': False,
             'error': str(e)
         }, status=500)
+
 
 @require_http_methods(["GET"])
 def estadisticas_servicios_ajax(request):
@@ -763,7 +985,9 @@ def estadisticas_servicios_ajax(request):
             'tipo': s.get_tipo_display(),
             'calificacion': float(s.calificacion_promedio),
             'precio': float(s.precio),
-            'destino': s.destino.nombre
+            'destino': s.destino.nombre,
+            'direccion': s.direccion,
+            'telefono': s.telefono,
         } for s in mejor_calificados]
         
         return JsonResponse({
@@ -787,6 +1011,7 @@ def comparar_servicios_ajax(request):
     """
     Vista AJAX para comparar múltiples servicios
     Usado por el chatbot (RF-007) para análisis comparativo
+    Incluye comparación de ubicación y contacto
     """
     servicios_ids = request.GET.get('ids', '').split(',')
     
@@ -801,7 +1026,7 @@ def comparar_servicios_ajax(request):
             id__in=servicios_ids,
             activo=True,
             disponible=True
-        ).select_related('destino', 'categoria')
+        ).select_related('destino', 'categoria').prefetch_related('horarios')
         
         comparacion = [{
             'id': s.id,
@@ -814,7 +1039,14 @@ def comparar_servicios_ajax(request):
             'region': s.destino.region,
             'capacidad': s.capacidad_maxima,
             'categoria': s.categoria.nombre if s.categoria else None,
-            'url': f'/servicios/{s.id}/'
+            'direccion': s.direccion,
+            'telefono': s.telefono,
+            'email': s.email_contacto,
+            'latitud': float(s.latitud),
+            'longitud': float(s.longitud),
+            'esta_abierto': s.esta_abierto_ahora(),
+            'url': f'/servicios/{s.id}/',
+            'url_google_maps': s.get_url_google_maps(),
         } for s in servicios]
         
         # Calcular diferencias
@@ -857,13 +1089,14 @@ def recomendaciones_ajax(request):
     tipo = request.GET.get('tipo')
     region = request.GET.get('region')
     personas = request.GET.get('personas', 1)
+    abierto_ahora = request.GET.get('abierto_ahora') == 'true'
     
     try:
         # Filtros base
         servicios = Servicio.objects.filter(
             activo=True,
             disponible=True
-        ).select_related('destino', 'categoria')
+        ).select_related('destino', 'categoria').prefetch_related('horarios')
         
         # Aplicar filtros
         if presupuesto:
@@ -884,6 +1117,14 @@ def recomendaciones_ajax(request):
             except ValueError:
                 pass
         
+        # Filtro de abierto ahora
+        if abierto_ahora:
+            servicios_abiertos = []
+            for s in servicios:
+                if s.esta_abierto_ahora():
+                    servicios_abiertos.append(s.id)
+            servicios = servicios.filter(id__in=servicios_abiertos)
+        
         # Ordenar por calificación y limitar resultados
         servicios = servicios.order_by('-calificacion_promedio', '-total_calificaciones')[:8]
         
@@ -896,7 +1137,14 @@ def recomendaciones_ajax(request):
             'destino': s.destino.nombre,
             'region': s.destino.region,
             'descripcion_corta': s.descripcion[:150] + '...' if len(s.descripcion) > 150 else s.descripcion,
-            'url': f'/servicios/{s.id}/'
+            'direccion': s.direccion,
+            'telefono': s.telefono,
+            'whatsapp': s.whatsapp if s.whatsapp else None,
+            'latitud': float(s.latitud),
+            'longitud': float(s.longitud),
+            'esta_abierto': s.esta_abierto_ahora(),
+            'url': f'/servicios/{s.id}/',
+            'url_google_maps': s.get_url_google_maps(),
         } for s in servicios]
         
         return JsonResponse({
@@ -907,8 +1155,89 @@ def recomendaciones_ajax(request):
                 'presupuesto': presupuesto,
                 'tipo': tipo,
                 'region': region,
-                'personas': personas
+                'personas': personas,
+                'abierto_ahora': abierto_ahora,
             }
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@require_http_methods(["GET"])
+def servicios_cercanos_ajax(request):
+    """
+    Vista AJAX para obtener servicios cercanos a una ubicación
+    Usado por el chatbot y búsqueda por mapa
+    """
+    lat = request.GET.get('lat')
+    lng = request.GET.get('lng')
+    radio_km = request.GET.get('radio', 10)  # Radio por defecto 10km
+    tipo = request.GET.get('tipo', '')
+    
+    if not lat or not lng:
+        return JsonResponse({
+            'success': False,
+            'error': 'Se requieren coordenadas (lat, lng)'
+        }, status=400)
+    
+    try:
+        from math import radians, cos, sin, asin, sqrt
+        
+        def haversine(lat1, lon1, lat2, lon2):
+            """Calcular distancia entre dos puntos en km"""
+            lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+            dlon = lon2 - lon1
+            dlat = lat2 - lat1
+            a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+            c = 2 * asin(sqrt(a))
+            km = 6371 * c
+            return km
+        
+        lat_usuario = float(lat)
+        lng_usuario = float(lng)
+        radio = float(radio_km)
+        
+        servicios = Servicio.objects.filter(
+            activo=True,
+            disponible=True
+        ).select_related('destino', 'categoria').prefetch_related('horarios')
+        
+        if tipo:
+            servicios = servicios.filter(tipo=tipo)
+        
+        # Filtrar por distancia
+        servicios_cercanos = []
+        for s in servicios:
+            distancia = haversine(lat_usuario, lng_usuario, float(s.latitud), float(s.longitud))
+            if distancia <= radio:
+                servicios_cercanos.append({
+                    'id': s.id,
+                    'nombre': s.nombre,
+                    'tipo': s.get_tipo_display(),
+                    'precio': float(s.precio),
+                    'calificacion': float(s.calificacion_promedio),
+                    'direccion': s.direccion,
+                    'telefono': s.telefono,
+                    'latitud': float(s.latitud),
+                    'longitud': float(s.longitud),
+                    'distancia_km': round(distancia, 2),
+                    'esta_abierto': s.esta_abierto_ahora(),
+                    'url': f'/servicios/{s.id}/',
+                    'url_google_maps': s.get_url_google_maps(),
+                })
+        
+        # Ordenar por distancia
+        servicios_cercanos.sort(key=lambda x: x['distancia_km'])
+        
+        return JsonResponse({
+            'success': True,
+            'servicios': servicios_cercanos[:20],  # Limitar a 20 resultados
+            'total': len(servicios_cercanos),
+            'radio_km': radio
         })
         
     except Exception as e:

@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}
 {% load calificaciones_extra %}
 
@@ -5,7 +6,7 @@
 <div class="min-h-screen bg-gray-50">
     
     <!-- Hero Section con Galería -->
-    <div class="relative h-[600px] overflow-hidden">
+    <div class="relative h-[500px] overflow-hidden">
         <div class="absolute inset-0">
             {% if imagen_principal %}
             <img src="{{ imagen_principal.imagen.url }}" 
@@ -23,7 +24,7 @@
         <div class="relative z-10 h-full flex items-end">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pb-8">
                 <!-- Breadcrumb -->
-                <nav class="mb-4">
+                <nav class="mb-3">
                     <ol class="flex items-center space-x-2 text-sm">
                         <li><a href="{% url 'home' %}" class="text-white/80 hover:text-white transition-colors">Inicio</a></li>
                         <li><i class="fas fa-chevron-right text-white/50 text-xs"></i></li>
@@ -36,7 +37,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-2">
                         <!-- Badges -->
-                        <div class="flex flex-wrap items-center gap-2 mb-4">
+                        <div class="flex flex-wrap items-center gap-2 mb-3">
                             <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold bg-white text-gray-800">
                                 {% if servicio.tipo == 'alojamiento' %}
                                     <i class="fas fa-hotel mr-2 text-purple-600"></i>
@@ -67,14 +68,14 @@
                             {% endif %}
                         </div>
 
-                        <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
+                        <h1 class="text-3xl md:text-4xl font-bold text-white mb-3 leading-tight">
                             {{ servicio.nombre }}
                         </h1>
 
-                        <div class="flex flex-wrap items-center gap-4 text-white/90 mb-4">
+                        <div class="flex flex-wrap items-center gap-4 text-white/90 mb-3">
                             <div class="flex items-center space-x-2">
                                 <i class="fas fa-location-dot text-sky-400"></i>
-                                <span>{{ servicio.destino.nombre }}, {{ servicio.destino.get_region_display }}</span>
+                                <span class="text-sm">{{ servicio.destino.nombre }}, {{ servicio.destino.get_region_display }}</span>
                             </div>
 
                             <div class="flex items-center space-x-2">
@@ -87,13 +88,13 @@
                                         {% endif %}
                                     {% endfor %}
                                 </div>
-                                <span class="font-semibold">{{ servicio.calificacion_promedio|floatformat:1 }}</span>
-                                <span class="text-white/70 text-sm">({{ servicio.total_calificaciones }})</span>
+                                <span class="font-semibold text-sm">{{ servicio.calificacion_promedio|floatformat:1 }}</span>
+                                <span class="text-white/70 text-xs">({{ servicio.total_calificaciones }})</span>
                             </div>
 
                             <div class="flex items-center space-x-2">
                                 <i class="fas fa-users text-sky-400"></i>
-                                <span>Hasta {{ servicio.capacidad_maxima }} personas</span>
+                                <span class="text-sm">Hasta {{ servicio.capacidad_maxima }} personas</span>
                             </div>
                         </div>
 
@@ -102,13 +103,13 @@
                         <div class="flex gap-2 overflow-x-auto pb-2">
                             {% if imagen_principal %}
                             <button onclick="cambiarImagen('{{ imagen_principal.imagen.url }}')" 
-                                    class="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 border-white shadow-lg hover:scale-105 transition-transform">
+                                    class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 border-white shadow-lg hover:scale-105 transition-transform">
                                 <img src="{{ imagen_principal.imagen.url }}" class="w-full h-full object-cover">
                             </button>
                             {% endif %}
                             {% for imagen in imagenes_secundarias %}
                             <button onclick="cambiarImagen('{{ imagen.imagen.url }}')" 
-                                    class="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 border-white/60 hover:border-white shadow-lg hover:scale-105 transition-transform">
+                                    class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 border-white/60 hover:border-white shadow-lg hover:scale-105 transition-transform">
                                 <img src="{{ imagen.imagen.url }}" class="w-full h-full object-cover">
                             </button>
                             {% endfor %}
@@ -118,44 +119,44 @@
 
                     <!-- Card de Precio (Desktop) -->
                     <div class="hidden lg:block">
-                        <div class="bg-white rounded-xl shadow-2xl p-6 sticky top-4">
+                        <div class="bg-white rounded-xl shadow-2xl p-5 sticky top-4">
                             <div class="text-center mb-4">
-                                <p class="text-sm text-gray-600 mb-1">Precio por persona</p>
-                                <div class="flex items-baseline justify-center mb-4">
-                                    <span class="text-4xl font-bold text-gray-900">${{ servicio.precio|floatformat:0 }}</span>
-                                    <span class="text-lg text-gray-500 ml-1">USD</span>
+                                <p class="text-xs text-gray-600 mb-1">Precio por persona</p>
+                                <div class="flex items-baseline justify-center mb-3">
+                                    <span class="text-3xl font-bold text-gray-900">${{ servicio.precio|floatformat:0 }}</span>
+                                    <span class="text-base text-gray-500 ml-1">USD</span>
                                 </div>
                             </div>
 
                             {% if user.is_authenticated %}
                             <button onclick="agregarAlCarrito({{ servicio.id }})" 
-                                    class="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold text-base transition-colors mb-2">
+                                    class="w-full py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold text-sm transition-colors mb-2">
                                 <i class="fas fa-shopping-cart mr-2"></i>
                                 Agregar al Carrito
                             </button>
                             <button onclick="reservarAhora({{ servicio.id }})" 
-                                    class="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-base transition-colors">
+                                    class="w-full py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-sm transition-colors">
                                 <i class="fas fa-bolt mr-2"></i>
                                 Reservar Ahora
                             </button>
                             {% else %}
                             <a href="{% url 'usuarios:login' %}?next={{ request.path }}" 
-                               class="block w-full py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold text-base text-center transition-colors">
+                               class="block w-full py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold text-sm text-center transition-colors">
                                 <i class="fas fa-sign-in-alt mr-2"></i>
                                 Iniciar Sesión
                             </a>
                             {% endif %}
 
-                            <div class="mt-4 pt-4 border-t border-gray-200 space-y-2">
-                                <div class="flex items-center text-sm text-gray-600">
+                            <div class="mt-3 pt-3 border-t border-gray-200 space-y-2">
+                                <div class="flex items-center text-xs text-gray-600">
                                     <i class="fas fa-shield-alt mr-2 text-green-600"></i>
                                     <span>Cancelación gratis</span>
                                 </div>
-                                <div class="flex items-center text-sm text-gray-600">
+                                <div class="flex items-center text-xs text-gray-600">
                                     <i class="fas fa-headset mr-2 text-sky-600"></i>
                                     <span>Soporte 24/7</span>
                                 </div>
-                                <div class="flex items-center text-sm text-gray-600">
+                                <div class="flex items-center text-xs text-gray-600">
                                     <i class="fas fa-medal mr-2 text-yellow-600"></i>
                                     <span>Calidad garantizada</span>
                                 </div>
@@ -168,85 +169,170 @@
     </div>
 
     <!-- Contenido Principal -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
             <!-- Columna Principal -->
-            <div class="lg:col-span-2 space-y-6">
+            <div class="lg:col-span-2 space-y-5">
                 <!-- Descripción -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <div class="flex items-center mb-4">
-                        <div class="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center mr-3">
-                            <i class="fas fa-info-circle text-sky-600 text-lg"></i>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                    <div class="flex items-center mb-3">
+                        <div class="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center mr-2">
+                            <i class="fas fa-info-circle text-sky-600"></i>
                         </div>
-                        <h2 class="text-2xl font-bold text-gray-900">Descripción</h2>
+                        <h2 class="text-xl font-bold text-gray-900">Descripción</h2>
                     </div>
-                    <div class="prose max-w-none">
-                        <p class="text-gray-700 leading-relaxed">{{ servicio.descripcion }}</p>
+                    <p class="text-gray-700 text-sm leading-relaxed">{{ servicio.descripcion }}</p>
+                </div>
+
+                <!-- Horarios de Atención -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                    <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center mr-2">
+                                <i class="fas fa-clock text-indigo-600"></i>
+                            </div>
+                            <h2 class="text-xl font-bold text-gray-900">Horarios</h2>
+                        </div>
+                        
+                        <div id="estadoActual" class="px-3 py-1.5 rounded-lg font-semibold text-xs">
+                            <i class="fas fa-circle-notch fa-spin mr-1"></i>
+                            Verificando...
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        {% if horario_semana %}
+                        <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg">
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-briefcase text-gray-600 text-sm"></i>
+                                <span class="font-medium text-gray-900 text-sm">Lunes a Viernes</span>
+                            </div>
+                            <span class="text-gray-700 text-sm font-medium">
+                                {{ horario_semana.hora_apertura|time:"H:i" }} - {{ horario_semana.hora_cierre|time:"H:i" }}
+                            </span>
+                        </div>
+                        {% endif %}
+
+                        {% if horario_fin_semana %}
+                        <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg">
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-calendar-week text-gray-600 text-sm"></i>
+                                <span class="font-medium text-gray-900 text-sm">Sábado y Domingo</span>
+                            </div>
+                            <span class="text-gray-700 text-sm font-medium">
+                                {{ horario_fin_semana.hora_apertura|time:"H:i" }} - {{ horario_fin_semana.hora_cierre|time:"H:i" }}
+                            </span>
+                        </div>
+                        {% endif %}
+
+                        {% if not horario_semana and not horario_fin_semana %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-info-circle text-gray-400 text-2xl mb-2"></i>
+                            <p class="text-gray-500 text-sm">Horarios no disponibles</p>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
 
-                <!-- Información del Proveedor -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <div class="flex items-center mb-4">
-                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                            <i class="fas fa-user-tie text-purple-600 text-lg"></i>
+                <!-- Ubicación -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                    <div class="flex items-center mb-3">
+                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-2">
+                            <i class="fas fa-map-marker-alt text-green-600"></i>
                         </div>
-                        <h2 class="text-2xl font-bold text-gray-900">Proveedor</h2>
+                        <h2 class="text-xl font-bold text-gray-900">Ubicación</h2>
                     </div>
-                    <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 bg-gradient-to-br from-sky-500 to-blue-600 rounded-full flex items-center justify-center text-white text-lg font-bold">
-                            {{ servicio.proveedor.nombre|first }}
+                    
+                    <!-- Información de Dirección -->
+                    <div class="space-y-3 mb-3">
+                        <div class="flex items-start space-x-2 p-2.5 bg-gray-50 rounded-lg">
+                            <div class="flex-shrink-0 mt-0.5">
+                                <i class="fas fa-location-dot text-blue-600 text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-gray-900 text-sm mb-0.5">Dirección</p>
+                                <p class="text-gray-700 text-xs leading-relaxed">{{ servicio.direccion }}</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-900">{{ servicio.proveedor.nombre }}</h3>
-                            <p class="text-sm text-gray-600">{{ servicio.proveedor.correo }}</p>
+                        
+                        {% if servicio.zona_referencia %}
+                        <div class="flex items-start space-x-2 p-2.5 bg-amber-50 rounded-lg border border-amber-100">
+                            <div class="flex-shrink-0 mt-0.5">
+                                <i class="fas fa-map-signs text-amber-600 text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-gray-900 text-sm mb-0.5">Referencia</p>
+                                <p class="text-gray-700 text-xs leading-relaxed">{{ servicio.zona_referencia }}</p>
+                            </div>
                         </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Mapa -->
+                    <div id="mapContainer" class="rounded-xl overflow-hidden shadow-lg border-2 border-gray-200 mb-3" style="height: 350px;">
+                        <div id="map" style="height: 100%; width: 100%;"></div>
+                    </div>
+                    
+                    <!-- Botones de Acción -->
+                    <div class="flex flex-wrap gap-2">
+                        <a href="{{ servicio.get_url_google_maps }}" 
+                        target="_blank" 
+                        class="flex-1 min-w-[180px] inline-flex items-center justify-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-xs transition-all hover:scale-105 shadow-md">
+                            <i class="fab fa-google mr-1.5"></i>
+                            Abrir en Google Maps
+                        </a>
+                        
+                        <button onclick="copiarUbicacion()" 
+                                class="flex-1 min-w-[180px] inline-flex items-center justify-center px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-semibold text-xs transition-all hover:scale-105 shadow-md">
+                            <i class="fas fa-copy mr-1.5"></i>
+                            Copiar Dirección
+                        </button>
                     </div>
                 </div>
 
                 <!-- SECCIÓN DE CALIFICACIONES -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6" id="seccion-calificaciones">
-                    <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5" id="seccion-calificaciones">
+                    <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
                         <div class="flex items-center">
-                            <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mr-3">
-                                <i class="fas fa-star text-yellow-600 text-lg"></i>
+                            <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center mr-2">
+                                <i class="fas fa-star text-yellow-600"></i>
                             </div>
                             <div>
-                                <h2 class="text-2xl font-bold text-gray-900">Calificaciones</h2>
-                                <p class="text-sm text-gray-600">{{ servicio.total_calificaciones }} opiniones</p>
+                                <h2 class="text-xl font-bold text-gray-900">Calificaciones</h2>
+                                <p class="text-xs text-gray-600">{{ servicio.total_calificaciones }} opiniones</p>
                             </div>
                         </div>
                         
                         {% if user.is_authenticated %}
                             {% if puede_calificar %}
                             <button onclick="mostrarModalCalificar()" 
-                                    class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold text-sm transition-all hover:scale-105">
+                                    class="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold text-xs transition-all hover:scale-105">
                                 <i class="fas fa-plus mr-1"></i>
                                 Dejar Reseña
                             </button>
                             {% elif ya_califico %}
                             <div class="flex items-center space-x-2">
-                                <span class="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg font-semibold text-sm">
+                                <span class="px-2.5 py-1 bg-green-100 text-green-700 rounded-lg font-semibold text-xs">
                                     <i class="fas fa-check-circle mr-1"></i>
                                     Ya calificaste
                                 </span>
                                 {% if calificacion_usuario %}
                                 <button onclick="mostrarModalEditarCalificacion()" 
-                                        class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                        class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                         title="Editar">
-                                    <i class="fas fa-edit"></i>
+                                    <i class="fas fa-edit text-sm"></i>
                                 </button>
                                 <button onclick="confirmarEliminarCalificacion({{ calificacion_usuario.id }})" 
-                                        class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                        class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                         title="Eliminar">
-                                    <i class="fas fa-trash"></i>
+                                    <i class="fas fa-trash text-sm"></i>
                                 </button>
                                 {% endif %}
                             </div>
                             {% endif %}
                         {% else %}
                         <a href="{% url 'usuarios:login' %}?next={{ request.path }}" 
-                           class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-semibold text-sm transition-colors">
+                           class="px-3 py-1.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-semibold text-xs transition-colors">
                             <i class="fas fa-sign-in-alt mr-1"></i>
                             Iniciar sesión
                         </a>
@@ -254,39 +340,39 @@
                     </div>
 
                     <!-- Resumen de Calificaciones -->
-                    <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-6 mb-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4 mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="text-center">
-                                <div class="text-5xl font-bold text-gray-900 mb-2">
+                                <div class="text-4xl font-bold text-gray-900 mb-1">
                                     {{ servicio.calificacion_promedio|floatformat:1 }}
                                 </div>
-                                <div class="flex items-center justify-center mb-2">
+                                <div class="flex items-center justify-center mb-1">
                                     {% for i in "12345" %}
                                         {% if forloop.counter <= servicio.calificacion_promedio %}
-                                        <i class="fas fa-star text-yellow-400 text-xl"></i>
+                                        <i class="fas fa-star text-yellow-400 text-lg"></i>
                                         {% else %}
-                                        <i class="far fa-star text-yellow-400 text-xl"></i>
+                                        <i class="far fa-star text-yellow-400 text-lg"></i>
                                         {% endif %}
                                     {% endfor %}
                                 </div>
-                                <p class="text-sm text-gray-600">Basado en {{ servicio.total_calificaciones }} reseñas</p>
+                                <p class="text-xs text-gray-600">Basado en {{ servicio.total_calificaciones }} reseñas</p>
                             </div>
 
-                            <div class="space-y-2">
+                            <div class="space-y-1.5">
                                 {% for rating in "54321" %}
-                                <div class="flex items-center space-x-3">
-                                    <div class="flex items-center text-sm text-gray-600 w-12">
+                                <div class="flex items-center space-x-2">
+                                    <div class="flex items-center text-xs text-gray-600 w-10">
                                         <span>{{ rating }}</span>
                                         <i class="fas fa-star text-yellow-400 text-xs ml-1"></i>
                                     </div>
-                                    <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                    <div class="flex-1 bg-gray-200 rounded-full h-1.5">
                                         {% with total=servicio.total_calificaciones count=stats_calificaciones|get_item:rating %}
                                         <div class="bg-yellow-400 h-full rounded-full transition-all"
                                              style="width: {% if total > 0 %}{{ count|mul:100|div:total|floatformat:0 }}{% else %}0{% endif %}%">
                                         </div>
                                         {% endwith %}
                                     </div>
-                                    <span class="text-sm text-gray-600 w-8 text-right">
+                                    <span class="text-xs text-gray-600 w-6 text-right">
                                         {{ stats_calificaciones|get_item:rating }}
                                     </span>
                                 </div>
@@ -296,27 +382,27 @@
                     </div>
 
                     <!-- Lista de Reseñas -->
-                    <div class="space-y-6">
+                    <div class="space-y-4">
                         {% for calificacion in calificaciones %}
-                        <div class="border-b border-gray-100 pb-6 last:border-0">
-                            <div class="flex items-start space-x-4">
+                        <div class="border-b border-gray-100 pb-4 last:border-0">
+                            <div class="flex items-start space-x-3">
                                 <div class="flex-shrink-0">
-                                    <div class="w-12 h-12 bg-gradient-to-br from-sky-500 to-blue-600 rounded-full flex items-center justify-center text-white text-lg font-bold">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-sky-500 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
                                         {{ calificacion.usuario.nombre|first|upper }}
                                     </div>
                                 </div>
 
                                 <div class="flex-1 min-w-0">
-                                    <div class="flex items-start justify-between mb-2">
+                                    <div class="flex items-start justify-between mb-1">
                                         <div>
-                                            <h4 class="font-semibold text-gray-900">{{ calificacion.usuario.nombre }}</h4>
-                                            <div class="flex items-center space-x-3 mt-1">
+                                            <h4 class="font-semibold text-gray-900 text-sm">{{ calificacion.usuario.nombre }}</h4>
+                                            <div class="flex items-center space-x-2 mt-0.5">
                                                 <div class="flex items-center">
                                                     {% for i in "12345" %}
                                                         {% if forloop.counter <= calificacion.puntuacion %}
-                                                        <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                        <i class="fas fa-star text-yellow-400 text-xs"></i>
                                                         {% else %}
-                                                        <i class="far fa-star text-yellow-400 text-sm"></i>
+                                                        <i class="far fa-star text-yellow-400 text-xs"></i>
                                                         {% endif %}
                                                     {% endfor %}
                                                 </div>
@@ -326,33 +412,32 @@
                                     </div>
 
                                     {% if calificacion.comentario %}
-                                    <p class="text-gray-700 text-sm leading-relaxed mb-3">{{ calificacion.comentario }}</p>
+                                    <p class="text-gray-700 text-xs leading-relaxed mb-2">{{ calificacion.comentario }}</p>
                                     {% endif %}
 
                                     {% if calificacion.respuesta %}
-                                    <div class="bg-sky-50 rounded-lg p-4 border-l-4 border-sky-500">
-                                        <div class="flex items-start space-x-3">
-                                            <i class="fas fa-reply text-sky-600 mt-1"></i>
+                                    <div class="bg-sky-50 rounded-lg p-3 border-l-4 border-sky-500">
+                                        <div class="flex items-start space-x-2">
+                                            <i class="fas fa-reply text-sky-600 mt-0.5 text-xs"></i>
                                             <div class="flex-1">
-                                                <div class="flex items-center justify-between mb-1">
-                                                    <p class="font-semibold text-sky-900 text-sm">Respuesta del proveedor</p>
+                                                <div class="flex items-center justify-between mb-0.5">
+                                                    <p class="font-semibold text-sky-900 text-xs">Respuesta del proveedor</p>
                                                     {% if user.is_authenticated and user == servicio.proveedor %}
                                                     <button onclick="editarRespuesta({{ calificacion.respuesta.id }}, '{{ calificacion.respuesta.respuesta|escapejs }}')" 
-                                                            class="text-xs text-blue-600 hover:text-blue-800 flex items-center">
-                                                        <i class="fas fa-edit mr-1"></i> Editar
+                                                            class="text-xs text-blue-600 hover:text-blue-800">
+                                                        <i class="fas fa-edit"></i>
                                                     </button>
                                                     {% endif %}
                                                 </div>
-                                                <p class="text-sky-900 text-sm" id="respuesta-texto-{{ calificacion.respuesta.id }}">{{ calificacion.respuesta.respuesta }}</p>
-                                                <p class="text-xs text-sky-700 mt-1">{{ calificacion.respuesta.fecha_respuesta|date:"d M Y" }}</p>
+                                                <p class="text-sky-900 text-xs" id="respuesta-texto-{{ calificacion.respuesta.id }}">{{ calificacion.respuesta.respuesta }}</p>
+                                                <p class="text-xs text-sky-700 mt-0.5">{{ calificacion.respuesta.fecha_respuesta|date:"d M Y" }}</p>
                                             </div>
                                         </div>
                                     </div>
                                     {% elif user.is_authenticated and user == servicio.proveedor %}
-                                    <!-- Botón para responder -->
                                     <button onclick="mostrarFormRespuesta({{ calificacion.id }}, '{{ calificacion.comentario|escapejs }}')" 
-                                            class="mt-3 inline-flex items-center px-3 py-1.5 text-sm text-sky-600 hover:text-sky-700 hover:bg-sky-50 rounded-lg transition-colors">
-                                        <i class="fas fa-reply mr-1.5"></i>
+                                            class="mt-2 inline-flex items-center px-2.5 py-1 text-xs text-sky-600 hover:text-sky-700 hover:bg-sky-50 rounded-lg transition-colors">
+                                        <i class="fas fa-reply mr-1"></i>
                                         Responder
                                     </button>
                                     {% endif %}
@@ -360,12 +445,12 @@
                             </div>
                         </div>
                         {% empty %}
-                        <div class="text-center py-12">
-                            <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i class="fas fa-comment-slash text-gray-400 text-3xl"></i>
+                        <div class="text-center py-8">
+                            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-comment-slash text-gray-400 text-2xl"></i>
                             </div>
-                            <h3 class="text-lg font-semibold text-gray-700 mb-2">Aún no hay calificaciones</h3>
-                            <p class="text-gray-500 text-sm">Sé el primero en compartir tu experiencia</p>
+                            <h3 class="text-base font-semibold text-gray-700 mb-1">Aún no hay calificaciones</h3>
+                            <p class="text-gray-500 text-xs">Sé el primero en compartir tu experiencia</p>
                         </div>
                         {% endfor %}
                     </div>
@@ -373,30 +458,30 @@
             </div>
 
             <!-- Sidebar -->
-            <div class="space-y-6">
+            <div class="space-y-4">
                 <!-- Servicios Relacionados -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 sticky top-4">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">Servicios Relacionados</h3>
-                    <div class="space-y-3">
-                        {% for relacionado in servicios_relacionados %}
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sticky top-4">
+                    <h3 class="text-base font-bold text-gray-900 mb-3">Servicios Relacionados</h3>
+                    <div class="space-y-2.5">
+                        {% for relacionado in servicios_relacionados|slice:":3" %}
                         <a href="{% url 'servicios:detalle_servicio' relacionado.id %}" class="block group">
-                            <div class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-50 transition-colors">
                                 {% if relacionado.imagenes.first %}
                                 <img src="{{ relacionado.imagenes.first.imagen.url }}" 
-                                     class="w-14 h-14 rounded-lg object-cover">
+                                     class="w-12 h-12 rounded-lg object-cover flex-shrink-0">
                                 {% else %}
-                                <div class="w-14 h-14 bg-gradient-to-br from-sky-400 to-blue-500 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-image text-white text-sm"></i>
+                                <div class="w-12 h-12 bg-gradient-to-br from-sky-400 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-image text-white text-xs"></i>
                                 </div>
                                 {% endif %}
                                 <div class="flex-1 min-w-0">
-                                    <h4 class="font-semibold text-gray-900 group-hover:text-sky-600 transition-colors text-sm truncate">
+                                    <h4 class="font-semibold text-gray-900 group-hover:text-sky-600 transition-colors text-xs truncate mb-0.5">
                                         {{ relacionado.nombre }}
                                     </h4>
                                     <div class="flex items-center justify-between">
-                                        <span class="text-sm font-semibold text-gray-900">${{ relacionado.precio|floatformat:0 }}</span>
+                                        <span class="text-xs font-bold text-gray-900">${{ relacionado.precio|floatformat:0 }}</span>
                                         <div class="flex items-center text-xs text-yellow-500">
-                                            <i class="fas fa-star mr-1"></i>
+                                            <i class="fas fa-star mr-0.5 text-xs"></i>
                                             <span>{{ relacionado.calificacion_promedio|floatformat:1 }}</span>
                                         </div>
                                     </div>
@@ -404,8 +489,67 @@
                             </div>
                         </a>
                         {% empty %}
-                        <p class="text-gray-500 text-sm text-center py-4">No hay servicios relacionados</p>
+                        <p class="text-gray-500 text-xs text-center py-3">No hay servicios relacionados</p>
                         {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Proveedor y Contacto - Unificado y Minimalista -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-sky-500 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                            {{ servicio.proveedor.nombre|first|upper }}
+                        </div>
+                        <div class="ml-2.5 flex-1 min-w-0">
+                            <h3 class="text-sm font-bold text-gray-900 truncate">{{ servicio.proveedor.nombre }}</h3>
+                            <p class="text-xs text-gray-500">Proveedor del servicio</p>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-3 border-t border-gray-100 space-y-2">
+                        <a href="tel:{{ servicio.telefono }}" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors group">
+                            <div class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-500 transition-colors flex-shrink-0">
+                                <i class="fas fa-phone text-blue-600 group-hover:text-white text-xs"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs text-gray-500">Teléfono</p>
+                                <p class="font-semibold text-gray-900 text-xs truncate">{{ servicio.telefono }}</p>
+                            </div>
+                        </a>
+
+                        {% if servicio.whatsapp %}
+                        <a href="https://wa.me/{{ servicio.whatsapp|cut:'+' }}" target="_blank" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors group">
+                            <div class="w-7 h-7 bg-green-100 rounded-lg flex items-center justify-center group-hover:bg-green-500 transition-colors flex-shrink-0">
+                                <i class="fab fa-whatsapp text-green-600 group-hover:text-white text-sm"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs text-gray-500">WhatsApp</p>
+                                <p class="font-semibold text-gray-900 text-xs truncate">{{ servicio.whatsapp }}</p>
+                            </div>
+                        </a>
+                        {% endif %}
+
+                        <a href="mailto:{{ servicio.email_contacto }}" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors group">
+                            <div class="w-7 h-7 bg-red-100 rounded-lg flex items-center justify-center group-hover:bg-red-500 transition-colors flex-shrink-0">
+                                <i class="fas fa-envelope text-red-600 group-hover:text-white text-xs"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs text-gray-500">Email</p>
+                                <p class="font-semibold text-gray-900 text-xs truncate">{{ servicio.email_contacto }}</p>
+                            </div>
+                        </a>
+
+                        {% if servicio.sitio_web %}
+                        <a href="{{ servicio.sitio_web }}" target="_blank" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors group">
+                            <div class="w-7 h-7 bg-indigo-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-500 transition-colors flex-shrink-0">
+                                <i class="fas fa-globe text-indigo-600 group-hover:text-white text-xs"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs text-gray-500">Sitio Web</p>
+                                <p class="font-semibold text-gray-900 text-xs truncate">Visitar</p>
+                            </div>
+                        </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -413,7 +557,7 @@
     </div>
 
     <!-- Sticky Bottom Bar (Mobile) -->
-    <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-40">
+    <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-40 shadow-lg">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-xs text-gray-600">Precio por persona</p>
@@ -424,12 +568,12 @@
             </div>
             {% if user.is_authenticated %}
             <button onclick="reservarAhora({{ servicio.id }})" 
-                    class="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-sm transition-colors">
+                    class="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-sm transition-colors shadow-md">
                 Reservar
             </button>
             {% else %}
             <a href="{% url 'usuarios:login' %}?next={{ request.path }}" 
-               class="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold text-sm transition-colors">
+               class="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-semibold text-sm transition-colors shadow-md">
                 Iniciar Sesión
             </a>
             {% endif %}
@@ -438,7 +582,6 @@
 </div>
 
 <!-- MODALES -->
-
 <!-- Modal Reserva Rápida -->
 <div id="modalReserva" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
@@ -671,7 +814,7 @@
     </div>
 </div>
 
-<!-- Modal Responder Calificación (PROVEEDOR) -->
+<!-- Modal Responder Calificación -->
 <div id="modalResponder" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6">
         <div class="flex items-center justify-between mb-6">
@@ -692,9 +835,7 @@
         <form id="formResponder">
             {% csrf_token %}
             <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    Tu respuesta
-                </label>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Tu respuesta</label>
                 <textarea name="respuesta" 
                           id="textoRespuesta"
                           rows="4" 
@@ -725,7 +866,7 @@
     </div>
 </div>
 
-<!-- Modal Editar Respuesta (PROVEEDOR) -->
+<!-- Modal Editar Respuesta -->
 <div id="modalEditarRespuesta" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6">
         <div class="flex items-center justify-between mb-6">
@@ -741,9 +882,7 @@
         <form id="formEditarRespuesta">
             {% csrf_token %}
             <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    Tu respuesta
-                </label>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Tu respuesta</label>
                 <textarea name="respuesta" 
                           id="textoEditarRespuesta"
                           rows="4" 
@@ -773,8 +912,13 @@
     </div>
 </div>
 
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+      crossorigin=""/>
+
 <style>
-/* Animaciones para estrellas */
 .star-btn, .star-btn-editar {
     transition: all 0.2s ease;
     cursor: pointer;
@@ -784,729 +928,750 @@
     transform: scale(1.15) rotate(5deg);
 }
 
-/* Scroll suave */
 html {
     scroll-behavior: smooth;
 }
 
-/* Espacio para bottom bar en mobile */
 @media (max-width: 1023px) {
     body {
         padding-bottom: 80px;
     }
 }
 
-/* Transición para cambio de imagen */
 #imagenPrincipal {
     transition: opacity 0.3s ease-in-out;
 }
+
+#mapContainer {
+    position: relative;
+    display: block;
+    width: 100%;
+    min-height: 350px;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+}
+
+.leaflet-container {
+    background: #e5e7eb;
+    border-radius: 12px;
+}
+
+.leaflet-popup-content-wrapper {
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.custom-marker {
+    background: transparent !important;
+    border: none !important;
+}
 </style>
-    
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+
 <script>
-    // VARIABLES GLOBALES
-    const precioUnitario = parseFloat('{{ servicio.precio }}');
-    let currentRating = 0;
-    let currentRatingEditar = parseInt('{{ calificacion_usuario.puntuacion|default:0 }}');
-    let calificacionActual = null;
-    let respuestaActual = null;
+{% load l10n %}
 
-    const ratingTexts = {
-        1: '⭐ Malo',
-        2: '⭐⭐ Regular',
-        3: '⭐⭐⭐ Bueno',
-        4: '⭐⭐⭐⭐ Muy bueno',
-        5: '⭐⭐⭐⭐⭐ Excelente'
-    };
-    // CAMBIAR IMAGEN PRINCIPAL
-    function cambiarImagen(url) {
-        const img = document.getElementById('imagenPrincipal');
-        if (img) {
-            img.style.opacity = '0';
-            setTimeout(() => {
-                img.src = url;
-                img.style.opacity = '1';
-            }, 150);
-        }
-    }
-    // MODAL DE RESERVA
-    function mostrarModalReserva() {
-        const modal = document.getElementById('modalReserva');
-        if (!modal) {
-            console.error('Modal no encontrado');
-            return;
-        }
-        
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-        
-        // Establecer fecha mínima
-        const fechaInput = document.getElementById('fechaServicio');
-        if (fechaInput) {
-            fechaInput.setAttribute('min', '{{ fecha_minima }}');
-        }
-        
-        // Reset valores
-        const cantidadInput = document.getElementById('cantidadPersonas');
-        if (cantidadInput) {
-            cantidadInput.value = 1;
-        }
-        if (fechaInput) {
-            fechaInput.value = '';
-        }
-        actualizarTotal();
+// Variables globales
+const precioUnitario = parseFloat('{{ servicio.precio }}');
+let currentRating = 0;
+let currentRatingEditar = parseInt('{{ calificacion_usuario.puntuacion|default:0 }}');
+let calificacionActual = null;
+let respuestaActual = null;
+let map = null;
+let marker = null;
+
+const ratingTexts = {
+    1: '⭐ Malo',
+    2: '⭐⭐ Regular',
+    3: '⭐⭐⭐ Bueno',
+    4: '⭐⭐⭐⭐ Muy bueno',
+    5: '⭐⭐⭐⭐⭐ Excelente'
+};
+
+// ========== MAPA DE SOLO LECTURA PARA DETALLE ==========
+function initMap() {
+    if (typeof L === 'undefined') {
+        setTimeout(initMap, 500);
+        return;
     }
 
-    function cerrarModalReserva() {
-        const modal = document.getElementById('modalReserva');
-        if (modal) {
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
-        }
-    }
+    const mapElement = document.getElementById('map');
+    if (!mapElement || map) return;
 
-    function actualizarTotal() {
-        const cantidad = parseInt(document.getElementById('cantidadPersonas')?.value) || 1;
-        const subtotal = precioUnitario * cantidad;
-        
-        const subtotalTexto = document.getElementById('subtotalTexto');
-        const personasTexto = document.getElementById('personasTexto');
-        
-        if (subtotalTexto) {
-            subtotalTexto.textContent = `$${Math.round(subtotal)}`;
-        }
-        if (personasTexto) {
-            personasTexto.textContent = `${cantidad} ${cantidad === 1 ? 'persona' : 'personas'}`;
-        }
-    }
+    // ✅ Coordenadas con decimales completos usando unlocalize
+    const lat = parseFloat('{{ servicio.latitud|unlocalize }}');
+    const lng = parseFloat('{{ servicio.longitud|unlocalize }}');
 
-    // CARRITO Y RESERVAS
-    function agregarAlCarrito(servicioId) {
-        mostrarModalReserva();
-    }
+    console.log('🗺️ Inicializando mapa de detalle:', { lat, lng });
 
-    function reservarAhora(servicioId) {
-        mostrarModalReserva();
-        
-        const form = document.getElementById('formReserva');
-        if (form) {
-            let inputReservaRapida = form.querySelector('input[name="reserva_rapida"]');
-            if (!inputReservaRapida) {
-                inputReservaRapida = document.createElement('input');
-                inputReservaRapida.type = 'hidden';
-                inputReservaRapida.name = 'reserva_rapida';
-                inputReservaRapida.value = '1';
-                form.appendChild(inputReservaRapida);
-            }
-        }
-    }
-
-    // SISTEMA DE CALIFICACIÓN (TURISTAS)
-    function setRating(rating) {
-        currentRating = rating;
-        const ratingValue = document.getElementById('ratingValue');
-        const ratingText = document.getElementById('ratingText');
-        
-        if (ratingValue) ratingValue.value = rating;
-        if (ratingText) ratingText.textContent = ratingTexts[rating];
-        
-        const stars = document.querySelectorAll('#ratingStars .star-btn');
-        stars.forEach((star, index) => {
-            const icon = star.querySelector('i');
-            if (index < rating) {
-                icon.classList.remove('far');
-                icon.classList.add('fas');
-                star.classList.remove('text-gray-300');
-                star.classList.add('text-yellow-400');
-            } else {
-                icon.classList.remove('fas');
-                icon.classList.add('far');
-                star.classList.remove('text-yellow-400');
-                star.classList.add('text-gray-300');
-            }
-        });
-    }
-
-    function setRatingEditar(rating) {
-        currentRatingEditar = rating;
-        const ratingValueEditar = document.getElementById('ratingValueEditar');
-        if (ratingValueEditar) ratingValueEditar.value = rating;
-        
-        const stars = document.querySelectorAll('#ratingStarsEditar .star-btn-editar');
-        stars.forEach((star, index) => {
-            const icon = star.querySelector('i');
-            if (index < rating) {
-                icon.classList.remove('far');
-                icon.classList.add('fas');
-                star.classList.remove('text-gray-300');
-                star.classList.add('text-yellow-400');
-            } else {
-                icon.classList.remove('fas');
-                icon.classList.add('far');
-                star.classList.remove('text-yellow-400');
-                star.classList.add('text-gray-300');
-            }
-        });
-    }
-
-    function mostrarModalCalificar() {
-        const modal = document.getElementById('modalCalificar');
-        if (modal) {
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-    }
-
-    function cerrarModalCalificar() {
-        const modal = document.getElementById('modalCalificar');
-        if (modal) {
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
-            currentRating = 0;
-            
-            const form = modal.querySelector('form');
-            if (form) form.reset();
-            
-            const stars = document.querySelectorAll('#ratingStars .star-btn');
-            stars.forEach(star => {
-                const icon = star.querySelector('i');
-                icon.classList.remove('fas');
-                icon.classList.add('far');
-                star.classList.remove('text-yellow-400');
-                star.classList.add('text-gray-300');
-            });
-            
-            const ratingText = document.getElementById('ratingText');
-            if (ratingText) ratingText.textContent = 'Selecciona una calificación';
-        }
-    }
-
-    function mostrarModalEditarCalificacion() {
-        const modal = document.getElementById('modalEditarCalificacion');
-        if (modal) {
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-    }
-
-    function cerrarModalEditarCalificacion() {
-        const modal = document.getElementById('modalEditarCalificacion');
-        if (modal) {
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
-        }
-    }
-
-    function confirmarEliminarCalificacion(calificacionId) {
-        const modal = document.getElementById('modalEliminarCalificacion');
-        const form = document.getElementById('formEliminarCalificacion');
-        if (modal && form) {
-            form.action = `/calificaciones/eliminar/${calificacionId}/`;
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-    }
-
-    function cerrarModalEliminarCalificacion() {
-        const modal = document.getElementById('modalEliminarCalificacion');
-        if (modal) {
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
-        }
-    }
-
-    // SISTEMA DE RESPUESTAS (PROVEEDORES)
-    function mostrarFormRespuesta(calificacionId, comentario) {
-        calificacionActual = calificacionId;
-        const modal = document.getElementById('modalResponder');
-        const textarea = document.getElementById('textoRespuesta');
-        const comentarioDiv = document.getElementById('comentarioOriginal');
-        
-        if (modal && textarea) {
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-            textarea.value = '';
-            
-            // Mostrar el comentario original
-            if (comentarioDiv) {
-                comentarioDiv.textContent = comentario || 'Sin comentario';
-            }
-            
-            // Actualizar contador
-            const charCount = document.getElementById('charCountRespuesta');
-            if (charCount) charCount.textContent = '0';
-            
-            textarea.focus();
-        }
-    }
-
-    function cerrarModalResponder() {
-        const modal = document.getElementById('modalResponder');
-        if (modal) {
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
-            calificacionActual = null;
-            
-            // Limpiar formulario
-            const textarea = document.getElementById('textoRespuesta');
-            if (textarea) textarea.value = '';
-        }
-    }
-
-    async function enviarRespuesta() {
-        const respuesta = document.getElementById('textoRespuesta')?.value.trim();
-        
-        if (!respuesta) {
-            mostrarNotificacion('La respuesta no puede estar vacía', 'error');
-            return;
-        }
-        
-        if (respuesta.length > 500) {
-            mostrarNotificacion('La respuesta no puede exceder 500 caracteres', 'error');
-            return;
-        }
-        
-        try {
-            const formData = new FormData();
-            formData.append('respuesta', respuesta);
-            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
-            
-            const response = await fetch(`/calificaciones/responder/${calificacionActual}/`, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                mostrarNotificacion('Respuesta publicada exitosamente', 'success');
-                cerrarModalResponder();
-                
-                // Recargar la página para mostrar la respuesta
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
-            } else {
-                mostrarNotificacion(data.error || 'Error al publicar la respuesta', 'error');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            mostrarNotificacion('Error al enviar la respuesta', 'error');
-        }
-    }
-
-    function editarRespuesta(respuestaId, textoActual) {
-        respuestaActual = respuestaId;
-        const modal = document.getElementById('modalEditarRespuesta');
-        const textarea = document.getElementById('textoEditarRespuesta');
-        
-        if (modal && textarea) {
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-            textarea.value = textoActual;
-            
-            // Actualizar contador
-            const charCount = document.getElementById('charCountEditarRespuesta');
-            if (charCount) charCount.textContent = textoActual.length;
-            
-            textarea.focus();
-        }
-    }
-
-    function cerrarModalEditarRespuesta() {
-        const modal = document.getElementById('modalEditarRespuesta');
-        if (modal) {
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
-            respuestaActual = null;
-        }
-    }
-
-    async function actualizarRespuesta() {
-        const respuesta = document.getElementById('textoEditarRespuesta')?.value.trim();
-        
-        if (!respuesta) {
-            mostrarNotificacion('La respuesta no puede estar vacía', 'error');
-            return;
-        }
-        
-        if (respuesta.length > 500) {
-            mostrarNotificacion('La respuesta no puede exceder 500 caracteres', 'error');
-            return;
-        }
-        
-        try {
-            const formData = new FormData();
-            formData.append('respuesta', respuesta);
-            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
-            
-            const response = await fetch(`/calificaciones/respuesta/editar/${respuestaActual}/`, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                mostrarNotificacion('Respuesta actualizada exitosamente', 'success');
-                cerrarModalEditarRespuesta();
-                
-                // Actualizar el texto en la página sin recargar
-                const textoElement = document.getElementById(`respuesta-texto-${respuestaActual}`);
-                if (textoElement) {
-                    textoElement.textContent = respuesta;
-                }
-                
-                // O recargar la página
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
-            } else {
-                mostrarNotificacion(data.error || 'Error al actualizar la respuesta', 'error');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            mostrarNotificacion('Error al actualizar la respuesta', 'error');
-        }
-    }
-
-    // NOTIFICACIONES
-    function mostrarNotificacion(mensaje, tipo) {
-        const notif = document.createElement('div');
-        notif.className = `fixed top-20 right-4 px-6 py-4 rounded-xl shadow-2xl z-50 transition-all transform ${
-            tipo === 'success' ? 'bg-green-500' : 'bg-red-500'
-        } text-white font-semibold`;
-        notif.innerHTML = `
-            <div class="flex items-center space-x-3">
-                <i class="fas fa-${tipo === 'success' ? 'check-circle' : 'exclamation-circle'} text-xl"></i>
-                <span>${mensaje}</span>
+    // Validar coordenadas
+    if (isNaN(lat) || isNaN(lng)) {
+        console.error('❌ Coordenadas inválidas:', { lat, lng });
+        mapElement.innerHTML = `
+            <div class="flex items-center justify-center h-full bg-red-50">
+                <div class="text-center p-8">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-5xl mb-4"></i>
+                    <p class="text-red-900 font-semibold text-lg">Coordenadas inválidas</p>
+                    <p class="text-red-700 text-sm mt-2">Lat: ${lat}, Lng: ${lng}</p>
+                </div>
             </div>
         `;
-        document.body.appendChild(notif);
-        
+        return;
+    }
+
+    // Validar rango de Ecuador
+    if (lat < -5 || lat > 2 || lng < -92 || lng > -75) {
+        console.error('❌ Coordenadas fuera de rango de Ecuador:', { lat, lng });
+        mapElement.innerHTML = `
+            <div class="flex items-center justify-center h-full bg-yellow-50">
+                <div class="text-center p-8">
+                    <i class="fas fa-map-marked-alt text-yellow-600 text-5xl mb-4"></i>
+                    <p class="text-yellow-900 font-semibold text-lg">Ubicación fuera de Ecuador</p>
+                    <p class="text-yellow-700 text-sm mt-2">Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    // Crear mapa
+    map = L.map('map', {
+        center: [lat, lng],
+        zoom: 15,
+        scrollWheelZoom: false,
+        dragging: true,
+        zoomControl: true,
+        attributionControl: true
+    });
+
+    // Agregar tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19,
+        minZoom: 5
+    }).addTo(map);
+
+    // Marcador personalizado
+    const iconHtml = `
+        <div style="position: relative;">
+            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); 
+                 border: 4px solid white; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); 
+                 box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);">
+                <div style="width: 12px; height: 12px; background: white; border-radius: 50%; 
+                     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(45deg);"></div>
+            </div>
+        </div>
+    `;
+
+    marker = L.marker([lat, lng], {
+        draggable: false,
+        icon: L.divIcon({
+            className: 'custom-marker',
+            html: iconHtml,
+            iconSize: [40, 40],
+            iconAnchor: [20, 40],
+            popupAnchor: [0, -40]
+        })
+    }).addTo(map);
+
+    // Popup
+    const popupContent = `
+        <div style="text-align: center; font-family: sans-serif; padding: 10px;">
+            <div style="font-size: 16px; font-weight: bold; color: #0ea5e9; margin-bottom: 8px;">
+                📍 {{ servicio.nombre }}
+            </div>
+            <div style="font-size: 13px; color: #64748b;">
+                <strong>Dirección:</strong><br>
+                {{ servicio.direccion }}
+            </div>
+            <div style="font-size: 12px; color: #94a3b8; margin-top: 6px;">
+                Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}
+            </div>
+        </div>
+    `;
+
+    marker.bindPopup(popupContent, {
+        maxWidth: 300,
+        className: 'custom-popup'
+    }).openPopup();
+
+    // Forzar re-render
+    setTimeout(() => {
+        if (map) map.invalidateSize(true);
+    }, 100);
+
+    console.log('✅ Mapa de detalle inicializado correctamente');
+}
+
+// === GALERÍA ===
+function cambiarImagen(url) {
+    const img = document.getElementById('imagenPrincipal');
+    if (img) {
+        img.style.opacity = '0';
         setTimeout(() => {
-            notif.style.opacity = '0';
-            notif.style.transform = 'translateX(100%)';
-            setTimeout(() => notif.remove(), 300);
-        }, 3000);
+            img.src = url;
+            img.style.opacity = '1';
+        }, 150);
     }
-    // EVENT LISTENERS
-    document.addEventListener('DOMContentLoaded', function() {
-        // Modal de reserva - cerrar al hacer clic fuera
-        const modalReserva = document.getElementById('modalReserva');
-        if (modalReserva) {
-            modalReserva.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    cerrarModalReserva();
-                }
-            });
-        }
-        
-        // Actualizar total al cambiar cantidad
-        const cantidadInput = document.getElementById('cantidadPersonas');
-        if (cantidadInput) {
-            cantidadInput.addEventListener('input', actualizarTotal);
-        }
-        
-        // Hover effect para estrellas (crear calificación)
-        document.querySelectorAll('.star-btn').forEach((star, index) => {
-            star.addEventListener('mouseenter', () => {
-                for (let i = 0; i <= index; i++) {
-                    const btn = document.querySelectorAll('.star-btn')[i];
-                    if (btn) {
-                        btn.querySelector('i').classList.add('fas');
-                        btn.querySelector('i').classList.remove('far');
-                        btn.classList.add('text-yellow-400');
-                    }
-                }
-            });
-        });
+}
 
-        const ratingStars = document.getElementById('ratingStars');
-        if (ratingStars) {
-            ratingStars.addEventListener('mouseleave', () => {
-                if (currentRating > 0) {
-                    setRating(currentRating);
-                } else {
-                    document.querySelectorAll('.star-btn').forEach(star => {
-                        const icon = star.querySelector('i');
-                        if (icon) {
-                            icon.classList.remove('fas');
-                            icon.classList.add('far');
-                        }
-                        star.classList.remove('text-yellow-400');
-                        star.classList.add('text-gray-300');
-                    });
-                    const ratingText = document.getElementById('ratingText');
-                    if (ratingText) {
-                        ratingText.textContent = 'Selecciona una calificación';
-                    }
-                }
-            });
-        }
-        
-        // Contador de caracteres para calificación
-        const comentarioCalificacion = document.getElementById('comentarioCalificacion');
-        if (comentarioCalificacion) {
-            comentarioCalificacion.addEventListener('input', function() {
-                const charCount = document.getElementById('charCount');
-                if (charCount) {
-                    charCount.textContent = this.value.length;
-                }
-            });
-        }
-        
-        // Contador de caracteres para respuesta
-        const textoRespuesta = document.getElementById('textoRespuesta');
-        if (textoRespuesta) {
-            textoRespuesta.addEventListener('input', function() {
-                const charCount = document.getElementById('charCountRespuesta');
-                if (charCount) {
-                    charCount.textContent = this.value.length;
-                }
-            });
-        }
-        
-        // Contador de caracteres para editar respuesta
-        const textoEditarRespuesta = document.getElementById('textoEditarRespuesta');
-        if (textoEditarRespuesta) {
-            textoEditarRespuesta.addEventListener('input', function() {
-                const charCount = document.getElementById('charCountEditarRespuesta');
-                if (charCount) {
-                    charCount.textContent = this.value.length;
-                }
-            });
-        }
-        
-        // Cerrar modales al hacer clic fuera
-        const modales = [
-            'modalCalificar', 
-            'modalEditarCalificacion', 
-            'modalEliminarCalificacion', 
-            'modalResponder', 
-            'modalEditarRespuesta'
-        ];
-        
-        modales.forEach(modalId => {
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        this.classList.add('hidden');
-                        document.body.style.overflow = '';
-                    }
-                });
-            }
-        });
+// === RESERVAS ===
+function mostrarModalReserva() {
+    const modal = document.getElementById('modalReserva');
+    if (!modal) return;
+    
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    
+    const fechaInput = document.getElementById('fechaServicio');
+    if (fechaInput) fechaInput.setAttribute('min', '{{ fecha_minima }}');
+    
+    const cantidadInput = document.getElementById('cantidadPersonas');
+    if (cantidadInput) cantidadInput.value = 1;
+    if (fechaInput) fechaInput.value = '';
+    
+    actualizarTotal();
+}
 
-        // Cerrar modales con ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                cerrarModalReserva();
-                cerrarModalCalificar();
-                cerrarModalEditarCalificacion();
-                cerrarModalEliminarCalificacion();
-                cerrarModalResponder();
-                cerrarModalEditarRespuesta();
-            }
-        });
-        
-        // Handler para formulario de respuesta
-        const formResponder = document.getElementById('formResponder');
-        if (formResponder) {
-            formResponder.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                await enviarRespuesta();
-            });
-        }
-        
-        // Handler para formulario de editar respuesta
-        const formEditarRespuesta = document.getElementById('formEditarRespuesta');
-        if (formEditarRespuesta) {
-            formEditarRespuesta.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                await actualizarRespuesta();
-            });
-        }
-        
-        // Prevenir envío múltiple de formularios
-        const forms = document.querySelectorAll('form');
-        forms.forEach(form => {
-            form.addEventListener('submit', function() {
-                const submitBtn = this.querySelector('button[type="submit"]');
-                if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Enviando...';
-                    
-                    // Reactivar después de 3 segundos (por si falla)
-                    setTimeout(() => {
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = submitBtn.dataset.originalText || 'Enviar';
-                    }, 3000);
-                }
-            });
-        });
-        
-        // Guardar texto original de botones submit
-        document.querySelectorAll('button[type="submit"]').forEach(btn => {
-            btn.dataset.originalText = btn.innerHTML;
-        });
-    });
-
-    // ====================================
-    // FUNCIONES AUXILIARES
-    // ====================================
-
-    // Validar fecha de servicio
-    function validarFechaServicio() {
-        const fechaInput = document.getElementById('fechaServicio');
-        if (fechaInput && fechaInput.value) {
-            const fechaSeleccionada = new Date(fechaInput.value);
-            const hoy = new Date();
-            hoy.setHours(0, 0, 0, 0);
-            
-            if (fechaSeleccionada < hoy) {
-                mostrarNotificacion('Debes seleccionar una fecha futura', 'error');
-                fechaInput.value = '';
-                return false;
-            }
-        }
-        return true;
+function cerrarModalReserva() {
+    const modal = document.getElementById('modalReserva');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
     }
+}
 
-    // Scroll suave a sección de calificaciones
-    function scrollACalificaciones() {
-        const seccion = document.getElementById('seccion-calificaciones');
-        if (seccion) {
-            seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+function actualizarTotal() {
+    const cantidad = parseInt(document.getElementById('cantidadPersonas')?.value) || 1;
+    const subtotal = precioUnitario * cantidad;
+    
+    const subtotalTexto = document.getElementById('subtotalTexto');
+    const personasTexto = document.getElementById('personasTexto');
+    
+    if (subtotalTexto) subtotalTexto.textContent = `$${Math.round(subtotal)}`;
+    if (personasTexto) personasTexto.textContent = `${cantidad} ${cantidad === 1 ? 'persona' : 'personas'}`;
+}
+
+function agregarAlCarrito(servicioId) {
+    mostrarModalReserva();
+}
+
+function reservarAhora(servicioId) {
+    mostrarModalReserva();
+    const form = document.getElementById('formReserva');
+    if (form) {
+        let input = form.querySelector('input[name="reserva_rapida"]');
+        if (!input) {
+            input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'reserva_rapida';
+            input.value = '1';
+            form.appendChild(input);
         }
     }
+}
 
-    // Copiar enlace del servicio
-    function copiarEnlace() {
-        const url = window.location.href;
-        
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(url).then(() => {
-                mostrarNotificacion('Enlace copiado al portapapeles', 'success');
-            }).catch(err => {
-                console.error('Error al copiar:', err);
-                mostrarNotificacion('Error al copiar el enlace', 'error');
-            });
+// === CALIFICACIONES ===
+function setRating(rating) {
+    currentRating = rating;
+    const ratingValue = document.getElementById('ratingValue');
+    const ratingText = document.getElementById('ratingText');
+    
+    if (ratingValue) ratingValue.value = rating;
+    if (ratingText) ratingText.textContent = ratingTexts[rating];
+    
+    document.querySelectorAll('#ratingStars .star-btn').forEach((star, index) => {
+        const icon = star.querySelector('i');
+        if (index < rating) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            star.classList.remove('text-gray-300');
+            star.classList.add('text-yellow-400');
         } else {
-            // Fallback para navegadores antiguos
-            const textarea = document.createElement('textarea');
-            textarea.value = url;
-            textarea.style.position = 'fixed';
-            textarea.style.opacity = '0';
-            document.body.appendChild(textarea);
-            textarea.select();
-            
-            try {
-                document.execCommand('copy');
-                mostrarNotificacion('Enlace copiado al portapapeles', 'success');
-            } catch (err) {
-                console.error('Error al copiar:', err);
-                mostrarNotificacion('Error al copiar el enlace', 'error');
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            star.classList.remove('text-yellow-400');
+            star.classList.add('text-gray-300');
+        }
+    });
+}
+
+function setRatingEditar(rating) {
+    currentRatingEditar = rating;
+    const ratingValueEditar = document.getElementById('ratingValueEditar');
+    if (ratingValueEditar) ratingValueEditar.value = rating;
+    
+    document.querySelectorAll('#ratingStarsEditar .star-btn-editar').forEach((star, index) => {
+        const icon = star.querySelector('i');
+        if (index < rating) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            star.classList.remove('text-gray-300');
+            star.classList.add('text-yellow-400');
+        } else {
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            star.classList.remove('text-yellow-400');
+            star.classList.add('text-gray-300');
+        }
+    });
+}
+
+function mostrarModalCalificar() {
+    const modal = document.getElementById('modalCalificar');
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function cerrarModalCalificar() {
+    const modal = document.getElementById('modalCalificar');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+        currentRating = 0;
+        
+        const form = modal.querySelector('form');
+        if (form) form.reset();
+        
+        document.querySelectorAll('#ratingStars .star-btn').forEach(star => {
+            const icon = star.querySelector('i');
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            star.classList.remove('text-yellow-400');
+            star.classList.add('text-gray-300');
+        });
+        
+        const ratingText = document.getElementById('ratingText');
+        if (ratingText) ratingText.textContent = 'Selecciona una calificación';
+    }
+}
+
+function mostrarModalEditarCalificacion() {
+    const modal = document.getElementById('modalEditarCalificacion');
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function cerrarModalEditarCalificacion() {
+    const modal = document.getElementById('modalEditarCalificacion');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+}
+
+function confirmarEliminarCalificacion(calificacionId) {
+    const modal = document.getElementById('modalEliminarCalificacion');
+    const form = document.getElementById('formEliminarCalificacion');
+    if (modal && form) {
+        form.action = `/calificaciones/eliminar/${calificacionId}/`;
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function cerrarModalEliminarCalificacion() {
+    const modal = document.getElementById('modalEliminarCalificacion');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+}
+
+// === RESPUESTAS ===
+function mostrarFormRespuesta(calificacionId, comentario) {
+    calificacionActual = calificacionId;
+    const modal = document.getElementById('modalResponder');
+    const textarea = document.getElementById('textoRespuesta');
+    const comentarioDiv = document.getElementById('comentarioOriginal');
+    
+    if (modal && textarea) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        textarea.value = '';
+        
+        if (comentarioDiv) {
+            comentarioDiv.textContent = comentario || 'Sin comentario';
+        }
+        
+        const charCount = document.getElementById('charCountRespuesta');
+        if (charCount) charCount.textContent = '0';
+        
+        textarea.focus();
+    }
+}
+
+function cerrarModalResponder() {
+    const modal = document.getElementById('modalResponder');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+        calificacionActual = null;
+        
+        const textarea = document.getElementById('textoRespuesta');
+        if (textarea) textarea.value = '';
+    }
+}
+
+async function enviarRespuesta() {
+    const respuesta = document.getElementById('textoRespuesta')?.value.trim();
+    
+    if (!respuesta) {
+        mostrarNotificacion('La respuesta no puede estar vacía', 'error');
+        return;
+    }
+    
+    if (respuesta.length > 500) {
+        mostrarNotificacion('La respuesta no puede exceder 500 caracteres', 'error');
+        return;
+    }
+    
+    try {
+        const formData = new FormData();
+        formData.append('respuesta', respuesta);
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+        
+        const response = await fetch(`/calificaciones/responder/${calificacionActual}/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
             }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            mostrarNotificacion('Respuesta publicada exitosamente', 'success');
+            cerrarModalResponder();
+            setTimeout(() => window.location.reload(), 1500);
+        } else {
+            mostrarNotificacion(data.error || 'Error al publicar la respuesta', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarNotificacion('Error al enviar la respuesta', 'error');
+    }
+}
+
+function editarRespuesta(respuestaId, textoActual) {
+    respuestaActual = respuestaId;
+    const modal = document.getElementById('modalEditarRespuesta');
+    const textarea = document.getElementById('textoEditarRespuesta');
+    
+    if (modal && textarea) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        textarea.value = textoActual;
+        
+        const charCount = document.getElementById('charCountEditarRespuesta');
+        if (charCount) charCount.textContent = textoActual.length;
+        
+        textarea.focus();
+    }
+}
+
+function cerrarModalEditarRespuesta() {
+    const modal = document.getElementById('modalEditarRespuesta');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+        respuestaActual = null;
+    }
+}
+
+async function actualizarRespuesta() {
+    const respuesta = document.getElementById('textoEditarRespuesta')?.value.trim();
+    
+    if (!respuesta) {
+        mostrarNotificacion('La respuesta no puede estar vacía', 'error');
+        return;
+    }
+    
+    if (respuesta.length > 500) {
+        mostrarNotificacion('La respuesta no puede exceder 500 caracteres', 'error');
+        return;
+    }
+    
+    try {
+        const formData = new FormData();
+        formData.append('respuesta', respuesta);
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+        
+        const response = await fetch(`/calificaciones/respuesta/editar/${respuestaActual}/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            mostrarNotificacion('Respuesta actualizada exitosamente', 'success');
+            cerrarModalEditarRespuesta();
             
-            document.body.removeChild(textarea);
+            const textoElement = document.getElementById(`respuesta-texto-${respuestaActual}`);
+            if (textoElement) textoElement.textContent = respuesta;
+            
+            setTimeout(() => window.location.reload(), 1500);
+        } else {
+            mostrarNotificacion(data.error || 'Error al actualizar la respuesta', 'error');
         }
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarNotificacion('Error al actualizar la respuesta', 'error');
     }
+}
 
-    // Imprimir página
-    function imprimirServicio() {
-        window.print();
+// === NOTIFICACIONES ===
+function mostrarNotificacion(mensaje, tipo) {
+    const notif = document.createElement('div');
+    notif.className = `fixed top-20 right-4 px-6 py-4 rounded-xl shadow-2xl z-50 transition-all transform ${
+        tipo === 'success' ? 'bg-green-500' : 'bg-red-500'
+    } text-white font-semibold`;
+    notif.innerHTML = `
+        <div class="flex items-center space-x-3">
+            <i class="fas fa-${tipo === 'success' ? 'check-circle' : 'exclamation-circle'} text-xl"></i>
+            <span>${mensaje}</span>
+        </div>
+    `;
+    document.body.appendChild(notif);
+    
+    setTimeout(() => {
+        notif.style.opacity = '0';
+        notif.style.transform = 'translateX(100%)';
+        setTimeout(() => notif.remove(), 300);
+    }, 3000);
+}
+
+// === EVENT LISTENERS ===
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(initMap, 250);
+
+    const modalReserva = document.getElementById('modalReserva');
+    if (modalReserva) {
+        modalReserva.addEventListener('click', function(e) {
+            if (e.target === this) cerrarModalReserva();
+        });
     }
-
-    // Reportar contenido inapropiado
-    function reportarContenido(tipo, id) {
-        if (confirm('¿Estás seguro de que deseas reportar este contenido?')) {
-            // Aquí iría la lógica para enviar el reporte
-            mostrarNotificacion('Reporte enviado. Lo revisaremos pronto.', 'success');
-        }
-    }
-
-    // ====================================
-    // UTILIDADES DE DEPURACIÓN
-    // ====================================
-    function debug(mensaje, datos) {
-        if (console && console.log) {
-            console.log(`[DEBUG] ${mensaje}`, datos || '');
-        }
-    }
-
-    // Verificar estado de elementos al cargar
-    window.addEventListener('load', function() {
-        debug('Página cargada completamente');
-        debug('Precio unitario:', precioUnitario);
-        debug('Modales encontrados:', {
-            reserva: !!document.getElementById('modalReserva'),
-            calificar: !!document.getElementById('modalCalificar'),
-            responder: !!document.getElementById('modalResponder')
+    
+    const cantidadInput = document.getElementById('cantidadPersonas');
+    if (cantidadInput) cantidadInput.addEventListener('input', actualizarTotal);
+    
+    document.querySelectorAll('.star-btn').forEach((star, index) => {
+        star.addEventListener('mouseenter', () => {
+            for (let i = 0; i <= index; i++) {
+                const btn = document.querySelectorAll('.star-btn')[i];
+                if (btn) {
+                    btn.querySelector('i').classList.add('fas');
+                    btn.querySelector('i').classList.remove('far');
+                    btn.classList.add('text-yellow-400');
+                }
+            }
         });
     });
 
-    // ====================================
-    // MANEJO DE ERRORES GLOBAL
-    // ====================================
-    window.addEventListener('error', function(e) {
-        console.error('Error global capturado:', e.message);
-        // No mostrar notificación al usuario para no saturar
-    });
-
-    // ====================================
-    // COMPATIBILIDAD CON NAVEGADORES ANTIGUOS
-    // ====================================
-    if (!String.prototype.includes) {
-        String.prototype.includes = function(search, start) {
-            if (typeof start !== 'number') {
-                start = 0;
-            }
-            
-            if (start + search.length > this.length) {
-                return false;
+    const ratingStars = document.getElementById('ratingStars');
+    if (ratingStars) {
+        ratingStars.addEventListener('mouseleave', () => {
+            if (currentRating > 0) {
+                setRating(currentRating);
             } else {
-                return this.indexOf(search, start) !== -1;
+                document.querySelectorAll('.star-btn').forEach(star => {
+                    const icon = star.querySelector('i');
+                    if (icon) {
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                    }
+                    star.classList.remove('text-yellow-400');
+                    star.classList.add('text-gray-300');
+                });
+                const ratingText = document.getElementById('ratingText');
+                if (ratingText) ratingText.textContent = 'Selecciona una calificación';
             }
-        };
+        });
     }
-
-    // Polyfill para fetch (si no existe)
-    if (!window.fetch) {
-        console.warn('Fetch API no disponible. Algunas funcionalidades pueden no funcionar.');
+    
+    const comentarioCalificacion = document.getElementById('comentarioCalificacion');
+    if (comentarioCalificacion) {
+        comentarioCalificacion.addEventListener('input', function() {
+            const charCount = document.getElementById('charCount');
+            if (charCount) charCount.textContent = this.value.length;
+        });
     }
-
-    // ====================================
-    // ANALYTICS Y TRACKING (OPCIONAL)
-    // ====================================
-    function trackEvent(categoria, accion, etiqueta) {
-        // Si tienes Google Analytics o similar, trackear eventos aquí
-        if (typeof gtag !== 'undefined') {
-            gtag('event', accion, {
-                'event_category': categoria,
-                'event_label': etiqueta
+    
+    const textoRespuesta = document.getElementById('textoRespuesta');
+    if (textoRespuesta) {
+        textoRespuesta.addEventListener('input', function() {
+            const charCount = document.getElementById('charCountRespuesta');
+            if (charCount) charCount.textContent = this.value.length;
+        });
+    }
+    
+    const textoEditarRespuesta = document.getElementById('textoEditarRespuesta');
+    if (textoEditarRespuesta) {
+        textoEditarRespuesta.addEventListener('input', function() {
+            const charCount = document.getElementById('charCountEditarRespuesta');
+            if (charCount) charCount.textContent = this.value.length;
+        });
+    }
+    
+    const modales = [
+        'modalCalificar', 
+        'modalEditarCalificacion', 
+        'modalEliminarCalificacion', 
+        'modalResponder', 
+        'modalEditarRespuesta'
+    ];
+    
+    modales.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }
             });
         }
-    }
+    });
 
-    // Ejemplos de tracking
-    function trackReserva() {
-        trackEvent('Reservas', 'click_reservar', '{{ servicio.nombre }}');
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            cerrarModalReserva();
+            cerrarModalCalificar();
+            cerrarModalEditarCalificacion();
+            cerrarModalEliminarCalificacion();
+            cerrarModalResponder();
+            cerrarModalEditarRespuesta();
+        }
+    });
+    
+    const formResponder = document.getElementById('formResponder');
+    if (formResponder) {
+        formResponder.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await enviarRespuesta();
+        });
     }
+    
+    const formEditarRespuesta = document.getElementById('formEditarRespuesta');
+    if (formEditarRespuesta) {
+        formEditarRespuesta.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await actualizarRespuesta();
+        });
+    }
+    
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function() {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Enviando...';
+                
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = submitBtn.dataset.originalText || 'Enviar';
+                }, 3000);
+            }
+        });
+    });
+    
+    document.querySelectorAll('button[type="submit"]').forEach(btn => {
+        btn.dataset.originalText = btn.innerHTML;
+    });
+});
 
-    function trackCalificacion() {
-        trackEvent('Calificaciones', 'crear_calificacion', '{{ servicio.nombre }}');
-    }
+window.addEventListener('load', function() {
+    [100, 300, 600].forEach(delay => {
+        setTimeout(() => {
+            if (map) map.invalidateSize(true);
+        }, delay);
+    });
+});
 
-    function trackRespuesta() {
-        trackEvent('Respuestas', 'responder_calificacion', '{{ servicio.nombre }}');
+let resizeTimer;
+window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        if (map) map.invalidateSize(true);
+    }, 150);
+});
+
+console.log('✅ Scripts cargados correctamente');
+</script>
+<script>
+// Datos de horarios desde Django
+const horariosData = {
+    semana: {
+        apertura: '{{ horario_semana.hora_apertura|time:"H:i"|default:"" }}',
+        cierre: '{{ horario_semana.hora_cierre|time:"H:i"|default:"" }}'
+    },
+    finSemana: {
+        apertura: '{{ horario_fin_semana.hora_apertura|time:"H:i"|default:"" }}',
+        cierre: '{{ horario_fin_semana.hora_cierre|time:"H:i"|default:"" }}'
     }
-    console.log('✅ Scripts de detalle.html cargados correctamente');
+};
+
+function verificarEstadoAhora() {
+    const ahora = new Date();
+    const diaSemana = ahora.getDay(); // 0 = Domingo, 6 = Sábado
+    const horaActual = ahora.getHours() * 60 + ahora.getMinutes(); // Minutos desde medianoche
+    
+    let horario;
+    
+    // Determinar qué horario usar
+    if (diaSemana >= 1 && diaSemana <= 5) {
+        // Lunes a Viernes
+        horario = horariosData.semana;
+    } else {
+        // Sábado y Domingo
+        horario = horariosData.finSemana;
+    }
+    
+    const estadoDiv = document.getElementById('estadoActual');
+    
+    if (!horario.apertura || !horario.cierre) {
+        estadoDiv.className = 'px-4 py-2 rounded-lg font-semibold text-sm bg-gray-100 text-gray-600';
+        estadoDiv.innerHTML = '<i class="fas fa-question-circle mr-2"></i>Sin horario definido';
+        return;
+    }
+    
+    // Convertir horarios a minutos
+    const [horaAp, minAp] = horario.apertura.split(':').map(Number);
+    const [horaCi, minCi] = horario.cierre.split(':').map(Number);
+    const apertura = horaAp * 60 + minAp;
+    const cierre = horaCi * 60 + minCi;
+    
+    // Verificar si está abierto
+    const estaAbierto = horaActual >= apertura && horaActual < cierre;
+    
+    if (estaAbierto) {
+        estadoDiv.className = 'px-4 py-2 rounded-lg font-semibold text-sm bg-green-100 text-green-700 border border-green-200';
+        estadoDiv.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Abierto ahora';
+    } else {
+        estadoDiv.className = 'px-4 py-2 rounded-lg font-semibold text-sm bg-red-100 text-red-700 border border-red-200';
+        estadoDiv.innerHTML = '<i class="fas fa-times-circle mr-2"></i>Cerrado ahora';
+    }
+}
+
+// Ejecutar al cargar y actualizar cada minuto
+document.addEventListener('DOMContentLoaded', verificarEstadoAhora);
+setInterval(verificarEstadoAhora, 60000);
 </script>
 {% endblock %}

@@ -2,9 +2,8 @@
 
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-sky-50 py-12">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <!-- Header -->
         <div class="mb-8">
             <nav class="mb-4">
                 <ol class="flex items-center space-x-2 text-sm">
@@ -12,7 +11,9 @@
                     <li><i class="fas fa-chevron-right text-gray-400 text-xs"></i></li>
                     <li><a href="{% url 'servicios:listar_servicios' %}" class="text-gray-600 hover:text-sky-600 transition-colors">Servicios</a></li>
                     <li><i class="fas fa-chevron-right text-gray-400 text-xs"></i></li>
-                    <li class="text-sky-600 font-medium">Editar Servicio</li>
+                    <li><a href="{% url 'servicios:detalle_servicio' servicio.id %}" class="text-gray-600 hover:text-sky-600 transition-colors">{{ servicio.nombre }}</a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 text-xs"></i></li>
+                    <li class="text-sky-600 font-medium">Editar</li>
                 </ol>
             </nav>
             
@@ -22,13 +23,12 @@
                 </div>
                 <div>
                     <h1 class="text-4xl font-bold text-gray-900">Editar Servicio</h1>
-                    <p class="text-gray-600 mt-1">Actualiza la información de tu servicio</p>
+                    <p class="text-gray-600 mt-1">Actualiza la información de tu servicio turístico</p>
                 </div>
             </div>
         </div>
 
-        <!-- Formulario -->
-        <form method="post" enctype="multipart/form-data" class="space-y-6">
+        <form method="post" enctype="multipart/form-data" class="space-y-6" id="servicioForm">
             {% csrf_token %}
             
             <!-- Información Básica -->
@@ -41,27 +41,21 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Nombre -->
                     <div class="md:col-span-2">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             Nombre del Servicio <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" 
-                               name="nombre" 
-                               required
-                               value="{{ servicio.nombre }}"
+                        <input type="text" name="nombre" required value="{{ servicio.nombre }}"
                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
-                               placeholder="Ej: Tour Islas Galápagos 5 días">
+                               placeholder="Ej: Tour a las Islas Galápagos">
                     </div>
 
-                    <!-- Tipo de Servicio -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             Tipo de Servicio <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
-                            <select name="tipo" 
-                                    required
+                            <select name="tipo" required
                                     class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all appearance-none bg-white cursor-pointer">
                                 <option value="">Selecciona un tipo</option>
                                 {% for tipo_code, tipo_nombre in tipos_servicio %}
@@ -74,90 +68,44 @@
                         </div>
                     </div>
 
-                    <!-- Precio -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             Precio (USD) <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
                             <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">$</span>
-                            <input type="number" 
-                                   name="precio" 
-                                   required
-                                   min="0"
-                                   step="0.01"
-                                   value="{{ servicio.precio }}"
-                                   class="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
-                                   placeholder="0.00">
+                            <input type="number" name="precio" required min="0" step="0.01" 
+                                value="{{ precio_valor }}"
+                                class="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                placeholder="0.00">
                         </div>
                     </div>
 
-                    <!-- Capacidad Máxima -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             Capacidad Máxima <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
                             <i class="fas fa-users absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                            <input type="number" 
-                                   name="capacidad_maxima" 
-                                   required
-                                   min="1"
-                                   value="{{ servicio.capacidad_maxima }}"
+                            <input type="number" name="capacidad_maxima" required min="1" value="{{ servicio.capacidad_maxima }}"
                                    class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
                                    placeholder="1">
                         </div>
                     </div>
 
-                    <!-- Disponibilidad -->
-                    <div class="flex items-center space-x-3 md:col-span-1">
-                        <input type="checkbox" 
-                               name="disponible" 
-                               id="disponible"
-                               {% if servicio.disponible %}checked{% endif %}
+                    <div class="flex items-center space-x-3">
+                        <input type="checkbox" name="disponible" id="disponible" {% if servicio.disponible %}checked{% endif %}
                                class="w-6 h-6 text-sky-600 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 cursor-pointer">
-                        <label for="disponible" class="text-sm font-semibold text-gray-700 cursor-pointer">
-                            Servicio disponible
-                        </label>
+                        <label for="disponible" class="text-sm font-semibold text-gray-700 cursor-pointer">Servicio disponible</label>
                     </div>
 
-                    <!-- Descripción -->
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            Descripción <span class="text-red-500">*</span>
-                        </label>
-                        <textarea name="descripcion" 
-                                  required
-                                  rows="5"
-                                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all resize-none"
-                                  placeholder="Describe detalladamente tu servicio, incluye qué está incluido, itinerario, etc.">{{ servicio.descripcion }}</textarea>
-                        <p class="text-xs text-gray-500 mt-2">
-                            <i class="fas fa-lightbulb mr-1"></i>
-                            Una buena descripción aumenta las reservas
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Ubicación -->
-            <div class="bg-white rounded-2xl shadow-xl p-8">
-                <div class="flex items-center mb-6">
-                    <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center mr-3 shadow-lg">
-                        <i class="fas fa-map-marker-alt text-white"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-gray-900">Ubicación</h2>
-                </div>
-
-                <div class="grid grid-cols-1 gap-6">
-                    <!-- Destino -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             Destino <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
                             <i class="fas fa-location-dot absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
-                            <select name="destino" 
-                                    required
+                            <select name="destino" required
                                     class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all appearance-none bg-white cursor-pointer">
                                 <option value="">Selecciona un destino</option>
                                 {% for destino in destinos %}
@@ -168,9 +116,325 @@
                             </select>
                             <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                         </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Categoría (opcional)</label>
+                        <div class="relative">
+                            <i class="fas fa-tag absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                            <select name="categoria"
+                                    class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all appearance-none bg-white cursor-pointer">
+                                <option value="">Sin categoría</option>
+                                {% for categoria in categorias %}
+                                <option value="{{ categoria.id }}" {% if servicio.categoria and servicio.categoria.id == categoria.id %}selected{% endif %}>
+                                    {{ categoria.nombre }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Descripción <span class="text-red-500">*</span>
+                        </label>
+                        <textarea name="descripcion" required rows="5" maxlength="1000" id="descripcion"
+                                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all resize-none"
+                                  placeholder="Describe detalladamente tu servicio, incluye qué está incluido, itinerario, experiencia, etc.">{{ servicio.descripcion }}</textarea>
+                        <div class="flex justify-between items-center mt-2">
+                            <p class="text-xs text-gray-500">
+                                <i class="fas fa-lightbulb mr-1"></i>
+                                Una buena descripción aumenta las reservas
+                            </p>
+                            <span class="text-xs text-gray-500">
+                                <span id="charCount">{{ servicio.descripcion|length }}</span> / 1000
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ubicación Geográfica -->
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <div class="flex items-center mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center mr-3 shadow-lg">
+                        <i class="fas fa-map-marker-alt text-white"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900">Ubicación Geográfica</h2>
+                </div>
+
+                <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 mb-6">
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-info-circle text-green-600 mt-1"></i>
+                        <p class="text-sm text-gray-700">
+                            <span class="font-semibold">Haz clic en el mapa</span> para actualizar la ubicación exacta de tu servicio, o ingresa las coordenadas manualmente.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Dirección -->
+                    <div class="lg:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Dirección Completa <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-location-dot absolute left-4 top-4 text-gray-400"></i>
+                            <input type="text" name="direccion" required value="{{ servicio.direccion }}"
+                                class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                placeholder="Ej: Av. Charles Darwin, Puerto Ayora 200102, Ecuador">
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">
+                            <i class="fas fa-map mr-1"></i>
+                            Incluye calle, número, ciudad y código postal
+                        </p>
+                    </div>
+
+                    <!-- ✅ INPUTS DE COORDENADAS - type="text" para mantener 8 decimales -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Latitud <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-globe absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" 
+                                name="latitud" 
+                                id="latitud" 
+                                required 
+                                value="{{ latitud_valor }}"
+                                class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all font-mono text-sm"
+                                placeholder="-0.74283300">
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Rango: -5° a 2°</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Longitud <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-compass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" 
+                                name="longitud" 
+                                id="longitud" 
+                                required 
+                                value="{{ longitud_valor }}"
+                                class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all font-mono text-sm"
+                                placeholder="-90.30895600">
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Rango: -92° a -75°</p>
+                    </div>
+
+                    <!-- ✅ TU PARTIAL DEL MAPA -->
+                    {% include 'servicios/partials/_mapa_leaflet_editable.html' %}
+
+                    <!-- Zona de Referencia -->
+                    <div class="lg:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Zona de Referencia (opcional)</label>
+                        <div class="relative">
+                            <i class="fas fa-map-signs absolute left-4 top-4 text-gray-400"></i>
+                            <input type="text" name="zona_referencia" value="{{ servicio.zona_referencia|default:'' }}"
+                                class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                placeholder="Ej: Frente al muelle principal, Cerca del parque central">
+                        </div>
                         <p class="text-xs text-gray-500 mt-2">
                             <i class="fas fa-info-circle mr-1"></i>
-                            La categoría se tomará automáticamente del destino seleccionado
+                            Referencias que ayuden a los visitantes a encontrar tu servicio
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Información de Contacto -->
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <div class="flex items-center mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center mr-3 shadow-lg">
+                        <i class="fas fa-address-book text-white"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900">Información de Contacto</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Teléfono Principal <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-phone absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="tel" name="telefono" required pattern="^\+?[0-9]{9,15}$"
+                                   value="{{ servicio.telefono }}"
+                                   class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                   placeholder="+593981234567">
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Formato: +593981234567</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Teléfono Alternativo (opcional)</label>
+                        <div class="relative">
+                            <i class="fas fa-phone-alt absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="tel" name="telefono_alternativo" pattern="^\+?[0-9]{9,15}$"
+                                   value="{{ servicio.telefono_alternativo|default:'' }}"
+                                   class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                   placeholder="+593987654321">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Email de Contacto <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="email" name="email_contacto" required
+                                   value="{{ servicio.email_contacto }}"
+                                   class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                   placeholder="contacto@ejemplo.com">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">WhatsApp (opcional)</label>
+                        <div class="relative">
+                            <i class="fab fa-whatsapp absolute left-4 top-1/2 transform -translate-y-1/2 text-green-500"></i>
+                            <input type="tel" name="whatsapp" pattern="^\+?[0-9]{9,15}$"
+                                   value="{{ servicio.whatsapp|default:'' }}"
+                                   class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                   placeholder="+593981234567">
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Para contacto rápido con clientes
+                        </p>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Sitio Web (opcional)</label>
+                        <div class="relative">
+                            <i class="fas fa-globe absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="url" name="sitio_web"
+                                   value="{{ servicio.sitio_web|default:'' }}"
+                                   class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                   placeholder="https://www.ejemplo.com">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Horarios de Atención -->
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <div class="flex items-center mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center mr-3 shadow-lg">
+                        <i class="fas fa-clock text-white"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900">Horarios de Atención</h2>
+                </div>
+
+                <div class="bg-gradient-to-br from-blue-50 to-sky-50 rounded-xl p-6 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-gray-900">
+                            <i class="fas fa-calendar-week text-blue-600 mr-2"></i>
+                            Lunes a Viernes
+                        </h3>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" name="cerrado_semana" id="cerrado_semana"
+                                   {% if horario_semana and horario_semana.cerrado %}checked{% endif %}
+                                   class="w-5 h-5 text-red-600 border-2 border-gray-300 rounded focus:ring-2 focus:ring-red-500 cursor-pointer">
+                            <span class="ml-2 text-sm font-semibold text-gray-700">Cerrado</span>
+                        </label>
+                    </div>
+
+                    <div id="horario_semana_fields" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Hora de Apertura</label>
+                            <div class="relative">
+                                <i class="fas fa-door-open absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <input type="time" name="hora_apertura_semana" id="hora_apertura_semana"
+                                       value="{% if horario_semana and not horario_semana.cerrado %}{{ horario_semana.hora_apertura }}{% else %}08:00{% endif %}"
+                                       class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Hora de Cierre</label>
+                            <div class="relative">
+                                <i class="fas fa-door-closed absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <input type="time" name="hora_cierre_semana" id="hora_cierre_semana"
+                                       value="{% if horario_semana and not horario_semana.cerrado %}{{ horario_semana.hora_cierre }}{% else %}18:00{% endif %}"
+                                       class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Notas (opcional)</label>
+                            <input type="text" name="notas_semana"
+                                   value="{% if horario_semana %}{{ horario_semana.notas|default:'' }}{% endif %}"
+                                   class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                   placeholder="Ej: Horario extendido en temporada alta">
+                        </div>
+                    </div>
+
+                    <div id="cerrado_semana_msg" class="hidden text-center py-4">
+                        <i class="fas fa-ban text-red-500 text-3xl mb-2"></i>
+                        <p class="text-gray-700 font-semibold">Cerrado de Lunes a Viernes</p>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-gray-900">
+                            <i class="fas fa-calendar-day text-purple-600 mr-2"></i>
+                            Sábado y Domingo
+                        </h3>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" name="cerrado_finde" id="cerrado_finde"
+                                   {% if horario_fin_semana and horario_fin_semana.cerrado %}checked{% endif %}
+                                   class="w-5 h-5 text-red-600 border-2 border-gray-300 rounded focus:ring-2 focus:ring-red-500 cursor-pointer">
+                            <span class="ml-2 text-sm font-semibold text-gray-700">Cerrado</span>
+                        </label>
+                    </div>
+
+                    <div id="horario_finde_fields" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Hora de Apertura</label>
+                            <div class="relative">
+                                <i class="fas fa-door-open absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <input type="time" name="hora_apertura_finde" id="hora_apertura_finde"
+                                       value="{% if horario_fin_semana and not horario_fin_semana.cerrado %}{{ horario_fin_semana.hora_apertura }}{% else %}09:00{% endif %}"
+                                       class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Hora de Cierre</label>
+                            <div class="relative">
+                                <i class="fas fa-door-closed absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <input type="time" name="hora_cierre_finde" id="hora_cierre_finde"
+                                       value="{% if horario_fin_semana and not horario_fin_semana.cerrado %}{{ horario_fin_semana.hora_cierre }}{% else %}17:00{% endif %}"
+                                       class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Notas (opcional)</label>
+                            <input type="text" name="notas_finde"
+                                   value="{% if horario_fin_semana %}{{ horario_fin_semana.notas|default:'' }}{% endif %}"
+                                   class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                   placeholder="Ej: Solo sábados en temporada baja">
+                        </div>
+                    </div>
+
+                    <div id="cerrado_finde_msg" class="hidden text-center py-4">
+                        <i class="fas fa-ban text-red-500 text-3xl mb-2"></i>
+                        <p class="text-gray-700 font-semibold">Cerrado Sábados y Domingos</p>
+                    </div>
+                </div>
+
+                <div class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 mt-6">
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-lightbulb text-yellow-600 mt-1"></i>
+                        <p class="text-sm text-gray-700">
+                            <span class="font-semibold">Tip:</span> Los horarios visibles ayudan a los turistas a planificar mejor su visita.
                         </p>
                     </div>
                 </div>
@@ -181,33 +445,44 @@
             <div class="bg-white rounded-2xl shadow-xl p-8">
                 <div class="flex items-center mb-6">
                     <div class="w-10 h-10 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-xl flex items-center justify-center mr-3 shadow-lg">
-                        <i class="fas fa-image text-white"></i>
+                        <i class="fas fa-images text-white"></i>
                     </div>
                     <h2 class="text-2xl font-bold text-gray-900">Imágenes Actuales</h2>
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="imagenesActuales">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {% for imagen in servicio.imagenes.all %}
-                    <div class="relative group" data-imagen-id="{{ imagen.id }}">
-                        <div class="aspect-square rounded-xl overflow-hidden shadow-lg">
-                            <img src="{{ imagen.imagen.url }}" class="w-full h-full object-cover">
-                        </div>
-                        <div class="absolute top-2 right-2">
-                            <button type="button" 
-                                    onclick="eliminarImagen({{ imagen.id }})"
-                                    class="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100">
-                                <i class="fas fa-times"></i>
-                            </button>
+                    <div class="relative group" id="imagen-{{ imagen.id }}">
+                        <div class="aspect-square rounded-xl overflow-hidden shadow-lg border-2 border-gray-200 hover:border-sky-400 transition-all bg-gray-100">
+                            <img src="{{ imagen.imagen.url }}" 
+                                 class="w-full h-full object-cover transition-transform group-hover:scale-110"
+                                 alt="{{ servicio.nombre }}">
                         </div>
                         {% if imagen.orden == 0 %}
                         <div class="absolute bottom-2 left-2">
-                            <span class="px-3 py-1 bg-yellow-400 text-yellow-900 rounded-full text-xs font-bold shadow-lg">
-                                <i class="fas fa-star mr-1"></i>Principal
+                            <span class="px-3 py-1.5 bg-yellow-400 text-yellow-900 rounded-full text-xs font-bold shadow-lg">
+                                Principal
                             </span>
                         </div>
                         {% endif %}
+                        <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button type="button" 
+                                    onclick="eliminarImagen({{ imagen.id }})"
+                                    class="w-10 h-10 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transition-all">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
                     </div>
                     {% endfor %}
+                </div>
+
+                <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-4 mt-6">
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-info-circle text-amber-600 mt-1"></i>
+                        <p class="text-sm text-gray-700">
+                            La primera imagen será la <span class="font-semibold">imagen principal</span> de tu servicio. Puedes eliminar imágenes haciendo clic en el icono de la papelera.
+                        </p>
+                    </div>
                 </div>
             </div>
             {% endif %}
@@ -215,8 +490,8 @@
             <!-- Nuevas Imágenes -->
             <div class="bg-white rounded-2xl shadow-xl p-8">
                 <div class="flex items-center mb-6">
-                    <div class="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center mr-3 shadow-lg">
-                        <i class="fas fa-plus text-white"></i>
+                    <div class="w-10 h-10 bg-gradient-to-br from-pink-400 to-rose-500 rounded-xl flex items-center justify-center mr-3 shadow-lg">
+                        <i class="fas fa-images text-white"></i>
                     </div>
                     <h2 class="text-2xl font-bold text-gray-900">Agregar Nuevas Imágenes</h2>
                 </div>
@@ -225,35 +500,27 @@
                     <i class="fas fa-cloud-upload-alt text-6xl text-gray-400 mb-4"></i>
                     <h3 class="text-lg font-semibold text-gray-700 mb-2">Arrastra imágenes o haz clic para seleccionar</h3>
                     <p class="text-sm text-gray-500 mb-4">PNG, JPG o WEBP (máx. 5MB por imagen)</p>
-                    <input type="file" 
-                           name="imagenes" 
-                           id="imagenes"
-                           multiple
-                           accept="image/*"
-                           class="hidden"
-                           onchange="previsualizarImagenes(this)">
-                    <button type="button" 
-                            onclick="document.getElementById('imagenes').click()"
+                    <input type="file" name="imagenes" id="imagenes" multiple accept="image/*" class="hidden">
+                    <button type="button" onclick="document.getElementById('imagenes').click()"
                             class="px-6 py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all">
                         <i class="fas fa-folder-open mr-2"></i>
                         Seleccionar Imágenes
                     </button>
                 </div>
 
-                <!-- Preview de nuevas imágenes -->
                 <div id="imagenesPreview" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 hidden"></div>
             </div>
 
             <!-- Botones de Acción -->
-            <div class="flex items-center justify-between space-x-4">
-                <a href="{% url 'servicios:detalle_servicio' servicio.id %}" 
-                   class="px-8 py-4 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-all inline-flex items-center">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <a href="{% url 'servicios:detalle_servicio' servicio.id %}"
+                   class="w-full sm:w-auto px-8 py-4 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-all inline-flex items-center justify-center">
                     <i class="fas fa-arrow-left mr-2"></i>
                     Cancelar
                 </a>
                 
-                <button type="submit" 
-                        class="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-2xl hover:scale-105 transition-all inline-flex items-center">
+                <button type="submit" id="submitBtn"
+                        class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-2xl hover:scale-105 transition-all inline-flex items-center justify-center">
                     <i class="fas fa-save mr-2"></i>
                     Guardar Cambios
                 </button>
@@ -264,138 +531,189 @@
 </div>
 
 <script>
-// Eliminar imagen existente (AJAX)
+function toggleHorarioSemana() {
+    const checkbox = document.getElementById('cerrado_semana');
+    const fields = document.getElementById('horario_semana_fields');
+    const msg = document.getElementById('cerrado_semana_msg');
+    
+    if (!checkbox || !fields || !msg) return;
+    
+    if (checkbox.checked) {
+        fields.classList.add('hidden');
+        msg.classList.remove('hidden');
+        fields.querySelectorAll('input').forEach(input => {
+            input.disabled = true;
+            input.required = false;
+        });
+    } else {
+        fields.classList.remove('hidden');
+        msg.classList.add('hidden');
+        fields.querySelectorAll('input').forEach(input => {
+            input.disabled = false;
+        });
+    }
+}
+
+function toggleHorarioFinde() {
+    const checkbox = document.getElementById('cerrado_finde');
+    const fields = document.getElementById('horario_finde_fields');
+    const msg = document.getElementById('cerrado_finde_msg');
+    
+    if (!checkbox || !fields || !msg) return;
+    
+    if (checkbox.checked) {
+        fields.classList.add('hidden');
+        msg.classList.remove('hidden');
+        fields.querySelectorAll('input').forEach(input => {
+            input.disabled = true;
+            input.required = false;
+        });
+    } else {
+        fields.classList.remove('hidden');
+        msg.classList.add('hidden');
+        fields.querySelectorAll('input').forEach(input => {
+            input.disabled = false;
+        });
+    }
+}
+
 function eliminarImagen(imagenId) {
     if (!confirm('¿Estás seguro de eliminar esta imagen?')) return;
+    
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     
     fetch(`/servicios/imagen/${imagenId}/eliminar/`, {
         method: 'POST',
         headers: {
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'X-CSRFToken': csrfToken,
             'Content-Type': 'application/json',
         },
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            document.querySelector(`[data-imagen-id="${imagenId}"]`).remove();
+            const elemento = document.getElementById(`imagen-${imagenId}`);
+            if (elemento) {
+                elemento.style.transition = 'all 0.3s ease';
+                elemento.style.opacity = '0';
+                elemento.style.transform = 'scale(0.8)';
+                setTimeout(() => elemento.remove(), 300);
+            }
             mostrarNotificacion('Imagen eliminada exitosamente', 'success');
         } else {
-            mostrarNotificacion('Error al eliminar la imagen', 'error');
+            mostrarNotificacion(data.error || 'Error al eliminar la imagen', 'error');
         }
     })
     .catch(error => {
+        console.error('Error:', error);
         mostrarNotificacion('Error al eliminar la imagen', 'error');
     });
 }
 
-// Previsualizar nuevas imágenes
 function previsualizarImagenes(input) {
     const preview = document.getElementById('imagenesPreview');
+    
+    if (!preview) return;
+    
     preview.innerHTML = '';
+    
+    if (!input.files || input.files.length === 0) {
+        preview.classList.add('hidden');
+        return;
+    }
+    
     preview.classList.remove('hidden');
     
-    if (input.files) {
-        Array.from(input.files).forEach((file, index) => {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                const div = document.createElement('div');
-                div.className = 'relative group';
-                div.innerHTML = `
-                    <div class="aspect-square rounded-xl overflow-hidden shadow-lg">
-                        <img src="${e.target.result}" class="w-full h-full object-cover">
-                    </div>
-                    <div class="absolute top-2 right-2">
-                        <button type="button" 
-                                onclick="eliminarImagenPreview(this, ${index})"
-                                class="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="absolute bottom-2 left-2">
-                        <span class="px-3 py-1 bg-green-400 text-green-900 rounded-full text-xs font-bold shadow-lg">
-                            <i class="fas fa-plus-circle mr-1"></i>Nueva
-                        </span>
-                    </div>
-                `;
-                preview.appendChild(div);
-            }
-            
-            reader.readAsDataURL(file);
-        });
-    }
-}
-
-function eliminarImagenPreview(button, index) {
-    const input = document.getElementById('imagenes');
-    const dt = new DataTransfer();
+    const maxSize = 5 * 1024 * 1024;
     
-    Array.from(input.files).forEach((file, i) => {
-        if (i !== index) {
-            dt.items.add(file);
+    Array.from(input.files).forEach((file, idx) => {
+        if (file.size > maxSize) {
+            alert(`La imagen "${file.name}" excede 5MB`);
+            return;
         }
+        
+        if (!file.type.match(/^image\/(jpeg|jpg|png|gif|webp)$/i)) {
+            alert(`"${file.name}" no es un formato válido`);
+            return;
+        }
+        
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const div = document.createElement('div');
+            div.className = 'relative group';
+            div.innerHTML = `
+                <div class="aspect-square rounded-xl overflow-hidden shadow-lg border-2 border-gray-200 hover:border-sky-400 transition-all bg-gray-100">
+                    <img src="${e.target.result}" 
+                         class="w-full h-full object-cover transition-transform group-hover:scale-110"
+                         alt="Preview ${idx + 1}">
+                </div>
+                <div class="absolute bottom-2 left-2">
+                    <span class="px-3 py-1.5 bg-green-400 text-green-900 rounded-full text-xs font-bold shadow-lg">
+                        Nueva
+                    </span>
+                </div>
+                <div class="absolute top-2 right-2">
+                    <span class="px-2.5 py-1 bg-gray-900 bg-opacity-80 text-white rounded-lg text-xs font-bold">
+                        ${idx + 1}
+                    </span>
+                </div>
+            `;
+            preview.appendChild(div);
+        };
+        
+        reader.onerror = function() {
+            alert(`Error al cargar "${file.name}"`);
+        };
+        
+        reader.readAsDataURL(file);
     });
-    
-    input.files = dt.files;
-    previsualizarImagenes(input);
 }
 
-// Drag and drop
-const dropZone = document.querySelector('.border-dashed');
-if (dropZone) {
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, preventDefaults, false);
-    });
-
-    function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropZone.addEventListener(eventName, () => {
-            dropZone.classList.add('border-sky-500', 'bg-sky-50');
-        });
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, () => {
-            dropZone.classList.remove('border-sky-500', 'bg-sky-50');
-        });
-    });
-
-    dropZone.addEventListener('drop', (e) => {
-        const files = e.dataTransfer.files;
-        document.getElementById('imagenes').files = files;
-        previsualizarImagenes(document.getElementById('imagenes'));
-    });
-}
-
-// Validación del formulario
-document.querySelector('form').addEventListener('submit', function(e) {
-    const nombre = document.querySelector('[name="nombre"]').value.trim();
-    const tipo = document.querySelector('[name="tipo"]').value;
-    const precio = document.querySelector('[name="precio"]').value;
-    const destino = document.querySelector('[name="destino"]').value;
-    const descripcion = document.querySelector('[name="descripcion"]').value.trim();
+function validarFormulario(e) {
+    const latInput = document.getElementById('latitud');
+    const lngInput = document.getElementById('longitud');
     
-    if (!nombre || !tipo || !precio || !destino || !descripcion) {
+    if (!latInput || !lngInput) {
         e.preventDefault();
-        mostrarNotificacion('Por favor completa todos los campos obligatorios', 'error');
+        mostrarNotificacion('Error: campos de coordenadas no encontrados', 'error');
         return false;
     }
     
-    if (parseFloat(precio) <= 0) {
+    const lat = latInput.value.trim();
+    const lng = lngInput.value.trim();
+    
+    if (!lat || !lng) {
         e.preventDefault();
-        mostrarNotificacion('El precio debe ser mayor a 0', 'error');
+        mostrarNotificacion('Por favor verifica la ubicación en el mapa', 'error');
+        latInput.focus();
         return false;
     }
     
-    const btn = this.querySelector('button[type="submit"]');
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Guardando...';
-    btn.disabled = true;
-});
+    const latNum = parseFloat(lat);
+    const lngNum = parseFloat(lng);
+    
+    if (isNaN(latNum) || isNaN(lngNum)) {
+        e.preventDefault();
+        mostrarNotificacion('Las coordenadas ingresadas no son válidas', 'error');
+        latInput.focus();
+        return false;
+    }
+    
+    if (latNum < -5 || latNum > 2 || lngNum < -92 || lngNum > -75) {
+        e.preventDefault();
+        mostrarNotificacion('Las coordenadas están fuera de Ecuador', 'error');
+        return false;
+    }
+    
+    const submitBtn = document.getElementById('submitBtn');
+    if (submitBtn) {
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Guardando...';
+        submitBtn.disabled = true;
+    }
+    
+    return true;
+}
 
 function mostrarNotificacion(mensaje, tipo) {
     const notificacion = document.createElement('div');
@@ -416,39 +734,105 @@ function mostrarNotificacion(mensaje, tipo) {
     }, 3000);
 }
 
-// Contador de caracteres
-const descripcionTextarea = document.querySelector('[name="descripcion"]');
-if (descripcionTextarea) {
-    const contadorDiv = document.createElement('div');
-    contadorDiv.className = 'text-right text-xs text-gray-500 mt-1';
-    contadorDiv.innerHTML = `<span id="charCount">${descripcionTextarea.value.length}</span> / 1000 caracteres`;
-    descripcionTextarea.parentNode.appendChild(contadorDiv);
+document.addEventListener('DOMContentLoaded', function() {
+    const descripcion = document.getElementById('descripcion');
+    const charCount = document.getElementById('charCount');
     
-    descripcionTextarea.addEventListener('input', function() {
-        const count = this.value.length;
-        document.getElementById('charCount').textContent = count;
-        
-        if (count > 1000) {
-            this.value = this.value.substring(0, 1000);
-            document.getElementById('charCount').textContent = 1000;
-        }
-    });
-}
+    if (descripcion && charCount) {
+        descripcion.addEventListener('input', function() {
+            const length = this.value.length;
+            charCount.textContent = length;
+            
+            if (length > 900) {
+                charCount.className = 'text-xs text-red-600 font-bold';
+            } else if (length > 700) {
+                charCount.className = 'text-xs text-yellow-600 font-semibold';
+            } else {
+                charCount.className = 'text-xs text-gray-500';
+            }
+        });
+    }
+    
+    const cerradoSemana = document.getElementById('cerrado_semana');
+    const cerradoFinde = document.getElementById('cerrado_finde');
+    
+    if (cerradoSemana) {
+        cerradoSemana.addEventListener('change', toggleHorarioSemana);
+        toggleHorarioSemana();
+    }
+    if (cerradoFinde) {
+        cerradoFinde.addEventListener('change', toggleHorarioFinde);
+        toggleHorarioFinde();
+    }
+    
+    const inputImagenes = document.getElementById('imagenes');
+    if (inputImagenes) {
+        inputImagenes.addEventListener('change', function() {
+            previsualizarImagenes(this);
+        });
+    }
+    
+    const form = document.getElementById('servicioForm');
+    if (form) {
+        form.addEventListener('submit', validarFormulario);
+    }
+    
+    const dropZone = document.querySelector('.border-dashed');
+    if (dropZone) {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.add('border-sky-500', 'bg-sky-50');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.remove('border-sky-500', 'bg-sky-50');
+            });
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (inputImagenes) {
+                inputImagenes.files = files;
+                previsualizarImagenes(inputImagenes);
+            }
+        });
+    }
+});
 </script>
 
 <style>
-input:focus, 
-textarea:focus, 
+input:focus,
+textarea:focus,
 select:focus {
+    outline: none;
     box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
 }
 
-.border-dashed {
-    transition: all 0.3s ease;
+input[type="checkbox"] {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+input[type="checkbox"]:checked {
+    background-color: #0ea5e9;
+    border-color: #0ea5e9;
+}
+
+input[type="checkbox"]:hover:not(:disabled) {
+    border-color: #0ea5e9;
 }
 
 textarea::-webkit-scrollbar {
-    width: 8px;
+    width: 10px;
 }
 
 textarea::-webkit-scrollbar-track {
@@ -461,59 +845,38 @@ textarea::-webkit-scrollbar-thumb {
     border-radius: 10px;
 }
 
-textarea::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #0284c7, #2563eb);
-}
-
 ::selection {
-    background-color: rgba(14, 165, 233, 0.3);
-    color: inherit;
+    background-color: rgba(14, 165, 233, 0.25);
 }
 
 @keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .fa-spin {
     animation: spin 1s linear infinite;
 }
 
-input[type="checkbox"] {
-    transition: all 0.2s ease;
+button,
+a,
+input,
+select,
+textarea {
+    transition: all 0.2s ease-in-out;
 }
 
-input[type="checkbox"]:checked {
-    background-color: #0ea5e9;
-    border-color: #0ea5e9;
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
-select {
-    background-image: none;
-}
-
-button {
-    position: relative;
-    overflow: hidden;
-}
-
-button::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-button:active::after {
-    width: 300px;
-    height: 300px;
+.border-dashed {
+    transition: all 0.3s ease;
 }
 </style>
+
 {% endblock %}

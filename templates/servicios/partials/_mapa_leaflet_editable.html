@@ -1,0 +1,464 @@
+<div class="lg:col-span-2">
+    <label class="block text-sm font-semibold text-gray-700 mb-2">
+        Selecciona la ubicación en el mapa <span class="text-red-500">*</span>
+    </label>
+    
+    <!-- ✅ MOSTRAR COORDENADAS ACTUALES -->
+    <div class="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+        <div class="flex items-center justify-between text-sm flex-wrap gap-2">
+            <div class="flex items-center space-x-4">
+                <div>
+                    <span class="font-semibold text-blue-900">Latitud:</span>
+                    <span class="text-blue-700 font-mono" id="displayLatitud">
+                        {{ servicio.latitud|default:'-0.1807' }}
+                    </span>
+                </div>
+                <div>
+                    <span class="font-semibold text-blue-900">Longitud:</span>
+                    <span class="text-blue-700 font-mono" id="displayLongitud">
+                        {{ servicio.longitud|default:'-78.4678' }}
+                    </span>
+                </div>
+            </div>
+            <button type="button" 
+                    onclick="sincronizarMapa()" 
+                    class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg transition-colors">
+                <i class="fas fa-sync-alt mr-1"></i> Actualizar mapa
+            </button>
+        </div>
+    </div>
+    
+    <!-- MAPA -->
+    <div id="mapContainer" style="height: 400px; width: 100%; position: relative; overflow: hidden;" class="rounded-xl shadow-lg border-2 border-gray-200">
+        <div id="map" style="height: 100%; width: 100%;"></div>
+    </div>
+    
+    <p class="text-xs text-gray-500 mt-2">
+        <i class="fas fa-hand-pointer mr-1"></i>
+        Haz clic en el mapa para colocar el marcador o arrástralo para ajustar la ubicación
+    </p>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+      crossorigin=""/>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+
+<script>
+let map = null;
+let marker = null;
+let mapInitialized = false;
+
+// ✅ FUNCIÓN PARA ACTUALIZAR EL DISPLAY DE COORDENADAS
+function updateDisplayCoords(lat, lng) {
+    const displayLat = document.getElementById('displayLatitud');
+    const displayLng = document.getElementById('displayLongitud');
+    
+    if (displayLat) displayLat.textContent = lat.toFixed(8);
+    if (displayLng) displayLng.textContent = lng.toFixed(8);
+    
+    console.log('📊 Display actualizado:', { lat: lat.toFixed(8), lng: lng.toFixed(8) });
+}
+
+function initMap() {
+    try {
+        if (typeof L === 'undefined') {
+            console.log('⏳ Esperando Leaflet...');
+            setTimeout(initMap, 500);
+            return;
+        }
+
+        if (mapInitialized && map) {
+            map.invalidateSize(true);
+            return;
+        }
+
+        const mapElement = document.getElementById('map');
+        if (!mapElement) {
+            console.error('❌ Elemento #map no encontrado');
+            return;
+        }
+
+        if (mapElement._leaflet_id) {
+            mapElement._leaflet_id = null;
+        }
+
+        // ✅ BUSCAR LOS INPUTS DE LATITUD Y LONGITUD EN EL FORMULARIO
+        const latInput = document.getElementById('latitud');
+        const lngInput = document.getElementById('longitud');
+        
+        if (!latInput || !lngInput) {
+            console.error('❌ CRÍTICO: No se encontraron inputs #latitud o #longitud');
+            alert('⚠️ ERROR: Los campos de latitud y longitud no están en el formulario.\n\nVerifica que el formulario tenga:\n<input id="latitud" name="latitud">\n<input id="longitud" name="longitud">');
+            return;
+        }
+        
+        console.log('✅ Inputs encontrados:', {
+            latitud: latInput.value,
+            longitud: lngInput.value
+        });
+        
+        let initialLat = parseFloat(latInput.value);
+        let initialLng = parseFloat(lngInput.value);
+        
+        // Validar coordenadas iniciales
+        if (isNaN(initialLat) || isNaN(initialLng)) {
+            console.warn('⚠️ Coordenadas inválidas, usando centro de Ecuador');
+            initialLat = -0.1807; // Quito, Ecuador (centro por defecto)
+            initialLng = -78.4678;
+        }
+        
+        console.log('🗺️ Inicializando mapa con coordenadas:', { lat: initialLat, lng: initialLng });
+        
+        // Determinar zoom inicial
+        const isDefaultLocation = (Math.abs(initialLat + 0.1807) < 0.01 && Math.abs(initialLng + 78.4678) < 0.01);
+        const initialZoom = isDefaultLocation ? 7 : 15;
+        
+        map = L.map('map', {
+            center: [initialLat, initialLng],
+            zoom: initialZoom,
+            scrollWheelZoom: true,
+            zoomControl: false,
+            attributionControl: true,
+            fadeAnimation: false,
+            zoomAnimation: true,
+            markerZoomAnimation: true
+        });
+        
+        L.control.zoom({
+            position: 'topleft',
+            zoomInTitle: 'Acercar',
+            zoomOutTitle: 'Alejar'
+        }).addTo(map);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19,
+            minZoom: 5,
+            crossOrigin: true
+        }).addTo(map);
+        
+        mapInitialized = true;
+        
+        // ✅ SI YA TIENE COORDENADAS, COLOCAR MARCADOR AUTOMÁTICAMENTE
+        if (!isDefaultLocation) {
+            console.log('🎯 Colocando marcador en ubicación guardada');
+            setTimeout(() => updateMarker(initialLat, initialLng), 500);
+        }
+        
+        setTimeout(() => map && map.invalidateSize(true), 100);
+        setTimeout(() => map && map.invalidateSize(true), 300);
+        setTimeout(() => map && map.invalidateSize(true), 600);
+        
+        // ✅ EVENTO CLICK EN EL MAPA
+        map.on('click', function(e) {
+            const lat = e.latlng.lat;
+            const lng = e.latlng.lng;
+            
+            console.log('🖱️ Click en mapa:', { lat, lng });
+            
+            // Validar rango de Ecuador
+            if (lat < -5 || lat > 2 || lng < -92 || lng > -75) {
+                alert('⚠️ La ubicación debe estar dentro de Ecuador\n\nRangos válidos:\n• Latitud: -5° a 2°\n• Longitud: -92° a -75°\n\nCoordenada seleccionada:\n• Lat: ' + lat.toFixed(6) + '\n• Lng: ' + lng.toFixed(6));
+                return;
+            }
+            
+            updateMarker(lat, lng);
+        });
+        
+        console.log('✅ Mapa inicializado correctamente');
+        
+    } catch (error) {
+        console.error('❌ Error al inicializar mapa:', error);
+        alert('Error al inicializar el mapa: ' + error.message);
+        mapInitialized = false;
+    }
+}
+
+function updateMarker(lat, lng) {
+    if (!map) {
+        console.error('❌ Mapa no inicializado');
+        return;
+    }
+    
+    console.log('📍 Actualizando marcador a:', { lat, lng });
+    
+    const latInput = document.getElementById('latitud');
+    const lngInput = document.getElementById('longitud');
+    
+    if (!latInput || !lngInput) {
+        console.error('❌ CRÍTICO: Inputs de coordenadas no encontrados al actualizar marcador');
+        alert('⚠️ ERROR: No se pueden actualizar las coordenadas.\nLos campos latitud/longitud no existen en el formulario.');
+        return;
+    }
+    
+    // ✅ ACTUALIZAR LOS INPUTS DEL FORMULARIO
+    latInput.value = lat.toFixed(8);
+    lngInput.value = lng.toFixed(8);
+    
+    console.log('✅ Inputs actualizados:', {
+        latitud: latInput.value,
+        longitud: lngInput.value
+    });
+    
+    // ✅ ACTUALIZAR EL DISPLAY VISUAL
+    updateDisplayCoords(lat, lng);
+    
+    // Eliminar marcador anterior
+    if (marker) {
+        map.removeLayer(marker);
+        marker = null;
+    }
+    
+    // Crear nuevo marcador
+    marker = L.marker([lat, lng], { 
+        draggable: true,
+        autoPan: true,
+        icon: L.divIcon({
+            className: 'custom-marker',
+            html: `
+                <div style="position: relative;">
+                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); 
+                         border: 4px solid white; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); 
+                         box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4); position: relative;">
+                        <div style="width: 12px; height: 12px; background: white; border-radius: 50%; 
+                             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(45deg);"></div>
+                    </div>
+                </div>
+            `,
+            iconSize: [40, 40],
+            iconAnchor: [20, 40],
+            popupAnchor: [0, -40]
+        })
+    }).addTo(map);
+    
+    const popupContent = `
+        <div style="text-align: center; font-family: sans-serif; padding: 10px;">
+            <div style="font-size: 16px; font-weight: bold; color: #0ea5e9; margin-bottom: 8px;">
+                📍 Ubicación del Servicio
+            </div>
+            <div style="font-size: 13px; color: #64748b;">
+                <strong>Latitud:</strong> ${lat.toFixed(6)}<br>
+                <strong>Longitud:</strong> ${lng.toFixed(6)}
+            </div>
+            <div style="margin-top: 8px; font-size: 11px; color: #94a3b8;">
+                ✋ Puedes arrastrar el marcador
+            </div>
+        </div>
+    `;
+    
+    marker.bindPopup(popupContent).openPopup();
+    
+    // ✅ EVENTO CUANDO ARRASTRAN EL MARCADOR
+    marker.on('dragend', function() {
+        const pos = marker.getLatLng();
+        const newLat = pos.lat;
+        const newLng = pos.lng;
+        
+        console.log('🔄 Marcador arrastrado a:', { lat: newLat, lng: newLng });
+        
+        // Actualizar inputs
+        if (latInput) latInput.value = newLat.toFixed(8);
+        if (lngInput) lngInput.value = newLng.toFixed(8);
+        
+        console.log('✅ Inputs actualizados tras arrastrar:', {
+            latitud: latInput.value,
+            longitud: lngInput.value
+        });
+        
+        // Actualizar display
+        updateDisplayCoords(newLat, newLng);
+        
+        // Actualizar popup
+        marker.setPopupContent(`
+            <div style="text-align: center; font-family: sans-serif; padding: 10px;">
+                <div style="font-size: 16px; font-weight: bold; color: #0ea5e9; margin-bottom: 8px;">
+                    📍 Ubicación del Servicio
+                </div>
+                <div style="font-size: 13px; color: #64748b;">
+                    <strong>Latitud:</strong> ${newLat.toFixed(6)}<br>
+                    <strong>Longitud:</strong> ${newLng.toFixed(6)}
+                </div>
+            </div>
+        `).openPopup();
+    });
+    
+    // Centrar mapa en el marcador
+    map.setView([lat, lng], 15);
+    
+    console.log('✅ Marcador colocado correctamente');
+}
+
+function sincronizarMapa() {
+    const latInput = document.getElementById('latitud');
+    const lngInput = document.getElementById('longitud');
+    
+    if (!latInput || !lngInput) {
+        console.error('⚠️ No se encontraron inputs de latitud/longitud');
+        alert('⚠️ ERROR: Los campos de coordenadas no están en el formulario');
+        return;
+    }
+    
+    const lat = parseFloat(latInput.value);
+    const lng = parseFloat(lngInput.value);
+    
+    console.log('🔄 Sincronizando mapa con:', { lat, lng });
+    
+    if (isNaN(lat) || isNaN(lng)) {
+        alert('⚠️ Coordenadas inválidas');
+        return;
+    }
+    
+    if (lat < -5 || lat > 2) {
+        alert('⚠️ Latitud fuera de rango: debe estar entre -5 y 2');
+        return;
+    }
+    
+    if (lng < -92 || lng > -75) {
+        alert('⚠️ Longitud fuera de rango: debe estar entre -92 y -75');
+        return;
+    }
+    
+    updateMarker(lat, lng);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Iniciando carga del mapa...');
+    
+    const latInput = document.getElementById('latitud');
+    const lngInput = document.getElementById('longitud');
+    
+    if (!latInput || !lngInput) {
+        console.error('❌ CRÍTICO: Inputs de coordenadas NO ENCONTRADOS en el DOM');
+        console.log('🔍 Verifica que el formulario tenga:');
+        console.log('   <input type="number" id="latitud" name="latitud">');
+        console.log('   <input type="number" id="longitud" name="longitud">');
+    }
+    
+    // Event listeners para sincronizar cuando se escriba manualmente
+    if (latInput) {
+        latInput.addEventListener('blur', sincronizarMapa);
+        latInput.addEventListener('change', sincronizarMapa);
+    }
+    if (lngInput) {
+        lngInput.addEventListener('blur', sincronizarMapa);
+        lngInput.addEventListener('change', sincronizarMapa);
+    }
+    
+    setTimeout(() => {
+        initMap();
+        
+        // Si ya tiene coordenadas, mostrar marcador
+        if (latInput && lngInput) {
+            const lat = parseFloat(latInput.value);
+            const lng = parseFloat(lngInput.value);
+            
+            if (!isNaN(lat) && !isNaN(lng)) {
+                // Evitar el centro por defecto
+                if (Math.abs(lat + 0.1807) > 0.01 || Math.abs(lng + 78.4678) > 0.01) {
+                    setTimeout(() => updateMarker(lat, lng), 1000);
+                }
+            }
+        }
+    }, 250);
+});
+
+window.addEventListener('load', function() {
+    const resizes = [100, 300, 600, 1000];
+    resizes.forEach(delay => {
+        setTimeout(() => {
+            if (map) map.invalidateSize(true);
+        }, delay);
+    });
+});
+
+let resizeTimer;
+window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        if (map) map.invalidateSize(true);
+    }, 150);
+});
+
+console.log('✅ Script del mapa cargado correctamente');
+</script>
+
+<style>
+#mapContainer {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 400px;
+    min-height: 400px;
+    max-height: 400px;
+    overflow: hidden;
+    z-index: 1;
+}
+
+#map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 1;
+}
+
+.leaflet-container {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 1 !important;
+    background: #e5e7eb !important;
+}
+
+.custom-marker {
+    background: transparent !important;
+    border: none !important;
+    cursor: grab !important;
+}
+
+.custom-marker:active {
+    cursor: grabbing !important;
+}
+
+.leaflet-control-zoom {
+    position: absolute !important;
+    top: 10px !important;
+    left: 10px !important;
+    border: 2px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    background: white !important;
+    z-index: 1000 !important;
+}
+
+.leaflet-control-zoom a {
+    width: 40px !important;
+    height: 40px !important;
+    line-height: 40px !important;
+    font-size: 22px !important;
+    font-weight: bold !important;
+    color: #374151 !important;
+    background: white !important;
+    transition: all 0.2s ease !important;
+}
+
+.leaflet-control-zoom a:hover {
+    background: #0ea5e9 !important;
+    color: white !important;
+}
+
+.leaflet-popup-content-wrapper {
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+</style>

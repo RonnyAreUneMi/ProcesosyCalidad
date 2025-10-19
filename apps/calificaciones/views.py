@@ -158,7 +158,7 @@ def crear_calificacion(request, servicio_id):
         # Moderación mejorada
         es_ofensivo, palabras = contiene_contenido_ofensivo(comentario)
         
-        # Crear la calificación
+        # Crear la calificación (el modelo actualiza automáticamente)
         with transaction.atomic():
             calificacion = Calificacion.objects.create(
                 usuario=request.user,
@@ -168,12 +168,8 @@ def crear_calificacion(request, servicio_id):
                 activo=not es_ofensivo,
                 moderado=es_ofensivo
             )
-            
-            # ✅ ACTUALIZAR CALIFICACIÓN DEL SERVICIO
-            servicio.actualizar_calificacion()
-            
-            # ✅ ACTUALIZAR CALIFICACIÓN DEL DESTINO
-            servicio.destino.actualizar_calificacion()
+            # ✅ NO es necesario llamar a actualizar_calificacion() aquí
+            # El modelo lo hace automáticamente en su método save()
         
         if es_ofensivo:
             messages.warning(
@@ -191,7 +187,6 @@ def crear_calificacion(request, servicio_id):
     except Exception as e:
         messages.error(request, f'Error al crear la calificación: {str(e)}')
         return redirect('servicios:detalle_servicio', servicio_id=servicio_id)
-
 
 @login_required
 @solo_turistas
@@ -223,11 +218,8 @@ def editar_calificacion(request, calificacion_id):
             # Moderación mejorada
             es_ofensivo, palabras = contiene_contenido_ofensivo(comentario)
             
+            # Actualizar la calificación (el modelo actualiza automáticamente)
             with transaction.atomic():
-                # Guardar servicio y destino antes de actualizar
-                servicio = calificacion.servicio
-                destino = servicio.destino
-                
                 calificacion.puntuacion = puntuacion
                 calificacion.comentario = comentario if comentario else None
                 
@@ -236,12 +228,8 @@ def editar_calificacion(request, calificacion_id):
                     calificacion.moderado = True
                 
                 calificacion.save()
-                
-                # ✅ ACTUALIZAR CALIFICACIÓN DEL SERVICIO
-                servicio.actualizar_calificacion()
-                
-                # ✅ ACTUALIZAR CALIFICACIÓN DEL DESTINO
-                destino.actualizar_calificacion()
+                # ✅ NO es necesario llamar a actualizar_calificacion() aquí
+                # El modelo lo hace automáticamente en su método save()
             
             if es_ofensivo:
                 messages.warning(request, 'Tu calificación está en revisión por contener contenido inapropiado.')
@@ -279,19 +267,11 @@ def eliminar_calificacion(request, calificacion_id):
     
     try:
         with transaction.atomic():
-            # Guardar referencias antes de desactivar
-            servicio = calificacion.servicio
-            destino = servicio.destino
-            
             # Desactivar en lugar de eliminar (soft delete)
             calificacion.activo = False
             calificacion.save()
-            
-            # ✅ ACTUALIZAR CALIFICACIÓN DEL SERVICIO
-            servicio.actualizar_calificacion()
-            
-            # ✅ ACTUALIZAR CALIFICACIÓN DEL DESTINO
-            destino.actualizar_calificacion()
+            # ✅ NO es necesario llamar a actualizar_calificacion() aquí
+            # El modelo lo hace automáticamente en su método save()
         
         messages.success(request, 'Calificación eliminada exitosamente.')
     except Exception as e:
@@ -571,6 +551,7 @@ def aprobar_calificacion(request, calificacion_id):
             calificacion.activo = True
             calificacion.moderado = True
             calificacion.save()
+            # ✅ El modelo actualiza automáticamente
         
         return JsonResponse({
             'success': True,
@@ -597,6 +578,7 @@ def rechazar_calificacion(request, calificacion_id):
             calificacion.activo = False
             calificacion.moderado = True
             calificacion.save()
+            # ✅ El modelo actualiza automáticamente
         
         return JsonResponse({
             'success': True,
