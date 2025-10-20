@@ -1,4 +1,4 @@
-# apps/chatbot/views.py - VERSIÓN CON OPENAI GPT-4
+# apps/chatbot/views.py - VERSIÓN OPTIMIZADA CON GPT-4
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.conf import settings
@@ -8,25 +8,53 @@ import json
 from django.test import RequestFactory
 from datetime import datetime, timedelta
 import hashlib
+import re
+from unicodedata import normalize
 
 
-# SISTEMA DE APRENDIZAJE Y MEMORIA
+# ============================================
+# UTILIDADES BÁSICAS (SIN HARDCODEAR DATOS)
+# ============================================
+
+class TextNormalizer:
+    """
+    Normalización básica de texto - El resto lo hace GPT-4
+    """
+    
+    @staticmethod
+    def normalizar_basico(texto):
+        """
+        Normalización básica: minúsculas, espacios, etc.
+        NO corrige ortografía (eso lo hace GPT-4)
+        """
+        if not texto:
+            return ""
+        
+        texto = texto.lower().strip()
+        texto = normalize('NFKD', texto).encode('ASCII', 'ignore').decode('ASCII')
+        texto = re.sub(r'\s+', ' ', texto)
+        
+        return texto
+
+
+# ============================================
+# SISTEMA DE MEMORIA (SIMPLIFICADO)
+# ============================================
 
 class ChatbotMemory:
     """
-    Sistema de memoria para que el chatbot aprenda de interacciones
+    Sistema de memoria optimizado - GPT-4 hace el análisis semántico
     """
     
     @staticmethod
     def generar_hash_consulta(query):
-        """Genera un hash único para una consulta"""
-        return hashlib.md5(query.lower().strip().encode()).hexdigest()
+        """Genera hash para caché"""
+        query_norm = TextNormalizer.normalizar_basico(query)
+        return hashlib.md5(query_norm.encode()).hexdigest()
     
     @staticmethod
     def registrar_consulta_exitosa(query, funcion_usada, resultado):
-        """
-        Registra una consulta exitosa para aprendizaje futuro
-        """
+        """Registra consultas exitosas"""
         hash_query = ChatbotMemory.generar_hash_consulta(query)
         cache_key = f"chatbot_success_{hash_query}"
         
@@ -34,22 +62,18 @@ class ChatbotMemory:
             'query': query,
             'funcion': funcion_usada,
             'timestamp': datetime.now().isoformat(),
-            'resultado_type': type(resultado).__name__,
-            'tuvo_resultados': bool(resultado.get('servicios') or resultado.get('destinos'))
+            'tuvo_resultados': bool(resultado.get('servicios') or resultado.get('destinos') or resultado.get('data'))
         }
         
-        cache.set(cache_key, data, timeout=86400 * 30)  # 30 días
+        cache.set(cache_key, data, timeout=86400 * 30)
         
-        # Incrementar contador de éxito
         counter_key = f"chatbot_success_count_{funcion_usada}"
         count = cache.get(counter_key, 0)
         cache.set(counter_key, count + 1, timeout=86400 * 30)
     
     @staticmethod
     def registrar_error(query, error_msg):
-        """
-        Registra errores para análisis posterior
-        """
+        """Registra errores"""
         hash_query = ChatbotMemory.generar_hash_consulta(query)
         cache_key = f"chatbot_error_{hash_query}"
         
@@ -60,161 +84,45 @@ class ChatbotMemory:
             'count': cache.get(cache_key, {}).get('count', 0) + 1
         }
         
-        cache.set(cache_key, data, timeout=86400 * 7)  # 7 días
-    
-    @staticmethod
-    def obtener_consultas_similares(query):
-        """
-        Busca consultas similares exitosas en el caché
-        """
-        # Buscar en caché las últimas 50 consultas exitosas
-        pattern = "chatbot_success_*"
-        keys = cache.keys(pattern)[:50] if hasattr(cache, 'keys') else []
-        
-        similares = []
-        query_words = set(query.lower().split())
-        
-        for key in keys:
-            data = cache.get(key)
-            if data and data.get('tuvo_resultados'):
-                stored_words = set(data['query'].lower().split())
-                # Calcular similitud simple
-                interseccion = len(query_words & stored_words)
-                if interseccion >= 2:  # Al menos 2 palabras en común
-                    similares.append({
-                        'query': data['query'],
-                        'funcion': data['funcion'],
-                        'similitud': interseccion
-                    })
-        
-        return sorted(similares, key=lambda x: x['similitud'], reverse=True)[:3]
+        cache.set(cache_key, data, timeout=86400 * 7)
 
 
-# VALIDADOR DE CONTEXTO
-
-class ContextValidator:
-    """
-    Valida y mejora el contexto de las consultas
-    """
-    
-    KEYWORDS_SERVICIOS = [
-        'hotel', 'alojamiento', 'hospedaje', 'tour', 'excursión',
-        'actividad', 'transporte', 'restaurante', 'comida', 'gastronomía',
-        'reservar', 'precio', 'costo', 'cuánto cuesta', 'disponibilidad'
-    ]
-    
-    KEYWORDS_DESTINOS = [
-        'destino', 'lugar', 'ciudad', 'provincia', 'visitar',
-        'conocer', 'lugares turísticos', 'atractivos', 'dónde ir',
-        'qué ver', 'región', 'zona'
-    ]
-    
-    KEYWORDS_RESERVAS = [
-        'reserva', 'reservas', 'mis reservas', 'mis viajes',
-        'confirmación', 'cancelar', 'estado', 'historial'
-    ]
-    
-    @staticmethod
-    def identificar_intencion(mensaje):
-        """
-        Identifica la intención principal del mensaje
-        Returns: dict con tipo e indicadores de confianza
-        """
-        msg_lower = mensaje.lower()
-        
-        scores = {
-            'servicios': sum(1 for kw in ContextValidator.KEYWORDS_SERVICIOS if kw in msg_lower),
-            'destinos': sum(1 for kw in ContextValidator.KEYWORDS_DESTINOS if kw in msg_lower),
-            'reservas': sum(1 for kw in ContextValidator.KEYWORDS_RESERVAS if kw in msg_lower)
-        }
-        
-        tipo_principal = max(scores, key=scores.get)
-        confianza = scores[tipo_principal]
-        
-        return {
-            'tipo': tipo_principal if confianza > 0 else 'general',
-            'confianza': confianza,
-            'scores': scores,
-            'necesita_aclaracion': confianza == 0 or (scores['servicios'] == scores['destinos'] and scores['servicios'] > 0)
-        }
-    
-    @staticmethod
-    def extraer_parametros(mensaje):
-        """
-        Extrae parámetros clave del mensaje
-        """
-        msg_lower = mensaje.lower()
-        params = {}
-        
-        # Detectar región
-        regiones = {
-            'costa': ['costa', 'playa', 'guayaquil', 'manta', 'salinas'],
-            'sierra': ['sierra', 'quito', 'cuenca', 'montaña', 'andes'],
-            'oriente': ['oriente', 'amazonía', 'amazonia', 'selva'],
-            'galapagos': ['galápagos', 'galapagos', 'islas']
-        }
-        
-        for region, keywords in regiones.items():
-            if any(kw in msg_lower for kw in keywords):
-                params['region'] = region
-                break
-        
-        # Detectar tipo de servicio
-        tipos = {
-            'alojamiento': ['hotel', 'alojamiento', 'hospedaje', 'hostal'],
-            'tour': ['tour', 'excursión', 'recorrido'],
-            'actividad': ['actividad', 'aventura', 'deportes'],
-            'transporte': ['transporte', 'traslado', 'taxi', 'bus'],
-            'gastronomia': ['restaurante', 'comida', 'gastronomía', 'comer']
-        }
-        
-        for tipo, keywords in tipos.items():
-            if any(kw in msg_lower for kw in keywords):
-                params['tipo'] = tipo
-                break
-        
-        # Detectar presupuesto
-        import re
-        precio_match = re.search(r'\$?\s*(\d+)\s*(?:dólares|dolares|usd)?', msg_lower)
-        if precio_match:
-            params['precio_max'] = int(precio_match.group(1))
-        
-        return params
-
-
-# INICIALIZACIÓN Y HERRAMIENTAS
+# ============================================
+# CLIENTE OPENAI
+# ============================================
 
 def get_openai_client():
-    """Inicializa el cliente de OpenAI de forma lazy"""
+    """Inicializa el cliente de OpenAI"""
     from openai import OpenAI
     
     api_key = settings.OPENAI_API_KEY
     if not api_key:
-        raise ValueError(
-            "❌ OPENAI_API_KEY no configurada. "
-            "Verifica tu archivo .env"
-        )
+        raise ValueError("OPENAI_API_KEY no configurada")
     
     return OpenAI(api_key=api_key)
 
+
+# ============================================
+# HERRAMIENTAS (FUNCIONES)
+# ============================================
 
 TOOLS = [
     {
         "type": "function",
         "function": {
             "name": "buscar_servicios",
-            "description": "Busca servicios turísticos (hoteles, tours, actividades, transporte, restaurantes). USAR PARA: reservas, precios, disponibilidad de servicios.",
+            "description": "Busca servicios turísticos por PALABRAS CLAVE (no nombres exactos). La búsqueda es flexible y encuentra coincidencias parciales. Ejemplos: 'oro verde' encuentra 'Oro Verde Manta', 'hilton' encuentra 'Hilton Colon Quito'.",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "q": {
                         "type": "string",
-                        "description": "Término de búsqueda general"
+                        "description": "PALABRAS CLAVE del servicio (NO nombre completo). Ejemplos: 'oro verde' (no 'Hotel Oro Verde'), 'hilton' (no 'Hotel Hilton Colon'), 'casa cangrejo' (no 'Restaurante La Casa del Cangrejo'). Elimina palabras genéricas como 'hotel', 'restaurante', 'tour'."
                     },
                     "tipo": {
                         "type": "string",
                         "enum": ["alojamiento", "tour", "actividad", "transporte", "gastronomia"],
-                        "description": "Tipo específico de servicio"
+                        "description": "Tipo de servicio"
                     },
                     "region": {
                         "type": "string",
@@ -233,13 +141,13 @@ TOOLS = [
         "type": "function",
         "function": {
             "name": "buscar_destinos",
-            "description": "Busca destinos turísticos (ciudades, lugares, atractivos). USAR PARA: información de lugares, qué visitar, dónde ir.",
+            "description": "Busca destinos turísticos por PALABRAS CLAVE (ciudades, lugares, atractivos). Búsqueda flexible que encuentra coincidencias parciales.",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "q": {
                         "type": "string",
-                        "description": "Nombre del destino, ciudad o provincia"
+                        "description": "PALABRAS CLAVE del destino (ciudad, provincia, lugar). Usa palabras distintivas. Ejemplos: 'quito', 'cuenca', 'galapagos'. Normaliza nombres (ej: 'Kito' → 'quito', 'Guayakil' → 'guayaquil')"
                     },
                     "region": {
                         "type": "string",
@@ -255,7 +163,7 @@ TOOLS = [
         "type": "function",
         "function": {
             "name": "obtener_destinos_por_region",
-            "description": "Obtiene los mejores destinos de una región. USAR PARA: explorar una región completa.",
+            "description": "Obtiene los mejores destinos de una región completa.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -272,7 +180,7 @@ TOOLS = [
         "type": "function",
         "function": {
             "name": "obtener_estadisticas_servicios",
-            "description": "Estadísticas de servicios disponibles",
+            "description": "Estadísticas generales de servicios disponibles",
             "parameters": {"type": "object", "properties": {}}
         }
     },
@@ -280,7 +188,7 @@ TOOLS = [
         "type": "function",
         "function": {
             "name": "obtener_estadisticas_destinos",
-            "description": "Estadísticas de destinos turísticos",
+            "description": "Estadísticas generales de destinos turísticos",
             "parameters": {"type": "object", "properties": {}}
         }
     },
@@ -294,7 +202,7 @@ TOOLS = [
                 "properties": {
                     "ids": {
                         "type": "string",
-                        "description": "IDs separados por comas (ejemplo: '1,2,3')"
+                        "description": "IDs separados por comas (ej: '1,2,3')"
                     }
                 },
                 "required": ["ids"]
@@ -305,7 +213,7 @@ TOOLS = [
         "type": "function",
         "function": {
             "name": "obtener_recomendaciones",
-            "description": "Recomendaciones personalizadas según criterios",
+            "description": "Recomendaciones personalizadas según criterios del usuario",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -327,7 +235,7 @@ TOOLS = [
         "type": "function",
         "function": {
             "name": "obtener_estadisticas_reservas",
-            "description": "Obtiene estadísticas generales de reservas del sistema",
+            "description": "Estadísticas generales de reservas del sistema",
             "parameters": {"type": "object", "properties": {}}
         }
     },
@@ -335,89 +243,114 @@ TOOLS = [
         "type": "function",
         "function": {
             "name": "obtener_mis_estadisticas",
-            "description": "Obtiene estadísticas personales del usuario autenticado (solo si está logueado)",
+            "description": "Estadísticas personales del usuario autenticado",
             "parameters": {"type": "object", "properties": {}}
         }
     }
 ]
 
 
+# ============================================
+# SYSTEM PROMPT OPTIMIZADO
+# ============================================
+
 SYSTEM_PROMPT = """Eres "Guía Ecuador" 🇪🇨, el asistente turístico inteligente de Ecuador.
 
 🎯 **TU MISIÓN:**
 Ayudar a turistas con información REAL y VERIFICADA de nuestra base de datos.
 
-🧠 **REGLAS DE ORO - NUNCA LAS ROMPAS:**
+🧠 **CAPACIDADES ESPECIALES:**
+1. **CORRECCIÓN ORTOGRÁFICA AUTOMÁTICA:**
+   - El usuario puede escribir con errores: "hoteles en kito" → interpretas "Quito"
+   - Nombres mal escritos: "Guayakil" → "Guayaquil", "Cuenka" → "Cuenca"
+   - Palabras en español: "resturante" → "restaurante", "hospedage" → "hospedaje"
+   - SIEMPRE normaliza y corrige ANTES de llamar funciones
 
-1. **DIFERENCIA CLARAMENTE:**
-   - 🏨 SERVICIOS = Hoteles, tours, actividades, restaurantes, transporte (cosas que se RESERVAN)
-   - 🏞️ DESTINOS = Ciudades, lugares, provincias, atractivos (lugares que se VISITAN)
+2. **BÚSQUEDA FLEXIBLE Y POR PALABRAS CLAVE:**
+   - Usuario dice "Hotel Oro Verde" → busca q="oro verde" (palabras clave principales)
+   - Usuario dice "restaurante El Coral" → busca q="coral" o q="el coral"
+   - Si el nombre tiene ubicación, sepárala: "Oro Verde Manta" → busca "oro verde" con filtros
+   - **REGLA DE ORO**: Usa las palabras más distintivas del nombre, NO el nombre completo
    
-2. **USA LA HERRAMIENTA CORRECTA:**
-   - Usuario pregunta por hoteles/tours/restaurantes/comedores → `buscar_servicios` con tipo='gastronomia'
-   - Usuario pregunta por ciudades/lugares/qué visitar → `buscar_destinos`
-   - Usuario menciona una REGIÓN (costa/sierra/oriente/galapagos) → SIEMPRE usa el parámetro `region`
-   - Ejemplo: "restaurantes en la sierra" → buscar_servicios(tipo='gastronomia', region='sierra')
+   Ejemplos:
+   ✅ "Hotel Oro Verde" → buscar_servicios(q="oro verde", tipo="alojamiento")
+   ✅ "Hilton Colon Quito" → buscar_servicios(q="hilton colon", tipo="alojamiento")
+   ✅ "tour galapagos" → buscar_servicios(q="galapagos", tipo="tour")
+   ❌ NO uses el nombre exacto completo si no hay resultados
 
-3. **BÚSQUEDA POR REGIÓN:**
-   - Las regiones válidas son SOLO: costa, sierra, oriente, galapagos (en MINÚSCULAS)
-   - Si el usuario dice "la sierra", "en la costa", etc. → usa 'sierra', 'costa' sin artículos
-   - SIEMPRE combina región con tipo cuando el usuario lo especifica
+3. **ESTRATEGIA DE BÚSQUEDA INCREMENTAL:**
+   - Primer intento: busca con palabras clave principales
+   - Si no hay resultados: prueba con menos palabras o variaciones
+   - Ejemplos:
+     * "Hotel Oro Verde Guayaquil" → primero "oro verde", luego "oro verde" + region
+     * "Restaurante La Casa del Cangrejo" → primero "casa cangrejo", luego "cangrejo"
 
-4. **NUNCA INVENTES DATOS:**
-   - Solo habla de lo que retornan las herramientas
-   - Si no hay resultados, di claramente "No encontré..."
-   - NO menciones lugares/servicios que no aparecen en los resultados
-
-5. **SIEMPRE USA HERRAMIENTAS ANTES DE RESPONDER:**
-   - Consulta específica → Buscar primero, responder después
-   - Duda entre opciones → Mejor usar 2 herramientas que adivinar
-
-6. **FORMATO DE RESPUESTA:**
-   ```
-   ✅ CON RESULTADOS:
-   "¡Encontré [N] opciones!
+4. **DIFERENCIACIÓN CLARA:**
+   - 🏨 SERVICIOS = Cosas que se RESERVAN (hoteles, tours, restaurantes, transporte)
+   - 🏞️ DESTINOS = Lugares que se VISITAN (ciudades, provincias, atractivos)
    
-   1. **[Nombre]** - $[Precio] ⭐[Rating]
-      📍 [Ubicación] • [Tipo]
-      [Ver más](/servicios/[ID]/)
-   
-   ¿Quieres más detalles de alguno?"
-   
-   ❌ SIN RESULTADOS:
-   "No encontré [búsqueda específica]. 😔
-   
-   ¿Te interesaría ver [alternativa real]?"
-   ```
+   Ejemplos:
+   - "hoteles en Quito" → buscar_servicios(q="quito", tipo="alojamiento")
+   - "qué visitar en Quito" → buscar_destinos(q="quito")
+   - "restaurantes en la sierra" → buscar_servicios(tipo="gastronomia", region="sierra")
+   - "Hotel Oro Verde" → buscar_servicios(q="oro verde", tipo="alojamiento")
 
-7. **MANEJO DE AMBIGÜEDAD:**
-   - Si no estás seguro → Pregunta al usuario
-   - "¿Buscas hoteles EN Quito o información SOBRE Quito?"
+4. **PARÁMETROS INTELIGENTES:**
+   - Regiones válidas: costa, sierra, oriente, galapagos (MINÚSCULAS, sin artículos)
+   - Si el usuario dice "en la costa" → usa region="costa"
+   - Combina múltiples filtros cuando sea apropiado
+   - **IMPORTANTE**: El parámetro 'q' debe contener solo palabras clave distintivas
 
 🚫 **PROHIBIDO:**
-- Mencionar destinos sin buscarlos primero
-- Inventar precios o datos
-- Confundir servicios con destinos
-- Responder sin usar herramientas
-- Ignorar el parámetro region cuando el usuario lo menciona
+- Usar nombres completos en el parámetro 'q' (ej: ❌ "Hotel Oro Verde Manta", ✅ "oro verde")
+- Inventar datos que no están en los resultados
+- Mencionar lugares/servicios que no aparecen en la respuesta de las funciones
+- Ignorar errores ortográficos del usuario (SIEMPRE normaliza primero)
+- Responder sin consultar las funciones cuando se necesita información específica
+- Incluir palabras genéricas en búsquedas: ❌ "hotel oro verde" → ✅ "oro verde"
 
-✅ **PERMITIDO:**
-- Usar 2+ herramientas si es necesario
-- Decir "no sé" cuando no hay datos
-- Pedir aclaración al usuario
+✅ **FLUJO DE TRABAJO:**
+1. Usuario envía mensaje (puede tener errores, puede ser nombre completo)
+2. TÚ extraes las palabras CLAVE distintivas (elimina "hotel", "restaurante", ubicaciones obvias)
+3. Llamas a la función con palabras clave + filtros (tipo, región)
+4. Si NO hay resultados, prueba con menos palabras o sin filtros
+5. Respondes basándote SOLO en los resultados reales
+6. Si aún no hay resultados, lo dices claramente y ofreces alternativas
 
 📏 **ESTILO:**
 - Conciso: máximo 150 palabras
-- Amigable pero profesional
+- Amigable y profesional
 - Usa emojis moderadamente (2-3 por mensaje)
-- Siempre termina con pregunta de seguimiento"""
+- Siempre termina con pregunta de seguimiento
+- Si corriges ortografía del usuario, hazlo de forma natural sin señalarlo
+
+**EJEMPLO DE BÚSQUEDA CORRECTA:**
+Usuario: "buscame hotel oro verde"
+TÚ piensas: "Quiere el hotel Oro Verde, pero debo buscar por palabras clave"
+TÚ llamas: buscar_servicios(q="oro verde", tipo="alojamiento")
+Base de datos tiene: "Oro Verde Manta", "Oro Verde Guayaquil"
+TÚ respondes: "¡Encontré 2 opciones del Oro Verde! 🏨
+1. **Oro Verde Manta**...
+2. **Oro Verde Guayaquil**...
+¿Cuál te interesa?"
+
+**EJEMPLO DE BÚSQUEDA INCREMENTAL:**
+Usuario: "Hotel Hilton Colon Quito"
+Intento 1: buscar_servicios(q="hilton colon", tipo="alojamiento") → ✅ encuentra
+Si no encuentra:
+Intento 2: buscar_servicios(q="hilton", tipo="alojamiento") → buscar alternativa
+
+**NUNCA DIGAS:** "No encontré 'Hotel Oro Verde' exacto" 
+**SÍ DI:** "No encontré hoteles con ese nombre" (después de intentar variaciones)"""
 
 
-# EJECUTOR DE FUNCIONES MEJORADO
+# ============================================
+# EJECUTOR DE FUNCIONES
+# ============================================
 
 def ejecutar_funcion(nombre_funcion, parametros, request=None):
     """
-    Ejecuta funciones AJAX con validación y logging mejorado
+    Ejecuta funciones AJAX con validación
     """
     from apps.servicios.views import (
         buscar_servicios_ajax,
@@ -435,10 +368,10 @@ def ejecutar_funcion(nombre_funcion, parametros, request=None):
         mis_estadisticas_ajax
     )
     
-    # Limpiar parámetros
+    # Limpiar parámetros (remover vacíos y None)
     parametros_limpios = {
         k: v for k, v in parametros.items()
-        if v and v != "" and v != 0
+        if v is not None and v != "" and v != 0
     }
     
     factory = RequestFactory()
@@ -505,17 +438,19 @@ def ejecutar_funcion(nombre_funcion, parametros, request=None):
     
     except Exception as e:
         import traceback
-        print(f"Error ejecutando {nombre_funcion}: {str(e)}")
+        print(f"❌ Error ejecutando {nombre_funcion}: {str(e)}")
         print(traceback.format_exc())
-        return {"error": str(e), "success": False}
+        return {"error": str(e), "success": False, "traceback": traceback.format_exc()[:500]}
 
 
+# ============================================
 # VISTA PRINCIPAL DEL CHATBOT
+# ============================================
 
 @require_http_methods(["POST"])
 def chatbot_message(request):
     """
-    Procesa mensajes del chatbot con sistema de aprendizaje usando OpenAI GPT-4
+    Procesa mensajes del chatbot con GPT-4 (maneja errores ortográficos automáticamente)
     """
     try:
         data = json.loads(request.body)
@@ -528,71 +463,56 @@ def chatbot_message(request):
                 'error': 'Mensaje vacío'
             }, status=400)
         
-        # ========================================
-        # ANÁLISIS PREVIO DEL CONTEXTO
-        # ========================================
-        intencion = ContextValidator.identificar_intencion(mensaje_usuario)
-        params_detectados = ContextValidator.extraer_parametros(mensaje_usuario)
-        consultas_similares = ChatbotMemory.obtener_consultas_similares(mensaje_usuario)
+        # Construir mensajes para GPT-4
+        mensajes = [{"role": "system", "content": SYSTEM_PROMPT}]
         
-        # Construir contexto mejorado
-        contexto_extra = f"\n\n**ANÁLISIS DE CONTEXTO:**\n"
-        contexto_extra += f"- Intención detectada: {intencion['tipo']} (confianza: {intencion['confianza']})\n"
-        
-        if params_detectados:
-            contexto_extra += f"- Parámetros detectados: {json.dumps(params_detectados, ensure_ascii=False)}\n"
-        
-        if consultas_similares:
-            contexto_extra += f"- Consultas similares exitosas: {len(consultas_similares)}\n"
-            for sim in consultas_similares[:2]:
-                contexto_extra += f"  · '{sim['query']}' → {sim['funcion']}\n"
-        
-        if intencion['necesita_aclaracion']:
-            contexto_extra += "⚠️ AMBIGÜEDAD DETECTADA: Considera preguntar si busca SERVICIOS o DESTINOS\n"
-        
-        # Construir mensajes para LLM
-        mensajes = [{"role": "system", "content": SYSTEM_PROMPT + contexto_extra}]
-        
-        # Incluir historial (últimos 8 mensajes)
-        for msg in historial[-8:]:
+        # Incluir historial reciente (últimos 10 mensajes)
+        for msg in historial[-10:]:
             if msg.get('role') in ['user', 'assistant']:
                 mensajes.append({
                     "role": msg['role'],
                     "content": msg.get('content', '')
                 })
         
+        # Agregar mensaje actual
         mensajes.append({
             "role": "user",
             "content": mensaje_usuario
         })
-    
-        # PRIMERA LLAMADA A OPENAI
+        
+        # ========================================
+        # PRIMERA LLAMADA A GPT-4
+        # ========================================
         client = get_openai_client()
         
-        respuesta_openai = client.chat.completions.create(
-            model="gpt-4-turbo-preview",  # Cambia a gpt-4o si tienes acceso
+        respuesta_inicial = client.chat.completions.create(
+            model="gpt-4-turbo-preview",  # Cambiar a "gpt-4o" si tienes acceso
             messages=mensajes,
             tools=TOOLS,
             tool_choice="auto",
-            temperature=0.6,
-            max_tokens=500
+            temperature=0.7,
+            max_tokens=600
         )
         
-        mensaje_asistente = respuesta_openai.choices[0].message
+        mensaje_asistente = respuesta_inicial.choices[0].message
         
-        # PROCESAR HERRAMIENTAS
-        resultados_herramientas = []
-        
+        # ========================================
+        # PROCESAR LLAMADAS A FUNCIONES
+        # ========================================
         if mensaje_asistente.tool_calls:
+            resultados_funciones = []
+            
             for tool_call in mensaje_asistente.tool_calls:
                 nombre_funcion = tool_call.function.name
                 
                 try:
                     argumentos = json.loads(tool_call.function.arguments)
-                except json.JSONDecodeError:
+                except json.JSONDecodeError as e:
+                    print(f"⚠️ Error parseando argumentos: {e}")
                     argumentos = {}
                 
                 # Ejecutar función
+                print(f"🔧 Ejecutando: {nombre_funcion}({argumentos})")
                 resultado = ejecutar_funcion(nombre_funcion, argumentos, request)
                 
                 # Registrar en memoria
@@ -602,35 +522,71 @@ def chatbot_message(request):
                         nombre_funcion,
                         resultado
                     )
+                else:
+                    print(f"⚠️ Función retornó error: {resultado.get('error')}")
                 
-                resultados_herramientas.append({
+                resultados_funciones.append({
+                    "tool_call_id": tool_call.id,
                     "nombre": nombre_funcion,
                     "argumentos": argumentos,
                     "resultado": resultado,
                     "exitoso": resultado.get('success', False)
                 })
-
+            
+            # ========================================
             # SEGUNDA LLAMADA CON RESULTADOS
-            contexto_herramientas = "\n\n**RESULTADOS DE CONSULTAS:**\n"
+            # ========================================
             
-            for res in resultados_herramientas:
-                estado = "✅ ÉXITO" if res['exitoso'] else "❌ ERROR"
-                contexto_herramientas += f"\n**{res['nombre']}** {estado}:\n"
-                contexto_herramientas += f"```json\n{json.dumps(res['resultado'], ensure_ascii=False, indent=2)}\n```\n"
-            
-            # Agregar recordatorios críticos
-            contexto_herramientas += "\n🚨 **RECORDATORIOS:**\n"
-            contexto_herramientas += "1. Solo menciona datos que aparecen en los resultados\n"
-            contexto_herramientas += "2. Si 'servicios' o 'destinos' está vacío, di 'No encontré'\n"
-            contexto_herramientas += "3. Diferencia claramente SERVICIOS de DESTINOS\n"
-            
-            mensajes_con_resultados = [
-                {"role": "system", "content": SYSTEM_PROMPT + contexto_extra},
-                {"role": "user", "content": mensaje_usuario},
-                {"role": "assistant", "content": "Entendido, consultaré la información."},
-                {"role": "user", "content": f"{contexto_herramientas}\n\nAhora responde de forma clara, concisa y BASADA ÚNICAMENTE EN LOS DATOS ANTERIORES."}
+            # Construir mensajes con resultados de funciones
+            mensajes_con_resultados = mensajes + [
+                {
+                    "role": "assistant",
+                    "content": None,
+                    "tool_calls": mensaje_asistente.tool_calls
+                }
             ]
             
+            # Agregar resultados de cada función
+            for res in resultados_funciones:
+                mensajes_con_resultados.append({
+                    "role": "tool",
+                    "tool_call_id": res["tool_call_id"],
+                    "name": res["nombre"],
+                    "content": json.dumps(res["resultado"], ensure_ascii=False)
+                })
+            
+            # Agregar instrucciones finales
+            instrucciones_finales = """
+RESULTADOS OBTENIDOS. Ahora responde al usuario:
+
+🎯 REGLAS CRÍTICAS:
+1. Usa SOLO los datos de los resultados anteriores
+2. Si 'servicios' o 'destinos' está vacío → di "No encontré..."
+3. Sé conciso (máximo 150 palabras)
+4. Incluye enlaces solo si hay IDs reales
+5. Termina con pregunta de seguimiento
+6. Si encontraste múltiples opciones del mismo nombre en diferentes ubicaciones, menciónalas todas
+
+EJEMPLOS DE RESPUESTAS CORRECTAS:
+✅ Usuario buscó "Hotel Oro Verde" y encontraste 2:
+"¡Encontré 2 opciones del Oro Verde! 🏨
+1. **Oro Verde Manta** - $120/noche ⭐4.5
+2. **Oro Verde Guayaquil** - $150/noche ⭐4.8
+¿Cuál ubicación prefieres?"
+
+✅ Usuario buscó "Hilton" y encontraste 1:
+"¡Perfecto! Encontré el **Hilton Colon Quito** 🏨..."
+
+❌ NO digas: "No encontré 'Hotel Oro Verde' exactamente" (si lo encontraste con búsqueda flexible)
+
+NO inventes datos. NO menciones lugares que no aparecen en los resultados."""
+            
+            mensajes_con_resultados.append({
+                "role": "user",
+                "content": instrucciones_finales
+            })
+            
+            # Generar respuesta final
             respuesta_final = client.chat.completions.create(
                 model="gpt-4-turbo-preview",
                 messages=mensajes_con_resultados,
@@ -639,32 +595,40 @@ def chatbot_message(request):
             )
             
             respuesta_texto = respuesta_final.choices[0].message.content
+            
+            debug_info = {
+                'funciones_usadas': [r['nombre'] for r in resultados_funciones],
+                'argumentos': [r['argumentos'] for r in resultados_funciones],
+                'resultados_exitosos': [r['exitoso'] for r in resultados_funciones]
+            }
         else:
+            # No se necesitaron funciones
             respuesta_texto = mensaje_asistente.content or "Lo siento, no pude generar una respuesta."
+            debug_info = {'funciones_usadas': [], 'mensaje': 'Respuesta directa sin funciones'}
         
         return JsonResponse({
             'success': True,
             'response': respuesta_texto,
-            'debug': {
-                'intencion': intencion,
-                'params_detectados': params_detectados,
-                'funciones_usadas': [r['nombre'] for r in resultados_herramientas] if mensaje_asistente.tool_calls else []
-            } if settings.DEBUG else None
+            'debug': debug_info if settings.DEBUG else None
         })
         
     except Exception as e:
         import traceback
         error_msg = str(e)
-        print(f"Error en chatbot: {error_msg}")
-        print(traceback.format_exc())
+        error_trace = traceback.format_exc()
+        
+        print(f"❌ Error en chatbot: {error_msg}")
+        print(error_trace)
         
         # Registrar error
         if 'mensaje_usuario' in locals():
             ChatbotMemory.registrar_error(mensaje_usuario, error_msg)
         
+        # Respuesta amigable al usuario
         return JsonResponse({
             'success': False,
-            'error': 'Ocurrió un error al procesar tu mensaje. Por favor intenta de nuevo.'
+            'error': 'Lo siento, ocurrió un error al procesar tu mensaje. Por favor intenta de nuevo.',
+            'debug': {'error': error_msg, 'trace': error_trace[:500]} if settings.DEBUG else None
         }, status=500)
 
 
@@ -685,14 +649,14 @@ def estadisticas_chatbot(request):
     try:
         stats = {
             'funciones_mas_usadas': {},
-            'errores_recientes': [],
             'total_consultas': 0
         }
         
         # Obtener contadores de funciones
         funciones = [
             'buscar_servicios', 'buscar_destinos', 'obtener_estadisticas_servicios',
-            'obtener_estadisticas_destinos', 'comparar_servicios', 'obtener_recomendaciones'
+            'obtener_estadisticas_destinos', 'comparar_servicios', 'obtener_recomendaciones',
+            'obtener_destinos_por_region', 'obtener_estadisticas_reservas', 'obtener_mis_estadisticas'
         ]
         
         for func in funciones:

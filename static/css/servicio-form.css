@@ -1,0 +1,371 @@
+
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
+        }
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .animate-fadeIn {
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    /* Estilos personalizados para SweetAlert2 */
+    .swal2-popup {
+        border-radius: 1rem !important;
+        padding: 2rem !important;
+    }
+
+    .swal2-title {
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
+        color: #1f2937 !important;
+    }
+
+    .swal2-html-container {
+        font-size: 0.95rem !important;
+        color: #4b5563 !important;
+    }
+
+    .swal2-icon {
+        margin: 1rem auto 1.5rem !important;
+    }
+
+    /* Ancho personalizado para modales grandes */
+    .swal-wide {
+        width: 600px !important;
+        max-width: 90vw !important;
+    }
+
+    /* Botones con efecto hover mejorado */
+    .swal2-confirm:hover,
+    .swal2-cancel:hover,
+    .swal2-deny:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+        transition: all 0.2s ease !important;
+    }
+
+    /* Toast notifications más modernas */
+    .swal2-toast {
+        padding: 1rem 1.5rem !important;
+        border-radius: 0.75rem !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    }
+
+    .swal2-toast .swal2-title {
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
+        margin: 0 !important;
+    }
+
+    /* Progress bar del timer */
+    .swal2-timer-progress-bar {
+        background: linear-gradient(90deg, #3b82f6, #2563eb) !important;
+        height: 4px !important;
+    }
+
+    /* Iconos más grandes y coloridos */
+    .swal2-icon.swal2-success [class^='swal2-success-line'] {
+        background-color: #10b981 !important;
+    }
+
+    .swal2-icon.swal2-success .swal2-success-ring {
+        border-color: rgba(16, 185, 129, 0.3) !important;
+    }
+
+    .swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+        background-color: #ef4444 !important;
+    }
+
+    /* Animación de entrada suave */
+    .swal2-show {
+        animation: slideUp 0.3s ease-out !important;
+    }
+
+    /* Scrollbar personalizado en modales con mucho contenido */
+    .swal2-html-container::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .swal2-html-container::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 10px;
+    }
+
+    .swal2-html-container::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+
+    .swal2-html-container::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    /* Mejorar legibilidad de listas en modales */
+    .swal2-html-container ul {
+        margin: 0.5rem 0;
+        padding-left: 1.5rem;
+    }
+
+    .swal2-html-container li {
+        margin: 0.25rem 0;
+    }
+
+    /* Efecto de glassmorphism en loading */
+    .swal2-popup.swal2-loading {
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95) !important;
+    }
+
+    /* Ordenamiento de botones responsive */
+    @media (max-width: 640px) {
+        .swal2-actions {
+            flex-direction: column !important;
+            width: 100% !important;
+        }
+
+        .swal2-actions button {
+            width: 100% !important;
+            margin: 0.25rem 0 !important;
+        }
+
+        .swal-wide {
+            width: 95vw !important;
+        }
+    }
+@keyframes slideUp {
+    from { 
+        transform: translateY(20px); 
+        opacity: 0; 
+    }
+    to { 
+        transform: translateY(0); 
+        opacity: 1; 
+    }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Focus states */
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+/* Checkboxes personalizados */
+input[type="checkbox"] {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+input[type="checkbox"]:checked {
+    background-color: #0ea5e9;
+    border-color: #0ea5e9;
+}
+
+input[type="checkbox"]:hover:not(:disabled) {
+    border-color: #0ea5e9;
+}
+
+/* Scrollbar personalizado para textarea */
+textarea::-webkit-scrollbar {
+    width: 10px;
+}
+
+textarea::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #0ea5e9, #3b82f6);
+    border-radius: 10px;
+}
+
+/* Selección de texto */
+::selection {
+    background-color: rgba(14, 165, 233, 0.25);
+}
+
+/* Spinner animado */
+.fa-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Transiciones globales */
+button,
+a,
+input,
+select,
+textarea {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Estados deshabilitados */
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Zona de drag and drop */
+.border-dashed {
+    transition: all 0.3s ease;
+}
+
+/* Estados de validación de inputs */
+input.border-green-500 {
+    border-color: #10b981 !important;
+    background-color: #f0fdf4;
+}
+
+input.border-red-500 {
+    border-color: #ef4444 !important;
+    background-color: #fef2f2;
+}
+
+/* Container de notificaciones */
+#notificacionesContainer {
+    pointer-events: none;
+}
+
+#notificacionesContainer > div {
+    pointer-events: all;
+}
+
+/* Mejoras responsivas */
+@media (max-width: 640px) {
+    #notificacionesContainer > div {
+        min-width: 280px;
+        font-size: 0.875rem;
+    }
+}
+
+/* Animación suave para elementos eliminados */
+.removing {
+    animation: fadeOut 0.3s ease-out forwards;
+    transform: scale(0.8);
+}
+
+/* Mejora visual para el mapa */
+#map {
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+/* Hover effects para botones de acción */
+button:not(:disabled):hover {
+    transform: translateY(-1px);
+}
+
+button:not(:disabled):active {
+    transform: translateY(0);
+}
+
+/* Preview de imágenes con efecto hover */
+#imagenesPreview .group:hover img {
+    filter: brightness(1.1);
+}
+
+/* Indicador de carga en el formulario */
+form.submitted {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/* Mejora visual para selects */
+select {
+    background-image: none;
+}
+
+/* Scrollbar para el body cuando hay modales */
+body.modal-open {
+    overflow: hidden;
+}
+
+/* Sombras suaves para cards */
+.shadow-xl {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+                0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-2xl {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Efecto de loading skeleton (opcional) */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Mejora de accesibilidad */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Focus visible mejorado */
+*:focus-visible {
+    outline: 2px solid #0ea5e9;
+    outline-offset: 2px;
+}
+
+/* Modo oscuro (opcional - si lo implementas después) */
+@media (prefers-color-scheme: dark) {
+    /* Puedes agregar estilos para modo oscuro aquí */
+}

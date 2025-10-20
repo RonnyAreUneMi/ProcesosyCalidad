@@ -92,7 +92,25 @@ function initMap() {
         
         if (!latInput || !lngInput) {
             console.error('❌ CRÍTICO: No se encontraron inputs #latitud o #longitud');
-            alert('⚠️ ERROR: Los campos de latitud y longitud no están en el formulario.\n\nVerifica que el formulario tenga:\n<input id="latitud" name="latitud">\n<input id="longitud" name="longitud">');
+            
+            // ✅ REEMPLAZAR alert() POR SWAL
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: '⚠️ Error Crítico',
+                    html: `
+                        <div class="text-left">
+                            <p class="mb-3">Los campos de latitud y longitud no están en el formulario.</p>
+                            <div class="bg-gray-100 p-3 rounded text-xs font-mono">
+                                &lt;input id="latitud" name="latitud"&gt;<br>
+                                &lt;input id="longitud" name="longitud"&gt;
+                            </div>
+                        </div>
+                    `,
+                    icon: 'error',
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: '#dc2626'
+                });
+            }
             return;
         }
         
@@ -162,7 +180,34 @@ function initMap() {
             
             // Validar rango de Ecuador
             if (lat < -5 || lat > 2 || lng < -92 || lng > -75) {
-                alert('⚠️ La ubicación debe estar dentro de Ecuador\n\nRangos válidos:\n• Latitud: -5° a 2°\n• Longitud: -92° a -75°\n\nCoordenada seleccionada:\n• Lat: ' + lat.toFixed(6) + '\n• Lng: ' + lng.toFixed(6));
+                // ✅ REEMPLAZAR alert() POR SWAL
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: '⚠️ Ubicación fuera de Ecuador',
+                        html: `
+                            <div class="text-left">
+                                <p class="mb-3">La ubicación debe estar dentro de Ecuador.</p>
+                                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-3 mb-3">
+                                    <p class="font-semibold text-yellow-800 mb-2">Rangos válidos:</p>
+                                    <ul class="text-sm text-yellow-700 space-y-1">
+                                        <li>• Latitud: <strong>-5° a 2°</strong></li>
+                                        <li>• Longitud: <strong>-92° a -75°</strong></li>
+                                    </ul>
+                                </div>
+                                <div class="bg-red-50 border-l-4 border-red-500 p-3">
+                                    <p class="font-semibold text-red-800 mb-1">Coordenada seleccionada:</p>
+                                    <p class="text-sm text-red-700">
+                                        • Lat: <span class="font-mono">${lat.toFixed(6)}</span><br>
+                                        • Lng: <span class="font-mono">${lng.toFixed(6)}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        `,
+                        icon: 'warning',
+                        confirmButtonText: 'Entendido',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                }
                 return;
             }
             
@@ -173,7 +218,17 @@ function initMap() {
         
     } catch (error) {
         console.error('❌ Error al inicializar mapa:', error);
-        alert('Error al inicializar el mapa: ' + error.message);
+        
+        // ✅ REEMPLAZAR alert() POR SWAL
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Error al inicializar el mapa',
+                text: error.message,
+                icon: 'error',
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#dc2626'
+            });
+        }
         mapInitialized = false;
     }
 }
@@ -191,7 +246,17 @@ function updateMarker(lat, lng) {
     
     if (!latInput || !lngInput) {
         console.error('❌ CRÍTICO: Inputs de coordenadas no encontrados al actualizar marcador');
-        alert('⚠️ ERROR: No se pueden actualizar las coordenadas.\nLos campos latitud/longitud no existen en el formulario.');
+        
+        // ✅ REEMPLAZAR alert() POR SWAL
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: '⚠️ Error',
+                text: 'No se pueden actualizar las coordenadas. Los campos latitud/longitud no existen en el formulario.',
+                icon: 'error',
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#dc2626'
+            });
+        }
         return;
     }
     
@@ -292,13 +357,23 @@ function updateMarker(lat, lng) {
     console.log('✅ Marcador colocado correctamente');
 }
 
-function sincronizarMapa() {
+async function sincronizarMapa() {
     const latInput = document.getElementById('latitud');
     const lngInput = document.getElementById('longitud');
     
     if (!latInput || !lngInput) {
         console.error('⚠️ No se encontraron inputs de latitud/longitud');
-        alert('⚠️ ERROR: Los campos de coordenadas no están en el formulario');
+        
+        // ✅ REEMPLAZAR alert() POR SWAL
+        if (typeof Swal !== 'undefined') {
+            await Swal.fire({
+                title: '⚠️ Error',
+                text: 'Los campos de coordenadas no están en el formulario',
+                icon: 'error',
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#dc2626'
+            });
+        }
         return;
     }
     
@@ -308,17 +383,66 @@ function sincronizarMapa() {
     console.log('🔄 Sincronizando mapa con:', { lat, lng });
     
     if (isNaN(lat) || isNaN(lng)) {
-        alert('⚠️ Coordenadas inválidas');
+        // ✅ REEMPLAZAR alert() POR SWAL
+        if (typeof Swal !== 'undefined') {
+            await Swal.fire({
+                title: '⚠️ Coordenadas inválidas',
+                text: 'Por favor ingresa números válidos para latitud y longitud',
+                icon: 'warning',
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#f59e0b'
+            });
+        }
         return;
     }
     
     if (lat < -5 || lat > 2) {
-        alert('⚠️ Latitud fuera de rango: debe estar entre -5 y 2');
+        // ✅ REEMPLAZAR alert() POR SWAL
+        if (typeof Swal !== 'undefined') {
+            await Swal.fire({
+                title: '⚠️ Latitud fuera de rango',
+                html: `
+                    <div class="text-left">
+                        <p class="mb-2">La latitud debe estar entre <strong>-5° y 2°</strong></p>
+                        <div class="bg-red-50 border-l-4 border-red-500 p-3 rounded">
+                            <p class="text-sm text-red-700">
+                                Valor ingresado: <span class="font-mono font-bold">${lat.toFixed(6)}</span>
+                            </p>
+                        </div>
+                    </div>
+                `,
+                icon: 'warning',
+                confirmButtonText: 'Corregir',
+                confirmButtonColor: '#3b82f6'
+            });
+            latInput.focus();
+            latInput.select();
+        }
         return;
     }
     
     if (lng < -92 || lng > -75) {
-        alert('⚠️ Longitud fuera de rango: debe estar entre -92 y -75');
+        // ✅ REEMPLAZAR alert() POR SWAL
+        if (typeof Swal !== 'undefined') {
+            await Swal.fire({
+                title: '⚠️ Longitud fuera de rango',
+                html: `
+                    <div class="text-left">
+                        <p class="mb-2">La longitud debe estar entre <strong>-92° y -75°</strong></p>
+                        <div class="bg-red-50 border-l-4 border-red-500 p-3 rounded">
+                            <p class="text-sm text-red-700">
+                                Valor ingresado: <span class="font-mono font-bold">${lng.toFixed(6)}</span>
+                            </p>
+                        </div>
+                    </div>
+                `,
+                icon: 'warning',
+                confirmButtonText: 'Corregir',
+                confirmButtonColor: '#3b82f6'
+            });
+            lngInput.focus();
+            lngInput.select();
+        }
         return;
     }
     
@@ -338,14 +462,23 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('   <input type="number" id="longitud" name="longitud">');
     }
     
-    // Event listeners para sincronizar cuando se escriba manualmente
+    // Event listeners para sincronizar SOLO cuando el usuario presione Enter
+    // NO usar blur/change para evitar loops infinitos
     if (latInput) {
-        latInput.addEventListener('blur', sincronizarMapa);
-        latInput.addEventListener('change', sincronizarMapa);
+        latInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sincronizarMapa();
+            }
+        });
     }
     if (lngInput) {
-        lngInput.addEventListener('blur', sincronizarMapa);
-        lngInput.addEventListener('change', sincronizarMapa);
+        lngInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sincronizarMapa();
+            }
+        });
     }
     
     setTimeout(() => {
