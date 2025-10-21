@@ -339,6 +339,8 @@ Usuario: "Hotel Hilton Colon Quito"
 Intento 1: buscar_servicios(q="hilton colon", tipo="alojamiento") → ✅ encuentra
 Si no encuentra:
 Intento 2: buscar_servicios(q="hilton", tipo="alojamiento") → buscar alternativa
+recuerda que no solo puede ser hotel tambien comedor restaurante servicio turisitico 
+rutas, buses todo este tipo de cosas son los servicios que yo dipongo asi que en todo separa y encuentra el contexto
 
 **NUNCA DIGAS:** "No encontré 'Hotel Oro Verde' exacto" 
 **SÍ DI:** "No encontré hoteles con ese nombre" (después de intentar variaciones)"""
@@ -443,9 +445,6 @@ def ejecutar_funcion(nombre_funcion, parametros, request=None):
         return {"error": str(e), "success": False, "traceback": traceback.format_exc()[:500]}
 
 
-# ============================================
-# VISTA PRINCIPAL DEL CHATBOT
-# ============================================
 
 @require_http_methods(["POST"])
 def chatbot_message(request):

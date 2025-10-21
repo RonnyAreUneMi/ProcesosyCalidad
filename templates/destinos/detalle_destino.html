@@ -1,6 +1,196 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<style>
+    /* Estilos personalizados para servicios del destino */
+
+    /* Animación suave para cards */
+    .hover-shadow {
+        transition: all 0.3s ease;
+    }
+
+    .hover-shadow:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Line clamp para texto truncado */
+    .line-clamp-1 {
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Animación del badge de "Abierto" */
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    /* Efecto hover en las imágenes */
+    .group:hover img {
+        filter: brightness(1.05);
+    }
+
+    /* Backdrop blur para navegadores que lo soporten */
+    .backdrop-blur-sm {
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+    }
+
+    /* Mejora de sombras */
+    .shadow-xl {
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Transiciones suaves globales */
+    .transition-all {
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 300ms;
+    }
+
+    .transition-transform {
+        transition-property: transform;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 300ms;
+    }
+
+    .transition-colors {
+        transition-property: background-color, border-color, color, fill, stroke;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 300ms;
+    }
+
+    .transition-opacity {
+        transition-property: opacity;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 300ms;
+    }
+
+    .transition-shadow {
+        transition-property: box-shadow;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 300ms;
+    }
+
+    /* Transformaciones */
+    .transform {
+        transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+    }
+
+    .group:hover .group-hover\:scale-110 {
+        transform: scale(1.1);
+    }
+
+    .group:hover .group-hover\:translate-x-1 {
+        transform: translateX(0.25rem);
+    }
+
+    .group:hover .group-hover\:bg-opacity-40 {
+        background-opacity: 0.4;
+    }
+
+    .group:hover .group-hover\:opacity-100 {
+        opacity: 1;
+    }
+
+    /* Estilos para los iconos de tipo de servicio */
+    .servicio-icon {
+        font-size: 1.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .group:hover .servicio-icon {
+        transform: scale(1.1);
+    }
+
+    /* Mejora de accesibilidad */
+    a:focus,
+    button:focus {
+        outline: 2px solid #0ea5e9;
+        outline-offset: 2px;
+    }
+
+    /* Estilos para el mapa */
+    #map {
+        border-radius: 0.5rem;
+    }
+
+    /* Efecto de escala en categorías */
+    .group:hover .group-hover\:bg-sky-600 {
+        background-color: #0284c7;
+    }
+
+    .group:hover .group-hover\:text-white {
+        color: white;
+    }
+
+    /* Responsive: en móviles las cards ocupan todo el ancho */
+    @media (max-width: 768px) {
+        .md\:grid-cols-2 {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+        }
+        
+        .md\:grid-cols-3 {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+        }
+        
+        .md\:grid-cols-4 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    /* Mejora visual del gradiente del hero */
+    .gradient-overlay {
+        background: linear-gradient(to top, rgba(17, 24, 39, 0.95), rgba(17, 24, 39, 0.5), transparent);
+    }
+
+    /* Animación de entrada suave */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    /* Estilos para las estrellas de calificación */
+    .star-rating {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    /* Hover effect para destinos relacionados */
+    .destino-relacionado:hover img {
+        transform: scale(1.05);
+    }
+</style>
+{% endblock %}
 {% block content %}
 <!-- Hero Section con Imagen Principal -->
 <div class="relative h-96 bg-gray-900">
@@ -171,40 +361,214 @@
             </div>
             {% endif %}
 
-            <!-- Servicios Disponibles -->
-            {% if servicios_destino %}
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                    <i class="fas fa-concierge-bell text-sky-600 mr-3"></i>
-                    Servicios Disponibles
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {% for servicio in servicios_destino %}
-                    <a href="{% url 'servicios:detalle_servicio' servicio.slug %}" 
-                       class="block border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-sky-300 transition-all">
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0">
-                                <div class="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-hotel text-sky-600"></i>
+
+
+    <!-- Servicios Disponibles -->
+    {% if servicios_destino %}
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-gray-900 flex items-center">
+                <i class="fas fa-concierge-bell text-sky-600 mr-3"></i>
+                Servicios Disponibles
+            </h2>
+            <span class="px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-sm font-semibold">
+                {{ total_servicios }} servicio{{ total_servicios|pluralize }}
+            </span>
+        </div>
+
+        <!-- Grid de Servicios -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for servicio in servicios_destino %}
+            <div class="group border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-sky-300 transition-all duration-300">
+                <a href="{% url 'servicios:detalle_servicio' servicio.id %}" class="block">
+                    <!-- Imagen del Servicio -->
+                    <div class="relative h-48 overflow-hidden bg-gray-200">
+                        {% if servicio.imagenes.all.0 %}
+                        <img src="{{ servicio.imagenes.all.0.imagen.url }}" 
+                            alt="{{ servicio.nombre }}" 
+                            class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
+                        {% else %}
+                        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-sky-400 to-sky-600">
+                            <i class="fas fa-image text-white text-4xl opacity-50"></i>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Badge de Tipo -->
+                        <div class="absolute top-3 left-3">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-white/90 backdrop-blur-sm text-gray-800 shadow-lg">
+                                {% if servicio.tipo == 'alojamiento' %}
+                                    <i class="fas fa-hotel mr-1 text-sky-600"></i>
+                                {% elif servicio.tipo == 'restaurante' %}
+                                    <i class="fas fa-utensils mr-1 text-orange-600"></i>
+                                {% elif servicio.tipo == 'transporte' %}
+                                    <i class="fas fa-bus mr-1 text-green-600"></i>
+                                {% elif servicio.tipo == 'tour' %}
+                                    <i class="fas fa-hiking mr-1 text-purple-600"></i>
+                                {% elif servicio.tipo == 'actividad' %}
+                                    <i class="fas fa-bolt mr-1 text-yellow-600"></i>
+                                {% else %}
+                                    <i class="fas fa-concierge-bell mr-1 text-gray-600"></i>
+                                {% endif %}
+                                {{ servicio.get_tipo_display }}
+                            </span>
+                        </div>
+
+                        <!-- Badge de Disponibilidad -->
+                        {% if servicio.esta_abierto_ahora %}
+                        <div class="absolute top-3 right-3">
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-green-500 text-white shadow-lg">
+                                <span class="w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></span>
+                                Abierto
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Contenido del Servicio -->
+                    <div class="p-4">
+                        <!-- Nombre y Categoría -->
+                        <h3 class="font-bold text-lg text-gray-900 group-hover:text-sky-600 transition-colors mb-2 line-clamp-2">
+                            {{ servicio.nombre }}
+                        </h3>
+
+                        {% if servicio.categoria %}
+                        <p class="text-sm text-gray-500 mb-3 flex items-center">
+                            <i class="fas fa-tag mr-1"></i>
+                            {{ servicio.categoria.nombre }}
+                        </p>
+                        {% endif %}
+
+                        <!-- Ubicación -->
+                        <div class="flex items-start text-sm text-gray-600 mb-3">
+                            <i class="fas fa-map-marker-alt mt-1 mr-2 text-sky-600 flex-shrink-0"></i>
+                            <span class="line-clamp-1">{{ servicio.direccion }}</span>
+                        </div>
+
+                        <!-- Información adicional -->
+                        <div class="flex items-center gap-4 text-xs text-gray-500 mb-4 pb-4 border-b border-gray-100">
+                            {% if servicio.capacidad_maxima %}
+                            <span class="flex items-center">
+                                <i class="fas fa-users mr-1"></i>
+                                {{ servicio.capacidad_maxima }} personas
+                            </span>
+                            {% endif %}
+                            {% if servicio.telefono %}
+                            <span class="flex items-center">
+                                <i class="fas fa-phone mr-1"></i>
+                                Contacto
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Calificación y Precio -->
+                        <div class="flex items-center justify-between">
+                            <!-- Calificación -->
+                            <div class="flex items-center">
+                                <div class="flex items-center bg-yellow-50 px-2 py-1 rounded-lg">
+                                    <i class="fas fa-star text-yellow-400 text-sm mr-1"></i>
+                                    <span class="text-sm font-bold text-gray-900">
+                                        {{ servicio.calificacion_promedio|floatformat:1 }}
+                                    </span>
                                 </div>
+                                {% if servicio.total_calificaciones > 0 %}
+                                <span class="text-xs text-gray-500 ml-2">
+                                    ({{ servicio.total_calificaciones }})
+                                </span>
+                                {% endif %}
                             </div>
-                            <div class="ml-4 flex-1">
-                                <h3 class="font-bold text-gray-900">{{ servicio.nombre }}</h3>
-                                <p class="text-sm text-gray-600 mt-1">{{ servicio.get_tipo_display }}</p>
-                                <div class="flex items-center justify-between mt-2">
-                                    <div class="flex items-center">
-                                        <i class="fas fa-star text-yellow-400 text-sm mr-1"></i>
-                                        <span class="text-sm font-semibold">{{ servicio.calificacion_promedio|floatformat:1 }}</span>
-                                    </div>
-                                    <span class="text-lg font-bold text-sky-600">${{ servicio.precio_base }}</span>
+
+                            <!-- Precio -->
+                            <div class="text-right">
+                                <div class="flex items-baseline">
+                                    <span class="text-2xl font-bold text-sky-600">
+                                        ${{ servicio.precio|floatformat:0 }}
+                                    </span>
+                                    <span class="text-xs text-gray-500 ml-1">/persona</span>
                                 </div>
                             </div>
                         </div>
-                    </a>
-                    {% endfor %}
-                </div>
+
+                        <!-- Botón de acción -->
+                        <div class="mt-4">
+                            <div class="w-full py-2 px-4 bg-sky-600 text-white text-center rounded-lg font-semibold group-hover:bg-sky-700 transition-colors flex items-center justify-center">
+                                <span>Ver detalles</span>
+                                <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
             </div>
-            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Botón para ver todos los servicios -->
+        {% if total_servicios > 6 %}
+        <div class="mt-6 text-center">
+            <a href="{% url 'servicios:listar_servicios' %}?destino={{ destino.id }}" 
+            class="inline-flex items-center px-6 py-3 border-2 border-sky-600 text-sky-600 font-semibold rounded-lg hover:bg-sky-600 hover:text-white transition-colors">
+                <span>Ver todos los {{ total_servicios }} servicios</span>
+                <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Servicios por Tipo (opcional - sección adicional) -->
+    {% if servicios_por_tipo %}
+    <div class="bg-gradient-to-br from-sky-50 to-blue-50 rounded-xl shadow-lg p-6 mt-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+            <i class="fas fa-th-large text-sky-600 mr-3"></i>
+            Servicios por Categoría
+        </h2>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {% for tipo_nombre, datos in servicios_por_tipo.items %}
+            <a href="{% url 'servicios:listar_servicios' %}?destino={{ destino.id }}&tipo={{ datos.codigo }}" 
+            class="block p-4 bg-white rounded-lg shadow hover:shadow-lg transition-shadow group">
+                <div class="text-center">
+                    <div class="w-16 h-16 mx-auto mb-3 bg-sky-100 rounded-full flex items-center justify-center group-hover:bg-sky-600 transition-colors">
+                        {% if datos.codigo == 'alojamiento' %}
+                            <i class="fas fa-hotel text-2xl text-sky-600 group-hover:text-white"></i>
+                        {% elif datos.codigo == 'restaurante' %}
+                            <i class="fas fa-utensils text-2xl text-orange-600 group-hover:text-white"></i>
+                        {% elif datos.codigo == 'transporte' %}
+                            <i class="fas fa-bus text-2xl text-green-600 group-hover:text-white"></i>
+                        {% elif datos.codigo == 'tour' %}
+                            <i class="fas fa-hiking text-2xl text-purple-600 group-hover:text-white"></i>
+                        {% elif datos.codigo == 'actividad' %}
+                            <i class="fas fa-bolt text-2xl text-yellow-600 group-hover:text-white"></i>
+                        {% else %}
+                            <i class="fas fa-concierge-bell text-2xl text-gray-600 group-hover:text-white"></i>
+                        {% endif %}
+                    </div>
+                    <h3 class="font-bold text-gray-900 text-sm mb-1">{{ tipo_nombre }}</h3>
+                    <p class="text-xs text-gray-600">{{ datos.total }} servicio{{ datos.total|pluralize }}</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Mensaje cuando no hay servicios -->
+    <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+        <div class="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+            <i class="fas fa-inbox text-3xl text-gray-400"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">No hay servicios disponibles</h3>
+        <p class="text-gray-600 mb-6">
+            Aún no se han registrado servicios para este destino.
+        </p>
+        {% if user.is_authenticated and user.rol.nombre == 'proveedor' %}
+        <a href="{% url 'servicios:crear_servicio' %}" 
+        class="inline-flex items-center px-6 py-3 bg-sky-600 text-white font-semibold rounded-lg hover:bg-sky-700 transition-colors">
+            <i class="fas fa-plus mr-2"></i>
+            Agregar Servicio
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
 
             <!-- Calificaciones y Opiniones -->
             {% if calificaciones %}
@@ -260,7 +624,7 @@
                             <div class="ml-4 flex-1">
                                 <div class="flex items-center justify-between">
                                     <h4 class="font-semibold text-gray-900">
-                                        {{ calificacion.usuario.get_full_name|default:calificacion.usuario.email }}
+                                        {{ calificacion.usuario.get_full_name|default:calificacion.usuario.correo }}
                                     </h4>
                                     <span class="text-sm text-gray-500">{{ calificacion.fecha_creacion|date:"d M Y" }}</span>
                                 </div>
@@ -285,15 +649,6 @@
             </div>
             {% endif %}
 
-            <!-- Mapa de Ubicación -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                    <i class="fas fa-map text-sky-600 mr-3"></i>
-                    Ubicación
-                </h2>
-                <div id="map" class="w-full h-96 rounded-lg bg-gray-200"></div>
-            </div>
-
         </div>
 
         <!-- Sidebar -->
@@ -312,7 +667,7 @@
                 </div>
 
                 <div class="space-y-3">
-                    <a href="#" class="block w-full py-3 px-4 bg-sky-600 text-white text-center rounded-lg font-semibold hover:bg-sky-700 transition-colors">
+                    <a href="{% url 'servicios:listar_servicios' %}" class="block w-full py-3 px-4 bg-sky-600 text-white text-center rounded-lg font-semibold hover:bg-sky-700 transition-colors">
                         <i class="fas fa-calendar-check mr-2"></i>
                         Ver Servicios
                     </a>

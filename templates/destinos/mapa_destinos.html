@@ -74,33 +74,26 @@
     </div>
 
     <!-- Contenedor centrado y limitado -->
-    <div class="flex justify-center py-8">
-        <div class="w-full max-w-5xl bg-white rounded-xl shadow-lg overflow-hidden relative" style="height: 600px;">
+   <div class="flex justify-center py-8">
+    <div class="relative w-full max-w-5xl bg-white rounded-xl shadow-lg overflow-visible" style="height: 600px; z-index: 0;">
+        <!-- Mapa centrado -->
+        <div class="flex justify-center items-center w-full h-full">
             <div id="map" class="w-full h-full"></div>
-            
-            <!-- Loading overlay -->
-            <div id="mapLoading" class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50">
-                <div class="text-center">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mb-4"></div>
-                    <p class="text-gray-600 font-semibold">Cargando mapa...</p>
-                </div>
+        </div>
+        
+        <!-- Loading overlay -->
+        <div id="mapLoading" class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-10">
+            <div class="text-center">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mb-4"></div>
+                <p class="text-gray-600 font-semibold">Cargando mapa...</p>
             </div>
         </div>
     </div>
+</div>
 
 
-    <!-- Panel de Información (lateral) -->
-    <div id="infoPanel" class="hidden fixed top-24 right-6 w-96 bg-white rounded-xl shadow-2xl z-50 max-h-[calc(100vh-120px)] overflow-y-auto">
-        <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-xl">
-            <h3 class="text-lg font-bold text-gray-900">Información del Destino</h3>
-            <button onclick="cerrarInfoPanel()" class="text-gray-400 hover:text-gray-600 transition-colors">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-        </div>
-        <div id="infoPanelContent" class="p-6">
-            <!-- Contenido dinámico del destino seleccionado -->
-        </div>
-    </div>
+
+    
 
 </div>
 
@@ -257,10 +250,7 @@
         }
     }
 
-    // ========================================
-    // CREAR MARCADORES
-    // ========================================
-    // ========================================
+
 // CREAR MARCADORES
 // ========================================
 function crearMarcadores() {
@@ -307,7 +297,7 @@ function crearMarcadores() {
                             ${(destino.calificacion_promedio || 0).toFixed(1)}
                         </span>
                     </div>
-                    <a href="/destinos/detalle/${destino.slug}/" 
+                    <a href="/destinos/${destino.slug}/" 
                        style="display: inline-block; background-color: #0ea5e9; color: white; 
                               padding: 4px 8px; border-radius: 6px; text-decoration: none; 
                               font-size: 12px; font-weight: 600;">
@@ -359,72 +349,7 @@ function crearMarcadores() {
         cerrarInfoPanel();
     }
 
-    // ========================================
-    // MOSTRAR PANEL DE INFORMACIÓN
-    // ========================================
-    function mostrarInfoPanel(destino) {
-    const panel = document.getElementById('infoPanel');
-    const content = document.getElementById('infoPanelContent');
 
-    const mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${destino.latitud},${destino.longitud}&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C${destino.latitud},${destino.longitud}&key=TU_API_KEY`;
-
-    const regionIconsHtml = {
-        'costa': '<i class="fas fa-umbrella-beach text-blue-600"></i>',
-        'sierra': '<i class="fas fa-mountain text-green-600"></i>',
-        'oriente': '<i class="fas fa-tree text-yellow-600"></i>',
-        'galapagos': '<i class="fas fa-fish text-red-600"></i>'
-    };
-
-    content.innerHTML = `
-        <div class="space-y-4">
-            <img src="${mapImageUrl}" alt="${destino.nombre}" class="w-full h-48 object-cover rounded-lg"/>
-            <div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-2">${destino.nombre}</h3>
-                <div class="flex items-center gap-2 text-sm text-gray-600">
-                    ${regionIconsHtml[destino.region] || ''}
-                    <span>${getRegionName(destino.region)}</span>
-                </div>
-            </div>
-            <div class="flex items-center gap-2">
-                <div class="flex text-yellow-500">
-                    ${'★'.repeat(Math.round(destino.calificacion_promedio || 0))}${'☆'.repeat(5 - Math.round(destino.calificacion_promedio || 0))}
-                </div>
-                <span class="text-sm font-semibold text-gray-700">
-                    ${(destino.calificacion_promedio || 0).toFixed(1)} / 5.0
-                </span>
-            </div>
-            <p class="text-gray-600 leading-relaxed">${destino.descripcion_corta || 'Sin descripción disponible'}</p>
-            <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
-                <div>
-                    <p class="text-xs text-gray-500 mb-1">Latitud</p>
-                    <p class="text-sm font-semibold text-gray-900">${parseFloat(destino.latitud).toFixed(4)}</p>
-                </div>
-                <div>
-                    <p class="text-xs text-gray-500 mb-1">Longitud</p>
-                    <p class="text-sm font-semibold text-gray-900">${parseFloat(destino.longitud).toFixed(4)}</p>
-                </div>
-            </div>
-            <a href="/destinos/detalle/${destino.slug}/" 
-               class="block w-full text-center px-6 py-3 bg-sky-600 text-white rounded-lg font-semibold hover:bg-sky-700 transition-colors">
-                <i class="fas fa-info-circle mr-2"></i>
-                Ver detalles completos
-            </a>
-        </div>
-    `;
-
-    panel.classList.remove('hidden');
-}
-
-
-    // ========================================
-    // CERRAR PANEL DE INFORMACIÓN
-    // ========================================
-    function cerrarInfoPanel() {
-        const panel = document.getElementById('infoPanel');
-        if (panel) {
-            panel.classList.add('hidden');
-        }
-    }
 
     // ========================================
     // OBTENER NOMBRE DE REGIÓN
