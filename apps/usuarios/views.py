@@ -204,6 +204,7 @@ from django.db import transaction
 from django.utils import timezone
 from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db import models
 from django.db.models import Q, Count
 from .forms import LoginForm, RegisterForm, PerfilUsuarioForm
 from .models import Usuario, Rol
@@ -383,6 +384,8 @@ def home_view(request):
     Vista de página principal
     Redirige según el estado de autenticación
     """
+    from apps.reservas.models import Reserva
+
     destinos = Destino.objects.filter(activo=True).values(
         'id', 'nombre', 'slug', 'descripcion_corta',
         'latitud', 'longitud', 'region', 'calificacion_promedio'
@@ -403,21 +406,80 @@ def home_view(request):
     
     destinos_json = json.dumps(destinos_list)
     
+    # Inicializar estadísticas
+    estadisticas_usuario = None
+
+    # Si el usuario está autenticado, calcular sus estadísticas
+    if request.user.is_authenticated and hasattr(request.user, 'rol') and request.user.rol:
+        if request.user.rol.nombre == 'turista':
+            mis_reservas = Reserva.objects.filter(usuario=request.user)
+            gasto_total = mis_reservas.filter(
+                estado__in=[Reserva.CONFIRMADA, Reserva.COMPLETADA]
+            ).aggregate(total=models.Sum('costo_total'))['total'] or 0
+            
+            estadisticas_usuario = {
+                'rol': 'turista',
+                'total_reservas': mis_reservas.count(),
+                'destinos_visitados': mis_reservas.filter(estado=Reserva.COMPLETADA).values('servicio__destino').distinct().count(),
+                'gasto_total': float(gasto_total)
+            }
+        elif request.user.rol.nombre == 'proveedor':
+            from apps.servicios.models import Servicio
+            servicios_ids = Servicio.objects.filter(proveedor=request.user).values_list('id', flat=True)
+            reservas_servicios = Reserva.objects.filter(servicio_id__in=servicios_ids)
+            ingresos = reservas_servicios.filter(
+                estado__in=[Reserva.CONFIRMADA, Reserva.COMPLETADA]
+            ).aggregate(total=models.Sum('costo_total'))['total'] or 0
+
+            estadisticas_usuario = {
+                'rol': 'proveedor',
+                'total_reservas_recibidas': reservas_servicios.count(),
+                'reservas_pendientes': reservas_servicios.filter(estado=Reserva.PENDIENTE).count(),
+                'ingresos_totales': float(ingresos)
+            }
+
     context = {
         'title': 'Ecuador Turismo - Descubre lo Extraordinario',
         'destinos_json': destinos_json,
+        'estadisticas_usuario': estadisticas_usuario,
     }
     return render(request, 'home.html', context)
 
 @login_required
 @require_http_methods(["GET", "POST"])
 def perfil_view(request):
-    """
-    Vista de perfil de usuario
-    Permite editar información personal
-    """
+    from apps.reservas.models import Reserva
+    from apps.calificaciones.models import Calificacion
+
+    # Inicializar estadísticas
+    estadisticas_usuario = {
+        'total_reservas': 0,
+        'destinos_visitados': 0,
+        'total_calificaciones': 0,
+        'puntos': 0,  # Placeholder
+    }
+
+    # Calcular estadísticas si el usuario es turista
+    if request.user.is_authenticated and hasattr(request.user, 'rol') and request.user.rol and request.user.rol.nombre == 'turista':
+        mis_reservas = Reserva.objects.filter(usuario=request.user)
+        
+        estadisticas_usuario['total_reservas'] = mis_reservas.count()
+        
+        estadisticas_usuario['destinos_visitados'] = mis_reservas.filter(
+            estado=Reserva.COMPLETADA
+        ).values('servicio__destino').distinct().count()
+        
+        estadisticas_usuario['total_calificaciones'] = Calificacion.objects.filter(
+            usuario=request.user,
+            activo=True
+        ).count()
+
     if request.method == 'POST':
         form = PerfilUsuarioForm(request.POST, instance=request.user)
+        
+        # Validar contraseña actual si se intenta cambiar
+        password_actual = request.POST.get('password_actual')
+        password1 = request.POST.get('password1')
         
         # Validar contraseña actual si se intenta cambiar
         password_actual = request.POST.get('password_actual')
@@ -431,7 +493,8 @@ def perfil_view(request):
                     'form': form,
                     'title': 'Mi Perfil',
                     'user': request.user,
-                    'permisos': request.user.get_permisos()
+                    'permisos': request.user.get_permisos(),
+                    'estadisticas_usuario': estadisticas_usuario,
                 }
                 return render(request, 'usuarios/perfil.html', context)
         
@@ -455,6 +518,7 @@ def perfil_view(request):
         'form': form,
         'title': 'Mi Perfil',
         'user': request.user,
-        'permisos': request.user.get_permisos()
+        'permisos': request.user.get_permisos(),
+        'estadisticas_usuario': estadisticas_usuario,
     }
     return render(request, 'usuarios/profile.html', context)

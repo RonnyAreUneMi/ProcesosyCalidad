@@ -22,6 +22,9 @@ urlpatterns = [
     path('reservas/', include('apps.reservas.urls')),
     path('calificaciones/', include('apps.calificaciones.urls')),
     path('chatbot/', include('apps.chatbot.urls')),
+    #Idioma
+    path('i18n/', include('django.conf.urls.i18n')),
+
 ]
 
 # Configuración para servir archivos media y static en desarrollo

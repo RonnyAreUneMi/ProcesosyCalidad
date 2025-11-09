@@ -218,7 +218,7 @@
                         <!-- Botones de Acción -->
                         <div class="flex items-center justify-end space-x-4 mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
                             <a href="{% url 'home' %}" 
-                               class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 dark:bg-gray-900 transition-all duration-200">
+                               class="px-6 py-3 bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white rounded-lg font-semibold transition-all duration-200">
                                 <i class="fas fa-times mr-2"></i>
                                 Cancelar
                             </a>
@@ -233,14 +233,14 @@
 
                 <!-- Zona de Peligro -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mt-6" data-aos="fade-left" data-aos-delay="100">
-                    <div class="px-6 py-4 bg-red-50 border-b border-red-200 dark:border-red-800">
+                    <div class="px-6 py-4 bg-red-50 dark:bg-red-900/30 border-b border-red-200 dark:border-red-800">
                         <h3 class="text-lg font-bold text-red-800 dark:text-red-200 flex items-center">
                             <i class="fas fa-exclamation-triangle mr-2"></i>
                             Zona de Peligro
                         </h3>
                     </div>
-                    <div class="p-6">
-                        <div class="flex items-start justify-between">
+                    <div class="p-6 dark:bg-gray-800">
+                        <div class="flex items-center justify-between">
                             <div>
                                 <h4 class="font-semibold text-gray-900 dark:text-white mb-1">Eliminar Cuenta</h4>
                                 <p class="text-sm text-gray-600 dark:text-gray-300">
@@ -249,7 +249,7 @@
                             </div>
                             <button type="button" 
                                     onclick="alert('Funcionalidad de eliminación de cuenta próximamente')"
-                                    class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-all duration-200 text-sm whitespace-nowrap ml-4">
+                                    class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg font-semibold hover:bg-red-700 dark:hover:bg-red-800 transition-all duration-200 text-sm whitespace-nowrap ml-4">
                                 <i class="fas fa-trash-alt mr-1"></i>
                                 Eliminar Cuenta
                             </button>
@@ -261,11 +261,11 @@
 
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8" data-aos="fade-up">
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-t-4 border-blue-500">
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-t-4 border-blue-500 dark:border-blue-400">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Reservas</p>
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white">0</p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ estadisticas_usuario.total_reservas|default:0 }}</p>
                     </div>
                     <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
                         <i class="fas fa-calendar-check text-blue-600 text-xl"></i>
@@ -273,11 +273,11 @@
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-t-4 border-green-500">
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-t-4 border-green-500 dark:border-green-400">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Destinos Visitados</p>
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white">0</p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ estadisticas_usuario.destinos_visitados|default:0 }}</p>
                     </div>
                     <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
                         <i class="fas fa-map-marked-alt text-green-600 text-xl"></i>
@@ -285,11 +285,11 @@
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-t-4 border-yellow-500">
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-t-4 border-yellow-500 dark:border-yellow-400">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Reseñas</p>
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white">0</p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ estadisticas_usuario.total_calificaciones|default:0 }}</p>
                     </div>
                     <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center">
                         <i class="fas fa-star text-yellow-600 text-xl"></i>
@@ -297,13 +297,13 @@
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-t-4 border-purple-500">
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-t-4 border-purple-500 dark:border-purple-400">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Puntos</p>
-                        <p class="text-2xl font-bold text-gray-900 dark:text-white">0</p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ estadisticas_usuario.puntos|default:0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
                         <i class="fas fa-gift text-purple-600 text-xl"></i>
                     </div>
                 </div>

@@ -42,6 +42,11 @@
     .rol-option:hover {
         transform: scale(1.02);
     }
+    .gradient-text-dark {
+        background: linear-gradient(135deg, #4A90E2 0%, #81B4E0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
 </style>
 {% endblock %}
 
@@ -49,10 +54,18 @@
 <div class="auth-container">
     <div class="auth-card w-full max-w-2xl bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
         <!-- Header -->
-        <div class="text-center mb-8">
-            <div class="text-6xl mb-4">🇪🇨</div>
-            <h1 class="text-3xl font-bold gradient-text mb-2">Crear Cuenta</h1>
-            <p class="text-gray-600 dark:text-gray-300">Únete a Ecuador Turismo y comienza tu aventura</p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-6 mb-8 text-center sm:text-left">
+            <a href="{% url 'home' %}" class="inline-block flex-shrink-0">
+                <img class="h-24 w-auto" src="/media/logo.png" alt="Ecuador Turismo Logo"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="h-24 w-24 gradient-bg rounded-2xl items-center justify-center text-white text-5xl font-bold shadow-lg" style="display: none;">ET</div>
+            </a>
+            <div>
+                <h1 class="text-4xl font-bold gradient-text dark:gradient-text-dark mb-1">
+                    Crear Cuenta
+                </h1>
+                <p class="text-gray-600 dark:text-gray-400">Únete a Ecuador Turismo y comienza tu aventura</p>
+            </div>
         </div>
 
         <!-- Form -->
@@ -62,8 +75,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Nombre -->
                 <div>
-                    <label for="{{ form.nombre.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        <i class="fas fa-user mr-1"></i> Nombre Completo
+                    <label for="{{ form.nombre.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        <i class="fas fa-user mr-1 text-primary-light"></i> Nombre Completo
                     </label>
                     <div class="relative">
                         <i class="fas fa-id-card input-icon"></i>
@@ -78,8 +91,8 @@
 
                 <!-- Email -->
                 <div>
-                    <label for="{{ form.correo.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        <i class="fas fa-envelope mr-1"></i> Correo Electrónico
+                    <label for="{{ form.correo.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        <i class="fas fa-envelope mr-1 text-primary-light"></i> Correo Electrónico
                     </label>
                     <div class="relative">
                         <i class="fas fa-at input-icon"></i>
@@ -95,8 +108,8 @@
 
             <!-- Teléfono -->
             <div>
-                <label for="{{ form.telefono.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    <i class="fas fa-phone mr-1"></i> Teléfono (Opcional)
+                <label for="{{ form.telefono.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                    <i class="fas fa-phone mr-1 text-primary-light"></i> Teléfono (Opcional)
                 </label>
                 <div class="relative">
                     <i class="fas fa-mobile-alt input-icon"></i>
@@ -112,8 +125,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Password -->
                 <div>
-                    <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        <i class="fas fa-lock mr-1"></i> Contraseña
+                    <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        <i class="fas fa-lock mr-1 text-primary-light"></i> Contraseña
                     </label>
                     <div class="relative">
                         <i class="fas fa-key input-icon"></i>
@@ -129,8 +142,8 @@
 
                 <!-- Confirm Password -->
                 <div>
-                    <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        <i class="fas fa-lock mr-1"></i> Confirmar Contraseña
+                    <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        <i class="fas fa-lock mr-1 text-primary-light"></i> Confirmar Contraseña
                     </label>
                     <div class="relative">
                         <i class="fas fa-check-circle input-icon"></i>
@@ -146,22 +159,22 @@
 
             <!-- Tipo de Cuenta / Rol -->
             <div>
-                <label for="{{ form.rol.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    <i class="fas fa-user-tag mr-1"></i> Tipo de Cuenta
+                <label for="{{ form.rol.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
+                    <i class="fas fa-user-tag mr-1 text-primary-light"></i> Tipo de Cuenta
                 </label>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Opción Turista -->
                     <label class="rol-option cursor-pointer">
                         <input type="radio" name="{{ form.rol.name }}" value="" checked class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 peer hidden">
-                        <div class="border-2 border-gray-300 dark:border-gray-600 peer-checked:border-blue-600 rounded-xl p-4 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition">
+                        <div class="border-2 border-gray-300 dark:border-gray-600 peer-checked:border-primary-light rounded-xl p-4 hover:bg-blue-50 dark:hover:bg-gray-700/50 transition">
                             <div class="flex items-center space-x-3">
                                 <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white text-2xl">
                                     🎒
                                 </div>
                                 <div>
                                     <h4 class="font-bold text-gray-800 dark:text-gray-200">Turista</h4>
-                                    <p class="text-xs text-gray-600 dark:text-gray-300">Buscar y reservar destinos</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400">Buscar y reservar destinos</p>
                                 </div>
                             </div>
                         </div>
@@ -172,14 +185,14 @@
                         {% if rol.nombre == 'proveedor' %}
                         <label class="rol-option cursor-pointer">
                             <input type="radio" name="{{ form.rol.name }}" value="{{ rol.id }}" class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 peer hidden">
-                            <div class="border-2 border-gray-300 dark:border-gray-600 peer-checked:border-orange-600 rounded-xl p-4 hover:bg-orange-50 transition">
+                            <div class="border-2 border-gray-300 dark:border-gray-600 peer-checked:border-amber-500 rounded-xl p-4 hover:bg-amber-50 dark:hover:bg-gray-700/50 transition">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white text-2xl">
                                         🏨
                                     </div>
                                     <div>
                                         <h4 class="font-bold text-gray-800 dark:text-gray-200">Proveedor</h4>
-                                        <p class="text-xs text-gray-600 dark:text-gray-300">Ofrecer servicios turísticos</p>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400">Ofrecer servicios turísticos</p>
                                     </div>
                                 </div>
                             </div>
@@ -209,24 +222,24 @@
 
             <!-- Términos y Condiciones -->
             <div class="flex items-start">
-                <input type="checkbox" required class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-4 h-4 text-blue-600 rounded mt-1 focus:ring-2 focus:ring-blue-500">
-                <label class="ml-2 text-sm text-gray-600 dark:text-gray-300">
-                    Acepto los <a href="#" class="text-blue-600 hover:underline">Términos y Condiciones</a> y la 
-                    <a href="#" class="text-blue-600 hover:underline">Política de Privacidad</a>
+                <input type="checkbox" required class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-4 h-4 text-primary rounded mt-1 focus:ring-2 focus:ring-primary-light">
+                <label class="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                    Acepto los <a href="#" class="text-primary hover:text-primary-dark dark:text-primary-light dark:hover:text-white">Términos y Condiciones</a> y la 
+                    <a href="#" class="text-primary hover:text-primary-dark dark:text-primary-light dark:hover:text-white">Política de Privacidad</a>
                 </label>
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="w-full py-3 btn-gradient text-white rounded-xl font-bold text-lg hover:shadow-xl transition transform hover:scale-105">
+            <button type="submit" class="w-full py-3 btn-primary text-white rounded-xl font-bold text-lg hover:shadow-xl transition transform hover:scale-105">
                 <i class="fas fa-user-plus mr-2"></i>Crear Mi Cuenta
             </button>
         </form>
 
         <!-- Login Link -->
         <div class="mt-6 text-center">
-            <p class="text-gray-600 dark:text-gray-300">
+            <p class="text-gray-600 dark:text-gray-400">
                 ¿Ya tienes cuenta?
-                <a href="{% url 'usuarios:login' %}" class="text-blue-600 hover:text-blue-800 dark:text-blue-200 font-bold">
+                <a href="{% url 'usuarios:login' %}" class="font-medium text-primary hover:text-primary-dark dark:text-primary-light dark:hover:text-white">
                     Inicia sesión aquí
                 </a>
             </p>

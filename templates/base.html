@@ -6,9 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Ecuador Turismo - Descubre lo Extraordinario{% endblock %}</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/media/logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/media/logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/media/logo.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // Configurar Tailwind para modo oscuro
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -29,7 +33,6 @@
 
     <!-- Script para cargar el tema antes de renderizar -->
     <script>
-        // Cargar tema guardado antes de que se renderice la página (evita parpadeo)
         (function() {
             const theme = localStorage.getItem('theme') || 'light';
             if (theme === 'dark') {
@@ -37,7 +40,6 @@
             }
         })();
 
-        // Función para actualizar el contador del carrito
         function actualizarContadorCarrito() {
             fetch('{% url "reservas:carrito_count" %}')
                 .then(response => response.json())
@@ -55,7 +57,6 @@
                 .catch(error => console.error('Error:', error));
         }
 
-        // Función para actualizar el contador de reservas pendientes
         function actualizarContadorReservas() {
             fetch('{% url "reservas:reservas_pendientes_count" %}')
                 .then(response => response.json())
@@ -73,13 +74,11 @@
                 .catch(error => console.error('Error:', error));
         }
 
-        // Actualizar contadores cuando se carga la página
         document.addEventListener('DOMContentLoaded', function() {
             actualizarContadorCarrito();
             actualizarContadorReservas();
         });
 
-        // Establecer intervalos para actualizar los contadores cada minuto
         setInterval(actualizarContadorCarrito, 60000);
         setInterval(actualizarContadorReservas, 60000);
     </script>
@@ -95,7 +94,6 @@
             --light: #f0f4f8;
         }
 
-        /* Variables para modo oscuro */
         .dark {
             --primary: #4A90E2;
             --primary-dark: #0052A3;
@@ -305,12 +303,10 @@
             z-index: 1000;
         }
 
-        /* Footer spacing para evitar solapamiento con chatbot */
         footer {
             padding-bottom: 70px !important;
         }
 
-        /* En pantallas pequeñas, ajustar el espacio */
         @media (max-width: 640px) {
             footer {
                 padding-bottom: 85px !important;
@@ -525,15 +521,236 @@
                 right: 16px;
             }
         }
+
+        /* CHATBOT */
+        .chatbot-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+        }
+
+        footer {
+            padding-bottom: 70px !important;
+        }
+
+        @media (max-width: 640px) {
+            footer {
+                padding-bottom: 85px !important;
+            }
+            .chatbot-container {
+                bottom: 16px;
+                right: 16px;
+            }
+        }
+        
+        @keyframes borderPulse {
+            0%, 100% { 
+                border-color: #FFC400;
+                box-shadow: 0 4px 20px rgba(255, 196, 0, 0.4);
+            }
+            33% { 
+                border-color: #0052A3;
+                box-shadow: 0 4px 20px rgba(0, 82, 163, 0.4);
+            }
+            66% { 
+                border-color: #CE1126;
+                box-shadow: 0 4px 20px rgba(206, 17, 38, 0.4);
+            }
+        }
+        
+        .chatbot-button {
+            position: relative;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid #FFC400;
+            animation: borderPulse 3s ease-in-out infinite;
+        }
+        
+        .chatbot-button:hover {
+            transform: scale(1.1) translateY(-2px);
+            animation-play-state: paused;
+            box-shadow: 0 8px 30px rgba(0, 82, 163, 0.4);
+        }
+        
+        .chatbot-button img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .chatbot-button i {
+            color: #0052A3;
+            font-size: 28px;
+        }
+        
+        .chatbot-window {
+            position: absolute;
+            bottom: 85px;
+            right: 0;
+            width: 380px;
+            height: 550px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+            pointer-events: none;
+            transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
+        }
+
+        .dark .chatbot-window {
+            background: #1e293b;
+            border-color: #334155;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .chatbot-window.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: all;
+        }
+        
+        .chatbot-header {
+            background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid #FFC400;
+        }
+        
+        .chatbot-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8fafc;
+        }
+
+        .dark .chatbot-messages {
+            background: #0f172a;
+        }
+        
+        .chatbot-messages::-webkit-scrollbar { width: 6px; }
+        .chatbot-messages::-webkit-scrollbar-track { background: #e2e8f0; }
+        .chatbot-messages::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #FFC400 0%, #0052A3 50%, #CE1126 100%);
+            border-radius: 3px;
+        }
+        
+        .chatbot-input-area {
+            padding: 16px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .dark .chatbot-input-area {
+            background: #1e293b;
+            border-top-color: #334155;
+        }
+        
+        .chat-message {
+            margin-bottom: 16px;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .chat-message.user { flex-direction: row-reverse; }
+        
+        .chat-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .chat-message.bot .chat-avatar {
+            background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
+            color: white;
+        }
+        
+        .chat-message.user .chat-avatar {
+            background: linear-gradient(135deg, #FFC400 0%, #FFD700 100%);
+            color: #003875;
+        }
+        
+        .chat-bubble {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        
+        .chat-message.bot .chat-bubble {
+            background: white;
+            color: #1e293b;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .chat-message.bot .chat-bubble {
+            background: #334155;
+            color: #e2e8f0;
+        }
+        
+        .chat-message.user .chat-bubble {
+            background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .chatbot-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #CE1126;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            border: 2px solid white;
+        }
+        
+        @media (max-width: 640px) {
+            .chatbot-window {
+                width: calc(100vw - 32px);
+                max-height: calc(100vh - 170px); /* Evita que tape el header */
+                bottom: 85px;
+                right: 0; /* Relativo al contenedor */
+            }
+        }
+
     </style>
     
     {% block extra_css %}{% endblock %}
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
 
-    <!-- CSRF Token para JavaScript -->
     <script>
-        // Asegurar que el CSRF token esté disponible
         window.CSRF_TOKEN = '{{ csrf_token }}';
     </script>
 
@@ -552,8 +769,10 @@
     <header class="bg-white/80 dark:bg-gray-800/90 backdrop-blur-sm shadow-md sticky top-0 z-50 border-b border-gray-200/50 dark:border-gray-700/50 transition-colors duration-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-3">
-                <a href="{% url 'home' %}" class="flex items-center space-x-3 cursor-pointer hover:opacity-90 transition group">
-                    <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center text-white text-xl font-bold shadow-lg group-hover:shadow-xl transition-all duration-300">ET</div>
+                <a href="{% url 'home' %}" class="flex items-center space-x-2 cursor-pointer hover:opacity-90 transition group">
+                    <img src="/media/logo.png" alt="Ecuador Turismo Logo" class="h-12 w-auto group-hover:scale-105 transition-transform duration-300" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="w-10 h-10 gradient-bg rounded-lg items-center justify-center text-white text-xl font-bold shadow-lg group-hover:shadow-xl transition-all duration-300" style="display: none;">ET</div>
                     <div>
                         <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-sky-500 dark:from-blue-400 dark:to-sky-300">Ecuador Turismo</h1>
                         <p class="text-xs text-gray-500 dark:text-gray-400">Descubre lo Extraordinario</p>
@@ -578,7 +797,6 @@
                     <div class="w-px h-6 bg-gray-200 dark:bg-gray-700/50"></div>
 
                     {% if user.is_authenticated %}
-                        <!-- Contadores según el rol -->
                         {% if user.rol.nombre == 'turista' %}
                             <a href="{% url 'reservas:ver_carrito' %}" class="relative p-2 hover:bg-blue-50 dark:hover:bg-gray-700/50 rounded-lg transition-all duration-300 group">
                                 <i class="fas fa-shopping-cart text-xl text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-all"></i>
@@ -593,13 +811,12 @@
                     {% endif %}
 
                     <!-- Botón de modo oscuro -->
-                    <button onclick="toggleDarkMode()" class="p-2 hover:bg-blue-50 dark:hover:bg-gray-700/50 rounded-lg transition-all duration-300 group ml-2" title="Cambiar tema">
+                    <button onclick="toggleDarkMode()" class="p-2 hover:bg-blue-50 dark:hover:bg-gray-700/50 rounded-lg transition-all duration-300 group" title="Cambiar tema">
                         <i class="fas fa-moon text-gray-700 dark:text-gray-300 text-lg dark:hidden group-hover:text-blue-600 group-hover:rotate-12 transform transition-all"></i>
                         <i class="fas fa-sun text-amber-400 text-lg hidden dark:inline group-hover:text-amber-300 group-hover:rotate-12 transform transition-all"></i>
                     </button>
                     
                     {% if user.is_authenticated %}
-                        
                         <div class="relative ml-3" x-data="{ open: false }">
                             <button @click="open = !open" class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700/50 transition-all duration-300 group">
                                 <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-sky-400 dark:from-blue-600 dark:to-sky-500 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md group-hover:shadow-lg transition-all">
@@ -720,29 +937,10 @@
         </div>
     </header>
     
-    {% if messages %}
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            {% for message in messages %}
-                <div class="{% if message.tags == 'error' %}message-error{% elif message.tags == 'success' %}message-success{% elif message.tags == 'warning' %}message-warning{% else %}message-info{% endif %} text-white px-6 py-4 rounded-lg shadow-lg mb-3 fade-in flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <div class="flex-shrink-0">
-                            {% if message.tags == 'error' %}<i class="fas fa-exclamation-circle text-xl"></i>
-                            {% elif message.tags == 'success' %}<i class="fas fa-check-circle text-xl"></i>
-                            {% elif message.tags == 'warning' %}<i class="fas fa-exclamation-triangle text-xl"></i>
-                            {% else %}<i class="fas fa-info-circle text-xl"></i>{% endif %}
-                        </div>
-                        <p class="font-medium">{{ message }}</p>
-                    </div>
-                    <button onclick="this.parentElement.remove()" class="text-white hover:text-gray-200 transition ml-4">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-    
     <main class="flex-grow">
-        {% block content %}{% endblock %}
+        {% block content %}
+            {# El contenido de las páginas hijas irá aquí #}
+        {% endblock %}
     </main>
     
     <div class="chatbot-container">
@@ -781,14 +979,14 @@
         </div>
     </div>
     
-    <!-- FOOTER OPTIMIZADO -->
     <footer class="bg-gray-900 dark:bg-gray-900 text-white py-4 mt-auto border-t border-gray-700/50 dark:border-cyan-500/20 transition-colors">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col sm:flex-row items-center justify-between">
-                <div class="flex items-center space-x-3 mb-2 sm:mb-0">
-                    <div class="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center text-white text-sm font-bold shadow-md">
-                        ET
-                    </div>
+                <div class="flex items-center space-x-2 mb-2 sm:mb-0">
+                    <img src="/media/logo.png" alt="Ecuador Turismo Logo" class="h-8 w-auto" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="w-8 h-8 gradient-bg rounded-lg items-center justify-center text-white text-sm font-bold shadow-md" style="display: none;">ET</div>
+
                     <div class="flex items-center space-x-2 divide-x divide-gray-700">
                         <span class="text-sm font-medium text-gray-300">&copy; 2025 Ecuador Turismo</span>
                         <span class="text-xs text-gray-400 pl-2">Todos los derechos reservados</span>
@@ -802,19 +1000,13 @@
             </div>
         </div>
     </footer>
-            </div>
-        </div>
-    </footer>
 
-    
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
     <script>
-/// MODO OSCURO
 function toggleDarkMode() {
     const html = document.documentElement;
     const isDark = html.classList.contains('dark');
-
     if (isDark) {
         html.classList.remove('dark');
         localStorage.setItem('theme', 'light');
@@ -824,7 +1016,6 @@ function toggleDarkMode() {
     }
 }
 
-// Aplicar tema guardado al cargar
 document.addEventListener('DOMContentLoaded', function() {
     const theme = localStorage.getItem('theme') || 'light';
     if (theme === 'dark') {
@@ -832,13 +1023,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-/// INICIALIZACIÓN
 AOS.init({ duration: 600, once: true, offset: 80, easing: 'ease-out' });
 
-// LOADER AUTOMÁTICO
-window.addEventListener('beforeunload', function() {
-    mostrarLoader();
-});
+window.addEventListener('beforeunload', function() { mostrarLoader(); });
 
 document.addEventListener('click', function(e) {
     const link = e.target.closest('a');
@@ -899,11 +1086,9 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// LOADER
 function mostrarLoader() { document.getElementById('loaderOverlay').classList.add('active'); }
 function ocultarLoader() { document.getElementById('loaderOverlay').classList.remove('active'); }
 
-// CONTADOR CARRITO
 function actualizarContadorCarrito() {
     {% if user.is_authenticated and user.rol.nombre == 'turista' %}
         fetch('{% url "reservas:ver_carrito" %}')
@@ -927,7 +1112,6 @@ function actualizarContadorCarrito() {
     setInterval(actualizarContadorCarrito, 30000);
 {% endif %}
 
-// CHATBOT OPTIMIZADO
 const CHAT_HISTORY_KEY = 'ecuadorTurismoChatHistory';
 let isProcessing = false;
 
@@ -1035,17 +1219,10 @@ async function sendChatMessage() {
 
 function detectarTipoConsulta(mensaje) {
     const mensajeLower = mensaje.toLowerCase();
-    
     const patternsSaludos = ['hola', 'buenos dias', 'buenas tardes', 'quien eres', 'que eres', 'como te llamas', 'adios', 'gracias', 'que puedes hacer'];
-    if (patternsSaludos.some(p => mensajeLower.includes(p))) {
-        return 'instantanea';
-    }
-    
+    if (patternsSaludos.some(p => mensajeLower.includes(p))) return 'instantanea';
     const patternsConsulta = ['buscar', 'recomendar', 'quiero', 'necesito', 'precio', 'costo', 'hotel', 'tour', 'destino', 'servicio'];
-    if (patternsConsulta.some(p => mensajeLower.includes(p))) {
-        return 'consulta';
-    }
-    
+    if (patternsConsulta.some(p => mensajeLower.includes(p))) return 'consulta';
     return 'general';
 }
 
@@ -1114,7 +1291,6 @@ function mostrarIndicadorEscritura(tipoConsulta) {
         bubbleDiv.innerHTML = crearIndicadorCarga('Procesando...');
     } else if (tipoConsulta === 'consulta') {
         bubbleDiv.innerHTML = crearIndicadorCarga('Consultando base de datos...');
-        
         setTimeout(() => {
             if (typingDiv.parentElement) {
                 bubbleDiv.innerHTML = crearIndicadorCarga('Analizando resultados...');
@@ -1122,7 +1298,6 @@ function mostrarIndicadorEscritura(tipoConsulta) {
         }, 2000);
     } else {
         bubbleDiv.innerHTML = crearIndicadorCarga('Analizando tu consulta...');
-        
         setTimeout(() => {
             if (typingDiv.parentElement) {
                 bubbleDiv.innerHTML = crearIndicadorCarga('Buscando información...');
@@ -1142,11 +1317,11 @@ function crearIndicadorCarga(texto) {
     return `
         <div class="flex items-center space-x-2">
             <div class="flex space-x-1">
-                <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
-                <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-                <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                <div class="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full animate-bounce"></div>
+                <div class="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                <div class="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
             </div>
-            <span class="text-gray-600 text-sm">${texto}</span>
+            <span class="text-gray-600 dark:text-gray-300 text-sm">${texto}</span>
         </div>
     `;
 }
@@ -1178,27 +1353,22 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// Obtener CSRF token al cargar la página
 function getCSRFToken() {
-    // 1. Intentar obtener de variable global
     if (window.CSRF_TOKEN) {
         return window.CSRF_TOKEN;
     }
 
-    // 2. Intentar obtener de cookie
     let token = getCookie('csrftoken');
     if (token) {
         return token;
     }
 
-    // 3. Intentar obtener del meta tag
     const metaTag = document.querySelector('meta[name="csrf-token"]');
     if (metaTag) {
         token = metaTag.getAttribute('content');
         if (token) return token;
     }
 
-    // 4. Intentar obtener del input hidden
     const inputTag = document.querySelector('input[name="csrfmiddlewaretoken"]');
     if (inputTag && inputTag.value) {
         return inputTag.value;

@@ -1037,9 +1037,12 @@ def validar_configuracion():
     
     errores = []
     
-    # Validar API Key de OpenAI
-    if not hasattr(settings, 'OPENAI_API_KEY') or not settings.OPENAI_API_KEY:
-        errores.append("OPENAI_API_KEY no configurada en settings.py")
+    # Validar que al menos una API Key (OpenAI o Groq) esté configurada
+    has_openai_key = hasattr(settings, 'OPENAI_API_KEY') and settings.OPENAI_API_KEY
+    has_groq_key = hasattr(settings, 'GROQ_API_KEY') and settings.GROQ_API_KEY
+    
+    if not has_openai_key and not has_groq_key:
+        errores.append("No se ha configurado ni OPENAI_API_KEY ni GROQ_API_KEY en el archivo .env")
     
     # Validar que las apps necesarias estén instaladas
     required_apps = ['apps.servicios', 'apps.destinos', 'apps.chatbot']

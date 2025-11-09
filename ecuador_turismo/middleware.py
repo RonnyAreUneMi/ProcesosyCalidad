@@ -96,29 +96,6 @@ class SecurityHeadersMiddleware(MiddlewareMixin):
             'microphone=(), payment=()'
         )
 
-        # Content Security Policy - Permitir CDNs necesarios
-        csp = (
-            "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' "
-            "https://cdn.tailwindcss.com "
-            "https://cdn.jsdelivr.net "
-            "https://cdnjs.cloudflare.com "
-            "https://unpkg.com; "
-            "style-src 'self' 'unsafe-inline' "
-            "https://cdn.tailwindcss.com "
-            "https://fonts.googleapis.com "
-            "https://cdnjs.cloudflare.com "
-            "https://unpkg.com; "
-            "img-src 'self' data: https: blob: "
-            "https://images.unsplash.com "
-            "https://raw.githubusercontent.com "
-            "https://*.tile.openstreetmap.org; "
-            "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
-            "connect-src 'self' https://*.tile.openstreetmap.org; "
-            "frame-ancestors 'none';"
-        )
-        response['Content-Security-Policy'] = csp
-
         return response
 
 
@@ -195,4 +172,3 @@ class ConnectionHandlingMiddleware(MiddlewareMixin):
         if isinstance(exception, (ConnectionError, TimeoutError)):
             logger.warning(f"Conexión perdida: {request.path}")
             return HttpResponseServerError("Error de conexión")
-
