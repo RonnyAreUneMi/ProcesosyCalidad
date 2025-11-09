@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/crear_ruta.css' %}">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-sky-50 dark:from-gray-900/80 dark:via-gray-900 dark:to-gray-800/90 dark:bg-opacity-95 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 dark:bg-gray-900/20 rounded-xl backdrop-blur-sm">
+        
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                        <i class="fas fa-route text-sky-600 dark:text-sky-400 mr-2"></i>
+                        Planificador de Rutas
+                    </h1>
+                    <p class="text-gray-600 dark:text-gray-300">Selecciona un destino y elige la mejor ruta para llegar</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección del Mapa y Selección -->
+        <div class="bg-white/80 dark:bg-gray-800/30 dark:backdrop-blur-sm rounded-xl shadow-lg p-6 dark:border dark:border-gray-700/30 backdrop-blur-sm">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+                <div class="w-8 h-8 bg-sky-100 dark:bg-sky-900/30 rounded-lg flex items-center justify-center mr-3 backdrop-blur-sm">
+                    <i class="fas fa-route text-sky-600 dark:text-sky-400 mr-2"></i>
+                </div>
+                Selecciona un Destino
+            </h2>
+            <p class="text-gray-600 dark:text-gray-300 mb-4">Localiza tu posición y elige un destino para ver las opciones de rutas disponibles.</p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Lista de Destinos -->
+                <div class="lg:col-span-1">
+                    <div class="bg-gray-50/30 dark:bg-gray-900/20 backdrop-blur-sm rounded-lg p-4 border border-gray-200/30 dark:border-gray-700/30">
+                        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3 flex items-center">
+                            <i class="fas fa-list mr-2 text-sky-600 dark:text-sky-400"></i>
+                            Destinos Disponibles
+                        </h3>
+                        
+                        <div class="mb-3">
+                            <input type="text" 
+                                   id="buscar-destino" 
+                                   placeholder="Buscar destino..."
+                                   class="text-gray-900 dark:text-white bg-white/50 dark:bg-gray-800/50 w-full px-3 py-2 text-sm border border-gray-300/50 dark:border-gray-600/50 rounded-lg focus:ring-2 focus:ring-sky-500 dark:focus:ring-sky-400 focus:border-sky-500 dark:focus:border-sky-400 outline-none placeholder-gray-500 dark:placeholder-gray-400">
+                        </div>
+
+                        <div class="mb-3">
+                            <select id="filtro-region" 
+                                    class="text-gray-900 dark:text-white bg-white/50 dark:bg-gray-800/50 w-full px-3 py-2 text-sm border border-gray-300/50 dark:border-gray-600/50 rounded-lg focus:ring-2 focus:ring-sky-500 dark:focus:ring-sky-400 focus:border-sky-500 dark:focus:border-sky-400 outline-none">
+                                <option value="" class="bg-white dark:bg-gray-800">Todas las regiones</option>
+                                <option value="costa" class="bg-white dark:bg-gray-800">Costa</option>
+                                <option value="sierra" class="bg-white dark:bg-gray-800">Sierra</option>
+                                <option value="oriente" class="bg-white dark:bg-gray-800">Oriente/Amazonía</option>
+                                <option value="galapagos" class="bg-white dark:bg-gray-800">Galápagos</option>
+                            </select>
+                        </div>
+                        
+                        <div id="lista-destinos" class="destinos-scroll space-y-2 max-h-96 overflow-y-auto pr-2">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mapa -->
+                <div class="lg:col-span-3">
+                    <div class="mb-2 flex justify-end">
+                        <button type="button" onclick="recargarMapa()" class="text-xs px-3 py-1 bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-400 rounded-lg hover:bg-sky-200 dark:hover:bg-sky-800/50 transition">
+                            <i class="fas fa-sync-alt mr-1"></i>
+                            Recargar mapa
+                        </button>
+                    </div>
+                    <div id="map" style="height: 500px; width: 100%; border-radius: 0.5rem;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Opciones de Rutas -->
+        <div id="rutas-opciones" class="bg-white dark:bg-gray-800/90 dark:backdrop-blur-sm rounded-xl shadow-lg p-6 mt-6 dark:border dark:border-gray-700/50" style="display: none;">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+                <div class="w-8 h-8 bg-green-100 dark:bg-green-900/50 rounded-lg flex items-center justify-center mr-3">
+                    <i class="fas fa-route text-green-600 dark:text-green-400"></i>
+                </div>
+                Opciones de Rutas Disponibles
+            </h2>
+            <p class="text-gray-600 dark:text-gray-300 mb-6">Selecciona la ruta que prefieras para llegar a tu destino</p>
+            
+            <div id="lista-rutas" class="space-y-4">
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Scripts externos -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+<!-- Variables de datos -->
+<script>
+    var destinos = {{ destinos_json|safe }};
+    var transporteData = {{ transporte_json|safe }};
+    var transporteServices = {{ transporte_services_json|safe }};
+</script>
+
+<!-- Scripts de la aplicación -->
+<script src="{% static 'js/servicios/crear_ruta_functions.js' %}"></script>
+
+{% endblock %}

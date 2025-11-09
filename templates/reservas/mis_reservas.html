@@ -4,70 +4,65 @@
 {% block title %}Mis Reservas - Ecuador Turismo{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50 py-8">
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/10 to-sky-50/20 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8">
     <div class="container mx-auto px-4 max-w-7xl">
         <!-- Encabezado con estadísticas -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-6">Mis Reservas</h1>
+            <h1 class="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6 flex items-center">
+                <i class="fas fa-calendar-check mr-3 text-blue-500 dark:text-blue-400"></i>
+                Mis Reservas
+            </h1>
             
             <!-- Tarjetas de estadísticas -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <!-- Total de reservas -->
-                <div class="bg-white rounded-lg shadow p-6">
+                <div class="bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-white/20 dark:border-gray-700/30 group hover:shadow-2xl transition-all duration-300">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-600 mb-1">Total Reservas</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ total_reservas }}</p>
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Total Reservas</p>
+                            <p class="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">{{ total_reservas }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                            </svg>
+                        <div class="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 dark:from-blue-500 dark:to-blue-700 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-book text-white text-xl"></i>
                         </div>
                     </div>
                 </div>
 
                 <!-- Pendientes -->
-                <div class="bg-white rounded-lg shadow p-6">
+                <div class="bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-white/20 dark:border-gray-700/30 group hover:shadow-2xl transition-all duration-300">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-600 mb-1">Pendientes</p>
-                            <p class="text-2xl font-bold text-yellow-600">{{ reservas_pendientes }}</p>
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Pendientes</p>
+                            <p class="text-3xl font-bold text-yellow-500 dark:text-yellow-400">{{ reservas_pendientes }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
+                        <div class="w-14 h-14 bg-gradient-to-br from-yellow-400 to-amber-500 dark:from-yellow-500 dark:to-amber-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-clock text-white text-xl group-hover:animate-spin"></i>
                         </div>
                     </div>
                 </div>
 
                 <!-- Completadas -->
-                <div class="bg-white rounded-lg shadow p-6">
+                <div class="bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-white/20 dark:border-gray-700/30 group hover:shadow-2xl transition-all duration-300">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-600 mb-1">Completadas</p>
-                            <p class="text-2xl font-bold text-green-600">{{ reservas_completadas }}</p>
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Completadas</p>
+                            <p class="text-3xl font-bold text-green-500 dark:text-green-400">{{ reservas_completadas }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
+                        <div class="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-500 dark:from-green-500 dark:to-emerald-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-check-circle text-white text-xl group-hover:rotate-12"></i>
                         </div>
                     </div>
                 </div>
 
                 <!-- Gasto total -->
-                <div class="bg-white rounded-lg shadow p-6">
+                <div class="bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-white/20 dark:border-gray-700/30 group hover:shadow-2xl transition-all duration-300">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-600 mb-1">Gasto Total</p>
-                            <p class="text-2xl font-bold text-blue-600">${{ gasto_total|floatformat:2 }}</p>
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Gasto Total</p>
+                            <p class="text-3xl font-bold text-blue-500 dark:text-blue-400">${{ gasto_total|floatformat:2 }}</p>
                         </div>
-                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
+                        <div class="w-14 h-14 bg-gradient-to-br from-blue-400 to-sky-500 dark:from-blue-500 dark:to-sky-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-dollar-sign text-white text-xl group-hover:bounce"></i>
                         </div>
                     </div>
                 </div>
@@ -75,30 +70,37 @@
         </div>
 
         <!-- Filtros y acciones -->
-        <div class="bg-white rounded-lg shadow p-4 mb-6">
+        <div class="bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-white/20 dark:border-gray-700/30 mb-6">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <!-- Filtros por estado -->
-                <div class="flex items-center gap-2">
-                    <span class="text-sm text-gray-600 font-medium">Filtrar por:</span>
-                    <div class="flex gap-2">
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-medium bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                        <i class="fas fa-filter mr-2"></i>Filtrar por:
+                    </span>
+                    <div class="flex flex-wrap gap-2">
                         <a href="{% url 'reservas:mis_reservas' %}" 
-                           class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {% if not filtro_estado %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                           class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 {% if not filtro_estado %}bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg hover:shadow-xl hover:scale-105{% else %}bg-white/50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20{% endif %}">
+                            <i class="fas fa-list-ul mr-2"></i>
                             Todas
                         </a>
                         <a href="?estado=pendiente" 
-                           class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {% if filtro_estado == 'pendiente' %}bg-yellow-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                           class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 {% if filtro_estado == 'pendiente' %}bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-lg hover:shadow-xl hover:scale-105{% else %}bg-white/50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/20{% endif %}">
+                            <i class="fas fa-clock mr-2"></i>
                             Pendientes
                         </a>
                         <a href="?estado=confirmada" 
-                           class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {% if filtro_estado == 'confirmada' %}bg-green-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                           class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 {% if filtro_estado == 'confirmada' %}bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg hover:shadow-xl hover:scale-105{% else %}bg-white/50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900/20{% endif %}">
+                            <i class="fas fa-check mr-2"></i>
                             Confirmadas
                         </a>
                         <a href="?estado=completada" 
-                           class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {% if filtro_estado == 'completada' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                           class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 {% if filtro_estado == 'completada' %}bg-gradient-to-r from-blue-500 to-sky-500 text-white shadow-lg hover:shadow-xl hover:scale-105{% else %}bg-white/50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20{% endif %}">
+                            <i class="fas fa-flag-checkered mr-2"></i>
                             Completadas
                         </a>
                         <a href="?estado=cancelada" 
-                           class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {% if filtro_estado == 'cancelada' %}bg-red-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                           class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 {% if filtro_estado == 'cancelada' %}bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-lg hover:shadow-xl hover:scale-105{% else %}bg-white/50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20{% endif %}">
+                            <i class="fas fa-ban mr-2"></i>
                             Canceladas
                         </a>
                     </div>
@@ -106,10 +108,8 @@
 
                 <!-- Botón nueva reserva -->
                 <a href="{% url 'servicios:listar_servicios' %}" 
-                   class="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
+                   class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-sky-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                    <i class="fas fa-plus-circle mr-2 group-hover:rotate-90 transition-transform"></i>
                     Nueva Reserva
                 </a>
             </div>
@@ -117,81 +117,116 @@
 
         <!-- Lista de reservas -->
         {% if page_obj %}
-            <div class="space-y-4">
+            <div class="space-y-6">
                 {% for reserva in page_obj %}
-                <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden">
+                <div class="bg-white/80 dark:bg-gray-800/50 backdrop-blur-lg rounded-xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 border border-white/20 dark:border-gray-700/30 group">
                     <div class="p-6">
                         <div class="flex flex-col lg:flex-row gap-6">
                             <!-- Imagen del servicio -->
                             <div class="flex-shrink-0">
                                 {% if reserva.servicio.imagenes.all.0 %}
-                                <img src="{{ reserva.servicio.imagenes.all.0.imagen.url }}" 
-                                     alt="{{ reserva.servicio.nombre }}"
-                                     class="w-full lg:w-48 h-48 object-cover rounded-lg">
+                                <div class="relative rounded-xl overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300">
+                                    <img src="{{ reserva.servicio.imagenes.all.0.imagen.url }}" 
+                                         alt="{{ reserva.servicio.nombre }}"
+                                         class="w-full lg:w-48 h-48 object-cover transition-transform duration-500 group-hover:scale-110">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                </div>
                                 {% else %}
-                                <div class="w-full lg:w-48 h-48 bg-gray-200 rounded-lg flex items-center justify-center">
-                                    <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                    </svg>
+                                <div class="w-full lg:w-48 h-48 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                                    <i class="fas fa-image text-gray-400 dark:text-gray-500 text-4xl group-hover:scale-110 transition-transform"></i>
                                 </div>
                                 {% endif %}
                             </div>
 
-                            <!-- Información de la reserva -->
+                                <!-- Información de la reserva -->
                             <div class="flex-1">
                                 <!-- Encabezado con estado -->
-                                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3">
+                                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4">
                                     <div>
-                                        <h3 class="text-xl font-bold text-gray-900 mb-1">
+                                        <h3 class="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2">
                                             <a href="{% url 'reservas:detalle_reserva' reserva.id %}" 
-                                               class="hover:text-blue-600">
+                                               class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-flex items-center group">
                                                 {{ reserva.servicio.nombre }}
+                                                <i class="fas fa-chevron-right ml-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
                                             </a>
                                         </h3>
-                                        <p class="text-sm text-gray-500">Código: #{{ reserva.codigo_reserva }}</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 flex items-center">
+                                            <i class="fas fa-hashtag mr-1 text-blue-500 dark:text-blue-400"></i>
+                                            {{ reserva.codigo_reserva }}
+                                        </p>
                                     </div>
                                     
                                     <!-- Badge de estado -->
-                                    <span class="inline-block mt-2 sm:mt-0 px-3 py-1 rounded-full text-sm font-semibold
-                                        {% if reserva.estado == 'pendiente' %}bg-yellow-100 text-yellow-800
-                                        {% elif reserva.estado == 'confirmada' %}bg-green-100 text-green-800
-                                        {% elif reserva.estado == 'completada' %}bg-blue-100 text-blue-800
-                                        {% elif reserva.estado == 'cancelada' %}bg-red-100 text-red-800
-                                        {% endif %}">
-                                        {% if reserva.estado == 'pendiente' %}⏳ Pendiente
-                                        {% elif reserva.estado == 'confirmada' %}✓ Confirmada
-                                        {% elif reserva.estado == 'completada' %}★ Completada
-                                        {% elif reserva.estado == 'cancelada' %}✗ Cancelada
-                                        {% endif %}
-                                    </span>
+                                    <div class="mt-2 sm:mt-0">
+                                        <span class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold shadow-lg transition-all duration-300
+                                            {% if reserva.estado == 'pendiente' %}
+                                                bg-gradient-to-r from-yellow-400 to-amber-500 dark:from-yellow-600 dark:to-amber-700 text-white
+                                            {% elif reserva.estado == 'confirmada' %}
+                                                bg-gradient-to-r from-green-400 to-emerald-500 dark:from-green-600 dark:to-emerald-700 text-white
+                                            {% elif reserva.estado == 'completada' %}
+                                                bg-gradient-to-r from-blue-400 to-sky-500 dark:from-blue-600 dark:to-sky-700 text-white
+                                            {% elif reserva.estado == 'cancelada' %}
+                                                bg-gradient-to-r from-red-400 to-rose-500 dark:from-red-600 dark:to-rose-700 text-white
+                                            {% endif %}
+                                            group-hover:shadow-xl group-hover:scale-105">
+                                            {% if reserva.estado == 'pendiente' %}
+                                                <i class="fas fa-clock mr-2 group-hover:animate-spin"></i>Pendiente
+                                            {% elif reserva.estado == 'confirmada' %}
+                                                <i class="fas fa-check-circle mr-2 group-hover:scale-110"></i>Confirmada
+                                            {% elif reserva.estado == 'completada' %}
+                                                <i class="fas fa-star mr-2 group-hover:animate-pulse"></i>Completada
+                                            {% elif reserva.estado == 'cancelada' %}
+                                                <i class="fas fa-times-circle mr-2 group-hover:rotate-12"></i>Cancelada
+                                            {% endif %}
+                                        </span>
+                                    </div>
                                 </div>
 
                                 <!-- Detalles en grid -->
-                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 text-sm">
-                                    <div>
-                                        <p class="text-gray-500 mb-1">📍 Destino</p>
-                                        <p class="font-semibold text-gray-900">{{ reserva.servicio.destino.nombre }}</p>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                                    <div class="bg-white/50 dark:bg-gray-700/50 p-3 rounded-lg backdrop-blur-sm group-hover:bg-blue-50/50 dark:group-hover:bg-blue-900/20 transition-colors">
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1 flex items-center">
+                                            <i class="fas fa-map-marker-alt mr-2 text-blue-500 dark:text-blue-400"></i>
+                                            Destino
+                                        </p>
+                                        <p class="font-semibold text-gray-900 dark:text-white">{{ reserva.servicio.destino.nombre }}</p>
                                     </div>
-                                    <div>
-                                        <p class="text-gray-500 mb-1">📅 Fecha del Servicio</p>
-                                        <p class="font-semibold text-gray-900">{{ reserva.fecha_servicio|date:"d/m/Y" }}</p>
+                                    <div class="bg-white/50 dark:bg-gray-700/50 p-3 rounded-lg backdrop-blur-sm group-hover:bg-blue-50/50 dark:group-hover:bg-blue-900/20 transition-colors">
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1 flex items-center">
+                                            <i class="fas fa-calendar-alt mr-2 text-blue-500 dark:text-blue-400"></i>
+                                            Fecha
+                                        </p>
+                                        <p class="font-semibold text-gray-900 dark:text-white">{{ reserva.fecha_servicio|date:"d/m/Y" }}</p>
                                     </div>
-                                    <div>
-                                        <p class="text-gray-500 mb-1">👥 Personas</p>
-                                        <p class="font-semibold text-gray-900">{{ reserva.cantidad_personas }}</p>
+                                    <div class="bg-white/50 dark:bg-gray-700/50 p-3 rounded-lg backdrop-blur-sm group-hover:bg-blue-50/50 dark:group-hover:bg-blue-900/20 transition-colors">
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1 flex items-center">
+                                            <i class="fas fa-users mr-2 text-blue-500 dark:text-blue-400"></i>
+                                            Personas
+                                        </p>
+                                        <p class="font-semibold text-gray-900 dark:text-white">{{ reserva.cantidad_personas }}</p>
                                     </div>
-                                    <div>
-                                        <p class="text-gray-500 mb-1">💰 Total Pagado</p>
-                                        <p class="font-semibold text-blue-600">${{ reserva.costo_total|floatformat:2 }}</p>
+                                    <div class="bg-white/50 dark:bg-gray-700/50 p-3 rounded-lg backdrop-blur-sm group-hover:bg-blue-50/50 dark:group-hover:bg-blue-900/20 transition-colors">
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1 flex items-center">
+                                            <i class="fas fa-dollar-sign mr-2 text-blue-500 dark:text-blue-400"></i>
+                                            Total
+                                        </p>
+                                        <p class="font-semibold text-blue-600 dark:text-blue-400">${{ reserva.costo_total|floatformat:2 }}</p>
                                     </div>
-                                </div>
-
-                                <!-- Información adicional -->
-                                <div class="flex flex-wrap items-center gap-4 text-xs text-gray-500 mb-4 pb-4 border-b">
-                                    <span>🏷️ {{ reserva.servicio.get_tipo_display }}</span>
-                                    <span>📅 Reservado: {{ reserva.fecha_reserva|date:"d/m/Y H:i" }}</span>
+                                </div>                                <!-- Información adicional -->
+                                <div class="flex flex-wrap items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                                    <span class="flex items-center">
+                                        <i class="fas fa-tag mr-2 text-blue-500 dark:text-blue-400"></i>
+                                        {{ reserva.servicio.get_tipo_display }}
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i class="fas fa-calendar-check mr-2 text-blue-500 dark:text-blue-400"></i>
+                                        Reservado: {{ reserva.fecha_reserva|date:"d/m/Y H:i" }}
+                                    </span>
                                     {% if reserva.estado == 'cancelada' and reserva.fecha_cancelacion %}
-                                    <span class="text-red-600">🚫 Cancelado: {{ reserva.fecha_cancelacion|date:"d/m/Y H:i" }}</span>
+                                    <span class="flex items-center text-red-600 dark:text-red-400">
+                                        <i class="fas fa-ban mr-2"></i>
+                                        Cancelado: {{ reserva.fecha_cancelacion|date:"d/m/Y H:i" }}
+                                    </span>
                                     {% endif %}
                                 </div>
 
@@ -199,31 +234,24 @@
                                 <div class="flex flex-wrap gap-3">
                                     <!-- Ver detalles -->
                                     <a href="{% url 'reservas:detalle_reserva' reserva.id %}" 
-                                       class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                        </svg>
+                                       class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white rounded-xl font-medium shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 text-sm">
+                                        <i class="fas fa-eye"></i>
                                         Ver Detalles
                                     </a>
 
                                     <!-- Cancelar (si está pendiente o confirmada) -->
                                     {% if reserva.estado == 'pendiente' or reserva.estado == 'confirmada' %}
                                     <button onclick="mostrarModalCancelar('{{ reserva.id }}', '{{ reserva.servicio.nombre }}')"
-                                            class="inline-flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                        </svg>
+                                            class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-rose-600 dark:from-red-600 dark:to-rose-700 text-white rounded-xl font-medium shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 text-sm">
+                                        <i class="fas fa-times-circle"></i>
                                         Cancelar Reserva
                                     </button>
                                     {% endif %}
 
                                     <!-- Ver servicio -->
                                     <a href="{% url 'servicios:detalle_servicio' reserva.servicio.id %}" 
-                                       class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                        </svg>
+                                       class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 text-gray-700 dark:text-white rounded-xl font-medium shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 text-sm">
+                                        <i class="fas fa-info-circle text-blue-500 dark:text-blue-400"></i>
                                         Ver Servicio
                                     </a>
                                 </div>
@@ -240,18 +268,18 @@
                 <nav class="flex items-center gap-2">
                     {% if page_obj.has_previous %}
                     <a href="?page={{ page_obj.previous_page_number }}{% if filtro_estado %}&estado={{ filtro_estado }}{% endif %}" 
-                       class="px-4 py-2 bg-white border rounded-lg hover:bg-gray-50">
+                       class="px-4 py-2 bg-white dark:bg-gray-800 border rounded-lg hover:bg-gray-50 dark:bg-gray-900">
                         ← Anterior
                     </a>
                     {% endif %}
 
-                    <span class="px-4 py-2 text-gray-700">
+                    <span class="px-4 py-2 text-gray-700 dark:text-gray-300">
                         Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
                     </span>
 
                     {% if page_obj.has_next %}
                     <a href="?page={{ page_obj.next_page_number }}{% if filtro_estado %}&estado={{ filtro_estado }}{% endif %}" 
-                       class="px-4 py-2 bg-white border rounded-lg hover:bg-gray-50">
+                       class="px-4 py-2 bg-white dark:bg-gray-800 border rounded-lg hover:bg-gray-50 dark:bg-gray-900">
                         Siguiente →
                     </a>
                     {% endif %}
@@ -261,12 +289,12 @@
 
         {% else %}
             <!-- Sin reservas -->
-            <div class="bg-white rounded-lg shadow-md p-12 text-center">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-12 text-center">
                 <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                 </svg>
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">No tienes reservas aún</h2>
-                <p class="text-gray-600 mb-6">¡Comienza a explorar los mejores destinos turísticos de Ecuador!</p>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">No tienes reservas aún</h2>
+                <p class="text-gray-600 dark:text-gray-300 mb-6">¡Comienza a explorar los mejores destinos turísticos de Ecuador!</p>
                 <a href="{% url 'servicios:listar_servicios' %}" 
                    class="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
                     Explorar Servicios
@@ -278,26 +306,26 @@
 
 <!-- Modal de cancelación -->
 <div id="modalCancelar" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-lg max-w-md w-full p-6">
-        <h3 class="text-xl font-bold text-gray-900 mb-4">Cancelar Reserva</h3>
-        <p class="text-gray-600 mb-4">¿Estás seguro de que deseas cancelar la reserva de <strong id="nombreServicio"></strong>?</p>
+    <div class="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6">
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Cancelar Reserva</h3>
+        <p class="text-gray-600 dark:text-gray-300 mb-4">¿Estás seguro de que deseas cancelar la reserva de <strong id="nombreServicio"></strong>?</p>
         
         <form id="formCancelar" method="POST" action="">
             {% csrf_token %}
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Motivo de cancelación (opcional)
                 </label>
                 <textarea name="motivo" 
                           rows="3"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500 dark:placeholder-gray-400"
                           placeholder="Escribe el motivo de la cancelación..."></textarea>
             </div>
 
             <div class="flex gap-3">
                 <button type="button" 
                         onclick="cerrarModalCancelar()"
-                        class="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium">
+                        class="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 font-medium">
                     Volver
                 </button>
                 <button type="submit"

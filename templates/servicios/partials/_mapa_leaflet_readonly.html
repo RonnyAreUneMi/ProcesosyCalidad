@@ -1,4 +1,4 @@
-<div id="mapContainer" class="rounded-xl overflow-hidden shadow-lg border-2 border-gray-200 mb-4" style="height: 400px;">
+<div id="mapContainer" class="rounded-xl overflow-hidden shadow-lg border-2 border-gray-200 dark:border-gray-700 mb-4" style="height: 400px;">
     <div id="map" style="height: 100%; width: 100%;"></div>
 </div>
 
@@ -38,7 +38,7 @@ function initMapDetalle() {
                 <div class="text-center p-8">
                     <i class="fas fa-exclamation-triangle text-red-600 text-5xl mb-4"></i>
                     <p class="text-red-900 font-semibold text-lg">Coordenadas inválidas</p>
-                    <p class="text-red-700 text-sm mt-2">Lat: ${lat}, Lng: ${lng}</p>
+                    <p class="text-red-700 dark:text-red-300 text-sm mt-2">Lat: ${lat}, Lng: ${lng}</p>
                 </div>
             </div>
         `;
@@ -53,7 +53,7 @@ function initMapDetalle() {
                 <div class="text-center p-8">
                     <i class="fas fa-map-marked-alt text-yellow-600 text-5xl mb-4"></i>
                     <p class="text-yellow-900 font-semibold text-lg">Ubicación fuera de Ecuador</p>
-                    <p class="text-yellow-700 text-sm mt-2">Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}</p>
+                    <p class="text-yellow-700 dark:text-yellow-300 text-sm mt-2">Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}</p>
                 </div>
             </div>
         `;

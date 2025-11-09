@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     
     <!-- Header Section -->
     <div class="gradient-bg py-12" data-aos="fade-down">
@@ -14,12 +14,12 @@
                     <p class="text-sky-100">Gestiona y modera las calificaciones reportadas</p>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <div class="hidden md:flex items-center bg-white/20 backdrop-blur-custom rounded-xl px-4 py-2">
+                    <div class="hidden md:flex items-center bg-white dark:bg-gray-800/20 backdrop-blur-custom rounded-xl px-4 py-2">
                         <i class="fas fa-exclamation-triangle text-yellow-300 mr-2"></i>
                         <span class="text-white font-semibold">{{ total_pendientes }} Pendientes</span>
                     </div>
                     <div class="hidden md:block">
-                        <div class="w-16 h-16 bg-white bg-opacity-20 backdrop-blur-custom rounded-2xl flex items-center justify-center">
+                        <div class="w-16 h-16 bg-white dark:bg-gray-800 bg-opacity-20 backdrop-blur-custom rounded-2xl flex items-center justify-center">
                             <i class="fas fa-shield-alt text-white text-3xl"></i>
                         </div>
                     </div>
@@ -31,21 +31,21 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-10">
         
         <!-- Filtros -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-8" data-aos="fade-up">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8" data-aos="fade-up">
             <div class="flex items-center mb-4">
                 <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center mr-3">
                     <i class="fas fa-filter text-white"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900">Filtrar Calificaciones</h3>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Filtrar Calificaciones</h3>
             </div>
             
             <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <!-- Estado -->
                 <div class="relative md:col-span-2">
-                    <i class="fas fa-clipboard-list absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                    <i class="fas fa-clipboard-list absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none"></i>
                     <select name="estado" 
                             onchange="this.form.submit()"
-                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none appearance-none bg-white">
+                            class="text-gray-900 dark:text-white w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none appearance-none bg-white dark:bg-gray-800">
                         <option value="">Todas las calificaciones</option>
                         <option value="pendiente" {% if request.GET.estado == "pendiente" %}selected{% endif %}>
                             Pendientes de revisión
@@ -58,7 +58,7 @@
 
                 <!-- Botón Limpiar -->
                 <a href="{% url 'calificaciones:moderar_calificaciones' %}" 
-                   class="px-4 py-3 border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors text-center">
+                   class="px-4 py-3 border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 dark:bg-gray-900 transition-colors text-center">
                     <i class="fas fa-redo mr-2"></i>
                     Limpiar Filtros
                 </a>
@@ -68,7 +68,7 @@
         <!-- Lista de Calificaciones para Moderar -->
         <div class="space-y-4 mb-8">
             {% for calificacion in page_obj %}
-            <div class="bg-white rounded-xl shadow-sm border-2 {% if not calificacion.activo %}border-red-200{% else %}border-green-200{% endif %} p-6 hover:shadow-md transition-all" 
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border-2 {% if not calificacion.activo %}border-red-200{% else %}border-green-200 dark:border-green-800{% endif %} p-6 hover:shadow-md transition-all" 
                  data-aos="fade-up"
                  id="calificacion{{ calificacion.id }}">
                 
@@ -86,23 +86,23 @@
                         <div class="flex items-start justify-between mb-3">
                             <div class="flex-1">
                                 <div class="flex items-center gap-3 mb-2">
-                                    <h4 class="font-bold text-gray-900">{{ calificacion.usuario.nombre }}</h4>
+                                    <h4 class="font-bold text-gray-900 dark:text-white">{{ calificacion.usuario.nombre }}</h4>
                                     
                                     <!-- Badge de Estado -->
                                     {% if not calificacion.activo %}
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300">
                                         <i class="fas fa-times-circle mr-1"></i>
                                         Pendiente / Rechazada
                                     </span>
                                     {% else %}
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300">
                                         <i class="fas fa-check-circle mr-1"></i>
                                         Aprobada
                                     </span>
                                     {% endif %}
                                     
                                     {% if calificacion.moderado %}
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300">
                                         <i class="fas fa-exclamation-triangle mr-1"></i>
                                         Moderada
                                     </span>
@@ -120,7 +120,7 @@
                                             {% endif %}
                                         {% endfor %}
                                     </div>
-                                    <span class="text-gray-600">
+                                    <span class="text-gray-600 dark:text-gray-300">
                                         <i class="far fa-calendar mr-1"></i>
                                         {{ calificacion.fecha_creacion|date:"d M Y, H:i" }}
                                     </span>
@@ -129,7 +129,7 @@
                         </div>
 
                         <!-- Info del Servicio -->
-                        <div class="bg-gray-50 rounded-lg p-3 mb-4">
+                        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 mb-4">
                             <div class="flex items-center gap-3">
                                 {% if calificacion.servicio.imagenes.first %}
                                 <img src="{{ calificacion.servicio.imagenes.first.imagen.url }}" 
@@ -142,8 +142,8 @@
                                 {% endif %}
                                 
                                 <div class="flex-1">
-                                    <h5 class="font-semibold text-gray-900">{{ calificacion.servicio.nombre }}</h5>
-                                    <p class="text-sm text-gray-600">
+                                    <h5 class="font-semibold text-gray-900 dark:text-white">{{ calificacion.servicio.nombre }}</h5>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300">
                                         <i class="fas fa-user-tie mr-1"></i>
                                         Proveedor: {{ calificacion.servicio.proveedor.nombre }}
                                     </p>
@@ -154,18 +154,18 @@
                         <!-- Comentario -->
                         {% if calificacion.comentario %}
                         <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
-                            <p class="text-sm font-semibold text-yellow-800 mb-1">
+                            <p class="text-sm font-semibold text-yellow-800 dark:text-yellow-200 mb-1">
                                 <i class="fas fa-comment-alt mr-1"></i>
                                 Comentario del usuario:
                             </p>
-                            <p class="text-gray-800 leading-relaxed">{{ calificacion.comentario }}</p>
+                            <p class="text-gray-800 dark:text-gray-200 leading-relaxed">{{ calificacion.comentario }}</p>
                         </div>
                         {% else %}
                         <p class="text-gray-400 italic mb-4 text-sm">Sin comentario escrito</p>
                         {% endif %}
 
                         <!-- Acciones de Moderación -->
-                        <div class="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
+                        <div class="flex flex-wrap gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                             {% if not calificacion.activo %}
                             <!-- Aprobar -->
                             <button onclick="aprobarCalificacion({{ calificacion.id }})"
@@ -194,7 +194,7 @@
                             
                             <!-- Ver Usuario -->
                             <button onclick="verDetallesUsuario({{ calificacion.usuario.id }})"
-                                    class="px-6 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors">
+                                    class="px-6 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 dark:bg-gray-900 transition-colors">
                                 <i class="fas fa-user mr-2"></i>
                                 Ver Usuario
                             </button>
@@ -203,12 +203,12 @@
                 </div>
             </div>
             {% empty %}
-            <div class="bg-white rounded-xl shadow-lg p-12 text-center">
-                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-12 text-center">
+                <div class="w-20 h-20 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i class="fas fa-check-double text-green-600 text-3xl"></i>
                 </div>
-                <h3 class="text-xl font-semibold text-gray-700 mb-2">¡Todo al día!</h3>
-                <p class="text-gray-500">No hay calificaciones pendientes de moderación</p>
+                <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">¡Todo al día!</h3>
+                <p class="text-gray-500 dark:text-gray-400">No hay calificaciones pendientes de moderación</p>
             </div>
             {% endfor %}
         </div>
@@ -219,26 +219,26 @@
             <nav class="inline-flex rounded-lg shadow-sm">
                 {% if page_obj.has_previous %}
                 <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}" 
-                   class="relative inline-flex items-center px-3 py-2 rounded-l-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                   class="relative inline-flex items-center px-3 py-2 rounded-l-lg border border-gray-300 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-900">
                     <i class="fas fa-angle-left"></i>
                 </a>
                 {% else %}
-                <span class="relative inline-flex items-center px-3 py-2 rounded-l-lg border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                <span class="relative inline-flex items-center px-3 py-2 rounded-l-lg border border-gray-300 bg-gray-100 dark:bg-gray-700 text-sm font-medium text-gray-400 cursor-not-allowed">
                     <i class="fas fa-angle-left"></i>
                 </span>
                 {% endif %}
 
-                <span class="relative inline-flex items-center px-4 py-2 border-t border-b border-gray-300 bg-white text-sm font-semibold text-gray-700">
+                <span class="relative inline-flex items-center px-4 py-2 border-t border-b border-gray-300 bg-white dark:bg-gray-800 text-sm font-semibold text-gray-700 dark:text-gray-300">
                     Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
                 </span>
 
                 {% if page_obj.has_next %}
                 <a href="?page={{ page_obj.next_page_number }}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}" 
-                   class="relative inline-flex items-center px-3 py-2 rounded-r-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                   class="relative inline-flex items-center px-3 py-2 rounded-r-lg border border-gray-300 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-900">
                     <i class="fas fa-angle-right"></i>
                 </a>
                 {% else %}
-                <span class="relative inline-flex items-center px-3 py-2 rounded-r-lg border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                <span class="relative inline-flex items-center px-3 py-2 rounded-r-lg border border-gray-300 bg-gray-100 dark:bg-gray-700 text-sm font-medium text-gray-400 cursor-not-allowed">
                     <i class="fas fa-angle-right"></i>
                 </span>
                 {% endif %}
@@ -250,16 +250,16 @@
 </div>
 
 <!-- Toast de Notificación -->
-<div id="toast" class="hidden fixed top-20 right-4 bg-white rounded-xl shadow-2xl p-4 z-50 max-w-sm transform transition-all">
+<div id="toast" class="hidden fixed top-20 right-4 bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-4 z-50 max-w-sm transform transition-all">
     <div class="flex items-start">
         <div id="toastIcon" class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center mr-3">
             <i class="fas fa-check text-white"></i>
         </div>
         <div class="flex-1">
-            <h4 id="toastTitle" class="font-bold text-gray-900 mb-1"></h4>
-            <p id="toastMessage" class="text-sm text-gray-600"></p>
+            <h4 id="toastTitle" class="font-bold text-gray-900 dark:text-white mb-1"></h4>
+            <p id="toastMessage" class="text-sm text-gray-600 dark:text-gray-300"></p>
         </div>
-        <button onclick="cerrarToast()" class="text-gray-400 hover:text-gray-600 ml-2">
+        <button onclick="cerrarToast()" class="text-gray-400 hover:text-gray-600 dark:text-gray-300 ml-2">
             <i class="fas fa-times"></i>
         </button>
     </div>

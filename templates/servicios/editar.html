@@ -6,18 +6,18 @@
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-sky-50 py-12">
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-sky-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 py-12">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div class="mb-8">
             <nav class="mb-4">
                 <ol class="flex items-center space-x-2 text-sm">
-                    <li><a href="{% url 'home' %}" class="text-gray-600 hover:text-sky-600 transition-colors">Inicio</a></li>
-                    <li><i class="fas fa-chevron-right text-gray-400 text-xs"></i></li>
-                    <li><a href="{% url 'servicios:listar_servicios' %}" class="text-gray-600 hover:text-sky-600 transition-colors">Servicios</a></li>
-                    <li><i class="fas fa-chevron-right text-gray-400 text-xs"></i></li>
-                    <li><a href="{% url 'servicios:detalle_servicio' servicio.id %}" class="text-gray-600 hover:text-sky-600 transition-colors">{{ servicio.nombre }}</a></li>
-                    <li><i class="fas fa-chevron-right text-gray-400 text-xs"></i></li>
+                    <li><a href="{% url 'home' %}" class="text-gray-600 dark:text-gray-300 hover:text-sky-600 transition-colors">Inicio</a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 text-xs"></i></li>
+                    <li><a href="{% url 'servicios:listar_servicios' %}" class="text-gray-600 dark:text-gray-300 hover:text-sky-600 transition-colors">Servicios</a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 text-xs"></i></li>
+                    <li><a href="{% url 'servicios:detalle_servicio' servicio.id %}" class="text-gray-600 dark:text-gray-300 hover:text-sky-600 transition-colors">{{ servicio.nombre }}</a></li>
+                    <li><i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 text-xs"></i></li>
                     <li class="text-sky-600 font-medium">Editar</li>
                 </ol>
             </nav>
@@ -27,8 +27,8 @@
                     <i class="fas fa-edit text-white text-3xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-4xl font-bold text-gray-900">Editar Servicio</h1>
-                    <p class="text-gray-600 mt-1">Actualiza la información de tu servicio turístico</p>
+                    <h1 class="text-4xl font-bold text-gray-900 dark:text-white">Editar Servicio</h1>
+                    <p class="text-gray-600 dark:text-gray-300 mt-1">Actualiza la información de tu servicio turístico</p>
                 </div>
             </div>
         </div>
@@ -37,31 +37,31 @@
             {% csrf_token %}
             
             <!-- Información Básica -->
-            <div class="bg-white rounded-2xl shadow-xl p-8">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
                 <div class="flex items-center mb-6">
                     <div class="w-10 h-10 bg-gradient-to-br from-sky-400 to-blue-500 rounded-xl flex items-center justify-center mr-3 shadow-lg">
                         <i class="fas fa-info-circle text-white"></i>
                     </div>
-                    <h2 class="text-2xl font-bold text-gray-900">Información Básica</h2>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Información Básica</h2>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Nombre del Servicio <span class="text-red-500">*</span>
                         </label>
                         <input type="text" name="nombre" required value="{{ servicio.nombre }}"
-                               class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                               class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                placeholder="Ej: Tour a las Islas Galápagos">
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Tipo de Servicio <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
                             <select name="tipo" required
-                                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all appearance-none bg-white cursor-pointer">
+                                    class="text-gray-900 dark:text-white w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all appearance-none bg-white dark:bg-gray-800 cursor-pointer">
                                 <option value="">Selecciona un tipo</option>
                                 {% for tipo_code, tipo_nombre in tipos_servicio %}
                                 <option value="{{ tipo_code }}" {% if servicio.tipo == tipo_code %}selected{% endif %}>
@@ -69,49 +69,49 @@
                                 </option>
                                 {% endfor %}
                             </select>
-                            <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                            <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none"></i>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Precio (USD) <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
-                            <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold">$</span>
+                            <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 font-bold">$</span>
                             <input type="number" name="precio" required min="0" step="0.01" 
                                 value="{{ precio_valor }}"
-                                class="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full pl-8 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                 placeholder="0.00">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Capacidad Máxima <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
-                            <i class="fas fa-users absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <i class="fas fa-users absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
                             <input type="number" name="capacidad_maxima" required min="1" value="{{ servicio.capacidad_maxima }}"
-                                   class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                   class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                    placeholder="1">
                         </div>
                     </div>
 
                     <div class="flex items-center space-x-3">
                         <input type="checkbox" name="disponible" id="disponible" {% if servicio.disponible %}checked{% endif %}
-                               class="w-6 h-6 text-sky-600 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 cursor-pointer">
-                        <label for="disponible" class="text-sm font-semibold text-gray-700 cursor-pointer">Servicio disponible</label>
+                               class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-6 h-6 text-sky-600 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 cursor-pointer">
+                        <label for="disponible" class="text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer">Servicio disponible</label>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Destino <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
-                            <i class="fas fa-location-dot absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                            <i class="fas fa-location-dot absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none"></i>
                             <select name="destino" required
-                                    class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all appearance-none bg-white cursor-pointer">
+                                    class="text-gray-900 dark:text-white w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all appearance-none bg-white dark:bg-gray-800 cursor-pointer">
                                 <option value="">Selecciona un destino</option>
                                 {% for destino in destinos %}
                                 <option value="{{ destino.id }}" {% if servicio.destino.id == destino.id %}selected{% endif %}>
@@ -119,16 +119,16 @@
                                 </option>
                                 {% endfor %}
                             </select>
-                            <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                            <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none"></i>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Categoría (opcional)</label>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Categoría (opcional)</label>
                         <div class="relative">
-                            <i class="fas fa-tag absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                            <i class="fas fa-tag absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none"></i>
                             <select name="categoria"
-                                    class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all appearance-none bg-white cursor-pointer">
+                                    class="text-gray-900 dark:text-white w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all appearance-none bg-white dark:bg-gray-800 cursor-pointer">
                                 <option value="">Sin categoría</option>
                                 {% for categoria in categorias %}
                                 <option value="{{ categoria.id }}" {% if servicio.categoria and servicio.categoria.id == categoria.id %}selected{% endif %}>
@@ -136,23 +136,23 @@
                                 </option>
                                 {% endfor %}
                             </select>
-                            <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                            <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none"></i>
                         </div>
                     </div>
 
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Descripción <span class="text-red-500">*</span>
                         </label>
                         <textarea name="descripcion" required rows="5" maxlength="1000" id="descripcion"
-                                  class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all resize-none"
+                                  class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all resize-none placeholder-gray-500 dark:placeholder-gray-400"
                                   placeholder="Describe detalladamente tu servicio, incluye qué está incluido, itinerario, experiencia, etc.">{{ servicio.descripcion }}</textarea>
                         <div class="flex justify-between items-center mt-2">
-                            <p class="text-xs text-gray-500">
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
                                 <i class="fas fa-lightbulb mr-1"></i>
                                 Una buena descripción aumenta las reservas
                             </p>
-                            <span class="text-xs text-gray-500">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">
                                 <span id="charCount">{{ servicio.descripcion|length }}</span> / 1000
                             </span>
                         </div>
@@ -161,18 +161,18 @@
             </div>
 
             <!-- Ubicación Geográfica -->
-            <div class="bg-white rounded-2xl shadow-xl p-8">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
                 <div class="flex items-center mb-6">
                     <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center mr-3 shadow-lg">
                         <i class="fas fa-map-marker-alt text-white"></i>
                     </div>
-                    <h2 class="text-2xl font-bold text-gray-900">Ubicación Geográfica</h2>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Ubicación Geográfica</h2>
                 </div>
 
                 <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 mb-6">
                     <div class="flex items-start space-x-3">
                         <i class="fas fa-info-circle text-green-600 mt-1"></i>
-                        <p class="text-sm text-gray-700">
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
                             <span class="font-semibold">Haz clic en el mapa</span> para actualizar la ubicación exacta de tu servicio, o ingresa las coordenadas manualmente.
                         </p>
                     </div>
@@ -181,16 +181,16 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Dirección -->
                     <div class="lg:col-span-2">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Dirección Completa <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
-                            <i class="fas fa-location-dot absolute left-4 top-4 text-gray-400"></i>
+                            <i class="fas fa-location-dot absolute left-4 top-4 text-gray-400 dark:text-gray-500"></i>
                             <input type="text" name="direccion" required value="{{ servicio.direccion }}"
-                                class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                 placeholder="Ej: Av. Charles Darwin, Puerto Ayora 200102, Ecuador">
                         </div>
-                        <p class="text-xs text-gray-500 mt-2">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
                             <i class="fas fa-map mr-1"></i>
                             Incluye calle, número, ciudad y código postal
                         </p>
@@ -198,38 +198,38 @@
 
                     <!-- Coordenadas -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Latitud <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
-                            <i class="fas fa-globe absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <i class="fas fa-globe absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
                             <input type="text" 
                                 name="latitud" 
                                 id="latitud" 
                                 required 
                                 value="{{ latitud_valor }}"
-                                class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all font-mono text-sm"
+                                class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all font-mono text-sm placeholder-gray-500 dark:placeholder-gray-400"
                                 placeholder="-0.74283300">
                         </div>
-                        <p class="text-xs text-gray-500 mt-1">Rango: -5° a 2°</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Rango: -5° a 2°</p>
                         <p class="text-xs text-red-500 mt-1 hidden" id="latitud-error"></p>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Longitud <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
-                            <i class="fas fa-compass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <i class="fas fa-compass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
                             <input type="text" 
                                 name="longitud" 
                                 id="longitud" 
                                 required 
                                 value="{{ longitud_valor }}"
-                                class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all font-mono text-sm"
+                                class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all font-mono text-sm placeholder-gray-500 dark:placeholder-gray-400"
                                 placeholder="-90.30895600">
                         </div>
-                        <p class="text-xs text-gray-500 mt-1">Rango: -92° a -75°</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Rango: -92° a -75°</p>
                         <p class="text-xs text-red-500 mt-1 hidden" id="longitud-error"></p>
                     </div>
 
@@ -238,14 +238,14 @@
 
                     <!-- Zona de Referencia -->
                     <div class="lg:col-span-2">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Zona de Referencia (opcional)</label>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Zona de Referencia (opcional)</label>
                         <div class="relative">
-                            <i class="fas fa-map-signs absolute left-4 top-4 text-gray-400"></i>
+                            <i class="fas fa-map-signs absolute left-4 top-4 text-gray-400 dark:text-gray-500"></i>
                             <input type="text" name="zona_referencia" value="{{ servicio.zona_referencia|default:'' }}"
-                                class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                 placeholder="Ej: Frente al muelle principal, Cerca del parque central">
                         </div>
-                        <p class="text-xs text-gray-500 mt-2">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
                             <i class="fas fa-info-circle mr-1"></i>
                             Referencias que ayuden a los visitantes a encontrar tu servicio
                         </p>
@@ -254,75 +254,75 @@
             </div>
 
             <!-- Información de Contacto -->
-            <div class="bg-white rounded-2xl shadow-xl p-8">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
                 <div class="flex items-center mb-6">
                     <div class="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center mr-3 shadow-lg">
                         <i class="fas fa-address-book text-white"></i>
                     </div>
-                    <h2 class="text-2xl font-bold text-gray-900">Información de Contacto</h2>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Información de Contacto</h2>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Teléfono Principal <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
-                            <i class="fas fa-phone absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <i class="fas fa-phone absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
                             <input type="tel" name="telefono" required pattern="^\+?[0-9]{9,15}$"
                                    value="{{ servicio.telefono }}"
-                                   class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                   class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                    placeholder="+593981234567">
                         </div>
-                        <p class="text-xs text-gray-500 mt-1">Formato: +593981234567</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Formato: +593981234567</p>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Teléfono Alternativo (opcional)</label>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Teléfono Alternativo (opcional)</label>
                         <div class="relative">
-                            <i class="fas fa-phone-alt absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <i class="fas fa-phone-alt absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
                             <input type="tel" name="telefono_alternativo" pattern="^\+?[0-9]{9,15}$"
                                    value="{{ servicio.telefono_alternativo|default:'' }}"
-                                   class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                   class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                    placeholder="+593987654321">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Email de Contacto <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
-                            <i class="fas fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <i class="fas fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
                             <input type="email" name="email_contacto" required
                                    value="{{ servicio.email_contacto }}"
-                                   class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                   class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                    placeholder="contacto@ejemplo.com">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">WhatsApp (opcional)</label>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">WhatsApp (opcional)</label>
                         <div class="relative">
                             <i class="fab fa-whatsapp absolute left-4 top-1/2 transform -translate-y-1/2 text-green-500"></i>
                             <input type="tel" name="whatsapp" pattern="^\+?[0-9]{9,15}$"
                                    value="{{ servicio.whatsapp|default:'' }}"
-                                   class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                   class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                    placeholder="+593981234567">
                         </div>
-                        <p class="text-xs text-gray-500 mt-1">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                             <i class="fas fa-info-circle mr-1"></i>
                             Para contacto rápido con clientes
                         </p>
                     </div>
 
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Sitio Web (opcional)</label>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Sitio Web (opcional)</label>
                         <div class="relative">
-                            <i class="fas fa-globe absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <i class="fas fa-globe absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
                             <input type="url" name="sitio_web"
                                    value="{{ servicio.sitio_web|default:'' }}"
-                                   class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                   class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                    placeholder="https://www.ejemplo.com">
                         </div>
                     </div>
@@ -330,118 +330,118 @@
             </div>
 
             <!-- Horarios de Atención -->
-            <div class="bg-white rounded-2xl shadow-xl p-8">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
                 <div class="flex items-center mb-6">
                     <div class="w-10 h-10 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center mr-3 shadow-lg">
                         <i class="fas fa-clock text-white"></i>
                     </div>
-                    <h2 class="text-2xl font-bold text-gray-900">Horarios de Atención</h2>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Horarios de Atención</h2>
                 </div>
 
                 <div class="bg-gradient-to-br from-blue-50 to-sky-50 rounded-xl p-6 mb-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">
                             <i class="fas fa-calendar-week text-blue-600 mr-2"></i>
                             Lunes a Viernes
                         </h3>
                         <label class="flex items-center cursor-pointer">
                             <input type="checkbox" name="cerrado_semana" id="cerrado_semana"
                                    {% if horario_semana and horario_semana.cerrado %}checked{% endif %}
-                                   class="w-5 h-5 text-red-600 border-2 border-gray-300 rounded focus:ring-2 focus:ring-red-500 cursor-pointer">
-                            <span class="ml-2 text-sm font-semibold text-gray-700">Cerrado</span>
+                                   class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-5 h-5 text-red-600 border-2 border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-red-500 cursor-pointer">
+                            <span class="ml-2 text-sm font-semibold text-gray-700 dark:text-gray-300">Cerrado</span>
                         </label>
                     </div>
 
                     <div id="horario_semana_fields" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Hora de Apertura</label>
+                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Hora de Apertura</label>
                             <div class="relative">
-                                <i class="fas fa-door-open absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <i class="fas fa-door-open absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
                                 <input type="time" name="hora_apertura_semana" id="hora_apertura_semana"
                                        value="{% if horario_semana and not horario_semana.cerrado %}{{ horario_semana.hora_apertura }}{% else %}08:00{% endif %}"
-                                       class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
+                                       class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Hora de Cierre</label>
+                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Hora de Cierre</label>
                             <div class="relative">
-                                <i class="fas fa-door-closed absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <i class="fas fa-door-closed absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
                                 <input type="time" name="hora_cierre_semana" id="hora_cierre_semana"
                                        value="{% if horario_semana and not horario_semana.cerrado %}{{ horario_semana.hora_cierre }}{% else %}18:00{% endif %}"
-                                       class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
+                                       class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
                             </div>
                         </div>
 
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Notas (opcional)</label>
+                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Notas (opcional)</label>
                             <input type="text" name="notas_semana"
                                    value="{% if horario_semana %}{{ horario_semana.notas|default:'' }}{% endif %}"
-                                   class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                   class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                    placeholder="Ej: Horario extendido en temporada alta">
                         </div>
                     </div>
 
                     <div id="cerrado_semana_msg" class="hidden text-center py-4">
                         <i class="fas fa-ban text-red-500 text-3xl mb-2"></i>
-                        <p class="text-gray-700 font-semibold">Cerrado de Lunes a Viernes</p>
+                        <p class="text-gray-700 dark:text-gray-300 font-semibold">Cerrado de Lunes a Viernes</p>
                     </div>
                 </div>
 
                 <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">
                             <i class="fas fa-calendar-day text-purple-600 mr-2"></i>
                             Sábado y Domingo
                         </h3>
                         <label class="flex items-center cursor-pointer">
                             <input type="checkbox" name="cerrado_finde" id="cerrado_finde"
                                    {% if horario_fin_semana and horario_fin_semana.cerrado %}checked{% endif %}
-                                   class="w-5 h-5 text-red-600 border-2 border-gray-300 rounded focus:ring-2 focus:ring-red-500 cursor-pointer">
-                            <span class="ml-2 text-sm font-semibold text-gray-700">Cerrado</span>
+                                   class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-5 h-5 text-red-600 border-2 border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-red-500 cursor-pointer">
+                            <span class="ml-2 text-sm font-semibold text-gray-700 dark:text-gray-300">Cerrado</span>
                         </label>
                     </div>
 
                     <div id="horario_finde_fields" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Hora de Apertura</label>
+                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Hora de Apertura</label>
                             <div class="relative">
-                                <i class="fas fa-door-open absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <i class="fas fa-door-open absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
                                 <input type="time" name="hora_apertura_finde" id="hora_apertura_finde"
                                        value="{% if horario_fin_semana and not horario_fin_semana.cerrado %}{{ horario_fin_semana.hora_apertura }}{% else %}09:00{% endif %}"
-                                       class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
+                                       class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Hora de Cierre</label>
+                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Hora de Cierre</label>
                             <div class="relative">
-                                <i class="fas fa-door-closed absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <i class="fas fa-door-closed absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
                                 <input type="time" name="hora_cierre_finde" id="hora_cierre_finde"
                                        value="{% if horario_fin_semana and not horario_fin_semana.cerrado %}{{ horario_fin_semana.hora_cierre }}{% else %}17:00{% endif %}"
-                                       class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
+                                       class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
                             </div>
                         </div>
 
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Notas (opcional)</label>
+                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Notas (opcional)</label>
                             <input type="text" name="notas_finde"
                                    value="{% if horario_fin_semana %}{{ horario_fin_semana.notas|default:'' }}{% endif %}"
-                                   class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                   class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                    placeholder="Ej: Solo sábados en temporada baja">
                         </div>
                     </div>
 
                     <div id="cerrado_finde_msg" class="hidden text-center py-4">
                         <i class="fas fa-ban text-red-500 text-3xl mb-2"></i>
-                        <p class="text-gray-700 font-semibold">Cerrado Sábados y Domingos</p>
+                        <p class="text-gray-700 dark:text-gray-300 font-semibold">Cerrado Sábados y Domingos</p>
                     </div>
                 </div>
 
-                <div class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 mt-6">
+                <div class="bg-yellow-50 border-2 border-yellow-200 dark:border-yellow-800 rounded-xl p-4 mt-6">
                     <div class="flex items-start space-x-3">
                         <i class="fas fa-lightbulb text-yellow-600 mt-1"></i>
-                        <p class="text-sm text-gray-700">
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
                             <span class="font-semibold">Tip:</span> Los horarios visibles ayudan a los turistas a planificar mejor su visita.
                         </p>
                     </div>
@@ -450,18 +450,18 @@
 
             <!-- Imágenes Actuales -->
             {% if servicio.imagenes.exists %}
-            <div class="bg-white rounded-2xl shadow-xl p-8">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
                 <div class="flex items-center mb-6">
                     <div class="w-10 h-10 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-xl flex items-center justify-center mr-3 shadow-lg">
                         <i class="fas fa-images text-white"></i>
                     </div>
-                    <h2 class="text-2xl font-bold text-gray-900">Imágenes Actuales</h2>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Imágenes Actuales</h2>
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {% for imagen in servicio.imagenes.all %}
                     <div class="relative group" id="imagen-{{ imagen.id }}">
-                        <div class="aspect-square rounded-xl overflow-hidden shadow-lg border-2 border-gray-200 hover:border-sky-400 transition-all bg-gray-100">
+                        <div class="aspect-square rounded-xl overflow-hidden shadow-lg border-2 border-gray-200 hover:border-sky-400 transition-all bg-gray-100 dark:bg-gray-700">
                             <img src="{{ imagen.imagen.url }}" 
                                  class="w-full h-full object-cover transition-transform group-hover:scale-110"
                                  alt="{{ servicio.nombre }}">
@@ -487,7 +487,7 @@
                 <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-4 mt-6">
                     <div class="flex items-start space-x-3">
                         <i class="fas fa-info-circle text-amber-600 mt-1"></i>
-                        <p class="text-sm text-gray-700">
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
                             La primera imagen será la <span class="font-semibold">imagen principal</span> de tu servicio. Puedes eliminar imágenes haciendo clic en el icono de la papelera.
                         </p>
                     </div>
@@ -496,19 +496,19 @@
             {% endif %}
 
             <!-- Nuevas Imágenes -->
-            <div class="bg-white rounded-2xl shadow-xl p-8">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
                 <div class="flex items-center mb-6">
                     <div class="w-10 h-10 bg-gradient-to-br from-pink-400 to-rose-500 rounded-xl flex items-center justify-center mr-3 shadow-lg">
                         <i class="fas fa-images text-white"></i>
                     </div>
-                    <h2 class="text-2xl font-bold text-gray-900">Agregar Nuevas Imágenes</h2>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Agregar Nuevas Imágenes</h2>
                 </div>
 
-                <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-sky-500 transition-colors cursor-pointer bg-gray-50 hover:bg-sky-50" onclick="document.getElementById('imagenes').click()">
-                    <i class="fas fa-cloud-upload-alt text-6xl text-gray-400 mb-4"></i>
-                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Arrastra imágenes o haz clic para seleccionar</h3>
-                    <p class="text-sm text-gray-500 mb-4">PNG, JPG o WEBP (máx. 5MB por imagen)</p>
-                    <input type="file" name="imagenes" id="imagenes" multiple accept="image/*" class="hidden">
+                <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-sky-500 transition-colors cursor-pointer bg-gray-50 dark:bg-gray-900 hover:bg-sky-50" onclick="document.getElementById('imagenes').click()">
+                    <i class="fas fa-cloud-upload-alt text-6xl text-gray-400 dark:text-gray-500 mb-4"></i>
+                    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Arrastra imágenes o haz clic para seleccionar</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">PNG, JPG o WEBP (máx. 5MB por imagen)</p>
+                    <input type="file" name="imagenes" id="imagenes" multiple accept="image/*" class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 hidden">
                     <button type="button" onclick="document.getElementById('imagenes').click()"
                             class="px-6 py-3 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all">
                         <i class="fas fa-folder-open mr-2"></i>
@@ -522,7 +522,7 @@
             <!-- Botones de Acción -->
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <a href="{% url 'servicios:detalle_servicio' servicio.id %}"
-                   class="w-full sm:w-auto px-8 py-4 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-all inline-flex items-center justify-center">
+                   class="w-full sm:w-auto px-8 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all inline-flex items-center justify-center">
                     <i class="fas fa-arrow-left mr-2"></i>
                     Cancelar
                 </a>

@@ -5,21 +5,23 @@ Django settings for ecuador_turismo project.
 from pathlib import Path
 from decouple import config
 import os
+import secrets
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+# ============================================
+# 🔒 SECURITY CONFIGURATION
+# ============================================
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-em%=j_kp$-b%4_s&5u9g#+(o&xq9(lsi5zpv5=b^xxb&&uaqpz'
+SECRET_KEY = config('SECRET_KEY', default=secrets.token_urlsafe(50))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=lambda v: [s.strip() for s in v.split(',')])
 
 
 # Application definition
@@ -47,6 +49,9 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'ecuador_turismo.middleware.SecurityHeadersMiddleware',
+    'ecuador_turismo.middleware.URLEncryptionMiddleware',
+    'ecuador_turismo.middleware.ConnectionHandlingMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -77,6 +82,10 @@ WSGI_APPLICATION = 'ecuador_turismo.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# ============================================
+# 🗄️ DATABASE ACID COMPLIANCE
+# ============================================
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -86,12 +95,21 @@ DATABASES = {
         'HOST': config('DB_HOST'),
         'PORT': config('DB_PORT'),
         'OPTIONS': {
-            'sslmode': 'require',  # Fuerza SSL
-            'connect_timeout': 10,  # Timeout de 10 segundos
-            'options': '-c statement_timeout=30000'  # 30 segundos para queries
+            'sslmode': 'require',
+            'connect_timeout': 10,
+            'options': '-c statement_timeout=30000',
         },
-        'CONN_MAX_AGE': 600,  # Reutiliza conexiones por 10 minutos
+        'CONN_MAX_AGE': 300,
+        'CONN_HEALTH_CHECKS': True,
+        'ATOMIC_REQUESTS': True,  # Garantiza transacciones ACID
     }
+}
+
+# Database Connection Pooling para ACID
+DATABASE_POOL_ARGS = {
+    'max_overflow': 10,
+    'pool_pre_ping': True,
+    'pool_recycle': 300,
 }
 
 
@@ -100,19 +118,31 @@ DATABASES = {
 # ============================================
 OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
 
-# Validar que la key esté configurada
-if not OPENAI_API_KEY and DEBUG:
+# ============================================
+# ✅ GROQ CONFIGURATION (Alternativa GRATIS)
+# ============================================
+GROQ_API_KEY = config('GROQ_API_KEY', default='')
+
+# Validar que al menos una key esté configurada
+if not GROQ_API_KEY and not OPENAI_API_KEY and DEBUG:
     import warnings
     warnings.warn(
-        "⚠️  OPENAI_API_KEY no está configurada. El chatbot no funcionará.\n"
+        "⚠️  Ni GROQ_API_KEY ni OPENAI_API_KEY están configuradas. El chatbot no funcionará.\n"
         "   Agrega tu API key en el archivo .env:\n"
+        "   GROQ_API_KEY=gsk_... (GRATIS) o\n"
         "   OPENAI_API_KEY=sk-proj-...",
         RuntimeWarning
     )
 
 # Configuración opcional de modelo (puedes cambiarlo aquí)
 OPENAI_MODEL = config('OPENAI_MODEL', default='gpt-4-turbo-preview')
+GROQ_MODEL = config('GROQ_MODEL', default='llama-3.3-70b-versatile')
 # Opciones: 'gpt-4-turbo-preview', 'gpt-4o', 'gpt-4', 'gpt-3.5-turbo'
+
+# ============================================
+# ✅ GROQ CONFIGURATION (Alternativa a OpenAI)
+# ============================================
+GROQ_API_KEY = config('GROQ_API_KEY', default='')
 
 # ============================================
 
@@ -121,7 +151,6 @@ OPENAI_MODEL = config('OPENAI_MODEL', default='gpt-4-turbo-preview')
 SUPABASE_URL = config('SUPABASE_URL')
 SUPABASE_ANON_KEY = config('SUPABASE_ANON_KEY')
 SUPABASE_BUCKET_NAME = config('SUPABASE_BUCKET_NAME')
-DEFAULT_FILE_STORAGE = 'storages.supabase_storage.SupabaseStorage'
 STORAGES = {
     "default": {
         "BACKEND": "storages.supabase_storage.SupabaseStorage",
@@ -139,15 +168,17 @@ AUTH_USER_MODEL = 'usuarios.Usuario'
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
+# ============================================
+# 🔐 PASSWORD SECURITY
+# ============================================
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        'OPTIONS': {
-            'min_length': 8,
-        }
+        'OPTIONS': {'min_length': 12},  # Aumentado a 12 caracteres
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -196,23 +227,146 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
 
-# Session settings
-# RF-003: Carrito de sesión expira en 24 horas
-SESSION_COOKIE_AGE = 86400  # 24 horas en segundos
-SESSION_SAVE_EVERY_REQUEST = True
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+# ============================================
+# 🔒 SECURITY ENHANCEMENTS
+# ============================================
+
+# URL Encryption Key (para encriptar URLs sensibles)
+URL_ENCRYPTION_KEY = config('URL_ENCRYPTION_KEY', default=secrets.token_urlsafe(32))
+
+# Rate Limiting
+RATELIMIT_ENABLE = True
+RATELIMIT_USE_CACHE = 'default'
+
+# CSRF Protection
+CSRF_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_HTTPONLY = False  # Permitir acceso desde JavaScript para AJAX
+CSRF_COOKIE_SAMESITE = 'Lax'  # Cambiar a Lax para permitir AJAX
+CSRF_USE_SESSIONS = False  # Usar cookies en lugar de sesiones
+CSRF_COOKIE_AGE = 3600  # 1 hora
+CSRF_COOKIE_NAME = 'csrftoken'
+CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
+
+# Session Security
+SESSION_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Strict'
+SESSION_COOKIE_AGE = 3600  # 1 hora para mayor seguridad
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
+# SSL/HTTPS Security
+SECURE_SSL_REDIRECT = not DEBUG
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# Security settings (para producción)
-if not DEBUG:
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = 'DENY'
+# HSTS (HTTP Strict Transport Security)
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0  # 1 año
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
+
+# Content Security
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+
+# Frame Protection
+X_FRAME_OPTIONS = 'DENY'
+
+# Content Security Policy
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net")
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://fonts.googleapis.com")
+CSP_IMG_SRC = ("'self'", "data:", "https:")
+CSP_FONT_SRC = ("'self'", "https://fonts.gstatic.com")
+
+# Permissions Policy
+PERMISSIONS_POLICY = {
+    "accelerometer": [],
+    "camera": [],
+    "geolocation": ["self"],
+    "microphone": [],
+    "payment": [],
+}
+
+# ============================================
+# 🔐 CACHE SECURITY (Redis)
+# ============================================
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+        'TIMEOUT': 60,  # 1 minuto de caché
+    }
+}
+
+# Cache para sesiones (ACID compliance)
+SESSION_CACHE_ALIAS = 'default'
+
+# Cache middleware settings
+CACHE_MIDDLEWARE_SECONDS = 60  # 1 minuto de caché
+CACHE_MIDDLEWARE_KEY_PREFIX = 'ecuador_turismo'
+CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
+
+# Connection handling settings
+CONN_MAX_AGE = None  # Conexiones persistentes sin límite de tiempo
+ATOMIC_REQUESTS = False  # Desactivar transacciones atómicas globales
+
+# ============================================
+# 📝 LOGGING SECURITY
+# ============================================
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': BASE_DIR / 'logs' / 'security.log',
+            'maxBytes': 1024*1024*15,  # 15MB
+            'backupCount': 10,
+            'formatter': 'verbose',
+        },
+        'security_file': {
+            'level': 'WARNING',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': BASE_DIR / 'logs' / 'security_alerts.log',
+            'maxBytes': 1024*1024*15,
+            'backupCount': 10,
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        'django.security': {
+            'handlers': ['security_file', 'console'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['file', 'console'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}
 
 
 # Messages framework

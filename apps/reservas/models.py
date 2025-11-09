@@ -159,8 +159,15 @@ class Reserva(models.Model):
     
     def confirmar(self):
         """Confirma la reserva"""
-        self.estado = self.CONFIRMADA
-        self.save(update_fields=['estado'])
+        from django.db import transaction
+        
+        if self.estado != self.PENDIENTE:
+            raise ValueError("Solo se pueden confirmar reservas pendientes")
+            
+        with transaction.atomic():
+            self.estado = self.CONFIRMADA
+            self.fecha_actualizacion = timezone.now()
+            self.save(update_fields=['estado', 'fecha_actualizacion'])
     
     def cancelar(self, motivo=''):
         """Cancela la reserva"""

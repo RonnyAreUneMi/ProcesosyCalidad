@@ -202,18 +202,18 @@
             <div class="text-white">
                 <!-- Badges -->
                 <div class="flex items-center gap-3 mb-4">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-sky-500">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-sky-500 text-white">
                         <i class="fas fa-map-marker-alt mr-1"></i>
                         {{ destino.get_region_display }}
                     </span>
                     {% if destino.destacado %}
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-500">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-500 text-white">
                         <i class="fas fa-star mr-1"></i>
                         Destacado
                     </span>
                     {% endif %}
                     {% if destino.categoria %}
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-500">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-500 text-white">
                         <i class="fas fa-tag mr-1"></i>
                         {{ destino.categoria.nombre }}
                     </span>
@@ -226,16 +226,16 @@
                 </h1>
                 
                 <!-- Ubicación y Calificación -->
-                <div class="flex flex-wrap items-center gap-4 text-lg">
+                <div class="flex flex-wrap items-center gap-4 text-lg text-gray-700 dark:text-gray-300">
                     <div class="flex items-center">
                         <i class="fas fa-map-pin mr-2 text-sky-400"></i>
-                        <span>{{ destino.provincia }}{% if destino.ciudad %}, {{ destino.ciudad }}{% endif %}</span>
+                        <span class="text-gray-700 dark:text-gray-300">{{ destino.provincia }}{% if destino.ciudad %}, {{ destino.ciudad }}{% endif %}</span>
                     </div>
                     {% if destino.calificacion_promedio > 0 %}
                     <div class="flex items-center">
                         <i class="fas fa-star mr-2 text-yellow-400"></i>
-                        <span class="font-semibold">{{ destino.calificacion_promedio|floatformat:1 }}</span>
-                        <span class="text-gray-300 ml-1">({{ destino.total_calificaciones }} opiniones)</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">{{ destino.calificacion_promedio|floatformat:1 }}</span>
+                        <span class="text-gray-600 dark:text-gray-400 ml-1">({{ destino.total_calificaciones }} opiniones)</span>
                     </div>
                     {% endif %}
                 </div>
@@ -252,20 +252,20 @@
         <div class="lg:col-span-2 space-y-8">
             
             <!-- Descripción -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
                     <i class="fas fa-info-circle text-sky-600 mr-3"></i>
                     Acerca de este destino
                 </h2>
-                <p class="text-gray-700 text-lg leading-relaxed">
+                <p class="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
                     {{ destino.descripcion }}
                 </p>
             </div>
 
             <!-- Información del Clima -->
             {% if destino.clima or destino.mejor_epoca or destino.altitud %}
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
                     <i class="fas fa-cloud-sun text-sky-600 mr-3"></i>
                     Clima e Información
                 </h2>
@@ -273,13 +273,13 @@
                     {% if destino.clima %}
                     <div class="flex items-start">
                         <div class="flex-shrink-0">
-                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
                                 <i class="fas fa-temperature-high text-blue-600 text-xl"></i>
                             </div>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500">Clima</p>
-                            <p class="text-lg font-semibold text-gray-900">{{ destino.clima }}</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Clima</p>
+                            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ destino.clima }}</p>
                         </div>
                     </div>
                     {% endif %}
@@ -287,13 +287,13 @@
                     {% if destino.altitud %}
                     <div class="flex items-start">
                         <div class="flex-shrink-0">
-                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
                                 <i class="fas fa-mountain text-green-600 text-xl"></i>
                             </div>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500">Altitud</p>
-                            <p class="text-lg font-semibold text-gray-900">{{ destino.altitud }} msnm</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Altitud</p>
+                            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ destino.altitud }} msnm</p>
                         </div>
                     </div>
                     {% endif %}
@@ -301,13 +301,13 @@
                     {% if destino.mejor_epoca %}
                     <div class="flex items-start">
                         <div class="flex-shrink-0">
-                            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center">
                                 <i class="fas fa-calendar-alt text-yellow-600 text-xl"></i>
                             </div>
                         </div>
                         <div class="ml-4">
-                            <p class="text-sm font-medium text-gray-500">Mejor Época</p>
-                            <p class="text-lg font-semibold text-gray-900">{{ destino.mejor_epoca }}</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Mejor Época</p>
+                            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ destino.mejor_epoca }}</p>
                         </div>
                     </div>
                     {% endif %}
@@ -317,18 +317,18 @@
 
             <!-- Atracciones Turísticas -->
             {% if atracciones %}
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
                     <i class="fas fa-camera text-sky-600 mr-3"></i>
                     Atracciones Turísticas
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {% for atraccion in atracciones %}
-                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                        <h3 class="font-bold text-lg text-gray-900 mb-2">{{ atraccion.nombre }}</h3>
-                        <p class="text-gray-600 text-sm mb-3">{{ atraccion.descripcion }}</p>
+                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-2">{{ atraccion.nombre }}</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">{{ atraccion.descripcion }}</p>
                         {% if atraccion.tipo %}
-                        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-sky-100 text-sky-800">
+                        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-sky-100 dark:bg-sky-900 text-sky-800 dark:text-sky-200">
                             <i class="fas fa-tag mr-1"></i>
                             {{ atraccion.get_tipo_display }}
                         </span>
@@ -341,8 +341,8 @@
 
             <!-- Galería de Imágenes -->
             {% if imagenes %}
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
                     <i class="fas fa-images text-sky-600 mr-3"></i>
                     Galería de Imágenes
                 </h2>
@@ -365,13 +365,13 @@
 
     <!-- Servicios Disponibles -->
     {% if servicios_destino %}
-    <div class="bg-white rounded-xl shadow-lg p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
         <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-gray-900 flex items-center">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
                 <i class="fas fa-concierge-bell text-sky-600 mr-3"></i>
                 Servicios Disponibles
             </h2>
-            <span class="px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-sm font-semibold">
+            <span class="px-3 py-1 bg-sky-100 dark:bg-sky-900 text-sky-800 dark:text-sky-200 rounded-full text-sm font-semibold">
                 {{ total_servicios }} servicio{{ total_servicios|pluralize }}
             </span>
         </div>
@@ -379,10 +379,10 @@
         <!-- Grid de Servicios -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             {% for servicio in servicios_destino %}
-            <div class="group border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-sky-300 transition-all duration-300">
+            <div class="group border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:shadow-xl hover:border-sky-300 transition-all duration-300">
                 <a href="{% url 'servicios:detalle_servicio' servicio.id %}" class="block">
                     <!-- Imagen del Servicio -->
-                    <div class="relative h-48 overflow-hidden bg-gray-200">
+                    <div class="relative h-48 overflow-hidden bg-gray-200 dark:bg-gray-700">
                         {% if servicio.imagenes.all.0 %}
                         <img src="{{ servicio.imagenes.all.0.imagen.url }}" 
                             alt="{{ servicio.nombre }}" 
@@ -395,7 +395,7 @@
                         
                         <!-- Badge de Tipo -->
                         <div class="absolute top-3 left-3">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-white/90 backdrop-blur-sm text-gray-800 shadow-lg">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-white dark:bg-gray-800/90 backdrop-blur-sm text-gray-800 dark:text-gray-200 shadow-lg">
                                 {% if servicio.tipo == 'alojamiento' %}
                                     <i class="fas fa-hotel mr-1 text-sky-600"></i>
                                 {% elif servicio.tipo == 'restaurante' %}
@@ -407,7 +407,7 @@
                                 {% elif servicio.tipo == 'actividad' %}
                                     <i class="fas fa-bolt mr-1 text-yellow-600"></i>
                                 {% else %}
-                                    <i class="fas fa-concierge-bell mr-1 text-gray-600"></i>
+                                    <i class="fas fa-concierge-bell mr-1 text-gray-600 dark:text-gray-300"></i>
                                 {% endif %}
                                 {{ servicio.get_tipo_display }}
                             </span>
@@ -417,7 +417,7 @@
                         {% if servicio.esta_abierto_ahora %}
                         <div class="absolute top-3 right-3">
                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-green-500 text-white shadow-lg">
-                                <span class="w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></span>
+                                <span class="w-2 h-2 bg-white dark:bg-gray-800 rounded-full mr-1 animate-pulse"></span>
                                 Abierto
                             </span>
                         </div>
@@ -427,25 +427,25 @@
                     <!-- Contenido del Servicio -->
                     <div class="p-4">
                         <!-- Nombre y Categoría -->
-                        <h3 class="font-bold text-lg text-gray-900 group-hover:text-sky-600 transition-colors mb-2 line-clamp-2">
+                        <h3 class="font-bold text-lg text-gray-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors mb-2 line-clamp-2">
                             {{ servicio.nombre }}
                         </h3>
 
                         {% if servicio.categoria %}
-                        <p class="text-sm text-gray-500 mb-3 flex items-center">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-3 flex items-center">
                             <i class="fas fa-tag mr-1"></i>
                             {{ servicio.categoria.nombre }}
                         </p>
                         {% endif %}
 
                         <!-- Ubicación -->
-                        <div class="flex items-start text-sm text-gray-600 mb-3">
+                        <div class="flex items-start text-sm text-gray-600 dark:text-gray-300 mb-3">
                             <i class="fas fa-map-marker-alt mt-1 mr-2 text-sky-600 flex-shrink-0"></i>
                             <span class="line-clamp-1">{{ servicio.direccion }}</span>
                         </div>
 
                         <!-- Información adicional -->
-                        <div class="flex items-center gap-4 text-xs text-gray-500 mb-4 pb-4 border-b border-gray-100">
+                        <div class="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-4 pb-4 border-b border-gray-100">
                             {% if servicio.capacidad_maxima %}
                             <span class="flex items-center">
                                 <i class="fas fa-users mr-1"></i>
@@ -464,14 +464,14 @@
                         <div class="flex items-center justify-between">
                             <!-- Calificación -->
                             <div class="flex items-center">
-                                <div class="flex items-center bg-yellow-50 px-2 py-1 rounded-lg">
+                                <div class="flex items-center bg-yellow-50 dark:bg-yellow-900/30 px-2 py-1 rounded-lg">
                                     <i class="fas fa-star text-yellow-400 text-sm mr-1"></i>
-                                    <span class="text-sm font-bold text-gray-900">
+                                    <span class="text-sm font-bold text-gray-900 dark:text-white">
                                         {{ servicio.calificacion_promedio|floatformat:1 }}
                                     </span>
                                 </div>
                                 {% if servicio.total_calificaciones > 0 %}
-                                <span class="text-xs text-gray-500 ml-2">
+                                <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">
                                     ({{ servicio.total_calificaciones }})
                                 </span>
                                 {% endif %}
@@ -480,10 +480,10 @@
                             <!-- Precio -->
                             <div class="text-right">
                                 <div class="flex items-baseline">
-                                    <span class="text-2xl font-bold text-sky-600">
+                                    <span class="text-2xl font-bold text-sky-600 dark:text-sky-400">
                                         ${{ servicio.precio|floatformat:0 }}
                                     </span>
-                                    <span class="text-xs text-gray-500 ml-1">/persona</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 ml-1">/persona</span>
                                 </div>
                             </div>
                         </div>
@@ -516,7 +516,7 @@
     <!-- Servicios por Tipo (opcional - sección adicional) -->
     {% if servicios_por_tipo %}
     <div class="bg-gradient-to-br from-sky-50 to-blue-50 rounded-xl shadow-lg p-6 mt-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
             <i class="fas fa-th-large text-sky-600 mr-3"></i>
             Servicios por Categoría
         </h2>
@@ -524,7 +524,7 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             {% for tipo_nombre, datos in servicios_por_tipo.items %}
             <a href="{% url 'servicios:listar_servicios' %}?destino={{ destino.id }}&tipo={{ datos.codigo }}" 
-            class="block p-4 bg-white rounded-lg shadow hover:shadow-lg transition-shadow group">
+            class="block p-4 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-shadow group">
                 <div class="text-center">
                     <div class="w-16 h-16 mx-auto mb-3 bg-sky-100 rounded-full flex items-center justify-center group-hover:bg-sky-600 transition-colors">
                         {% if datos.codigo == 'alojamiento' %}
@@ -538,11 +538,11 @@
                         {% elif datos.codigo == 'actividad' %}
                             <i class="fas fa-bolt text-2xl text-yellow-600 group-hover:text-white"></i>
                         {% else %}
-                            <i class="fas fa-concierge-bell text-2xl text-gray-600 group-hover:text-white"></i>
+                            <i class="fas fa-concierge-bell text-2xl text-gray-600 dark:text-gray-300 group-hover:text-white"></i>
                         {% endif %}
                     </div>
-                    <h3 class="font-bold text-gray-900 text-sm mb-1">{{ tipo_nombre }}</h3>
-                    <p class="text-xs text-gray-600">{{ datos.total }} servicio{{ datos.total|pluralize }}</p>
+                    <h3 class="font-bold text-gray-900 dark:text-white text-sm mb-1">{{ tipo_nombre }}</h3>
+                    <p class="text-xs text-gray-600 dark:text-gray-300">{{ datos.total }} servicio{{ datos.total|pluralize }}</p>
                 </div>
             </a>
             {% endfor %}
@@ -552,12 +552,12 @@
 
     {% else %}
     <!-- Mensaje cuando no hay servicios -->
-    <div class="bg-white rounded-xl shadow-lg p-12 text-center">
-        <div class="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-            <i class="fas fa-inbox text-3xl text-gray-400"></i>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-12 text-center">
+        <div class="w-20 h-20 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+            <i class="fas fa-inbox text-3xl text-gray-400 dark:text-gray-500"></i>
         </div>
-        <h3 class="text-xl font-bold text-gray-900 mb-2">No hay servicios disponibles</h3>
-        <p class="text-gray-600 mb-6">
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">No hay servicios disponibles</h3>
+        <p class="text-gray-600 dark:text-gray-300 mb-6">
             Aún no se han registrado servicios para este destino.
         </p>
         {% if user.is_authenticated and user.rol.nombre == 'proveedor' %}
@@ -572,18 +572,18 @@
 
             <!-- Calificaciones y Opiniones -->
             {% if calificaciones %}
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
                     <i class="fas fa-comments text-sky-600 mr-3"></i>
                     Opiniones de Viajeros
                 </h2>
                 
                 <!-- Resumen de Calificaciones -->
                 {% if total_calificaciones > 0 %}
-                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
                     <div class="flex items-center justify-between mb-4">
                         <div>
-                            <div class="text-4xl font-bold text-gray-900">{{ destino.calificacion_promedio|floatformat:1 }}</div>
+                            <div class="text-4xl font-bold text-gray-900 dark:text-white">{{ destino.calificacion_promedio|floatformat:1 }}</div>
                             <div class="flex items-center mt-1">
                                 {% for i in "12345" %}
                                     {% if forloop.counter <= destino.calificacion_promedio %}
@@ -593,17 +593,17 @@
                                     {% endif %}
                                 {% endfor %}
                             </div>
-                            <p class="text-sm text-gray-600 mt-1">{{ total_calificaciones }} opinión{{ total_calificaciones|pluralize:"es" }}</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">{{ total_calificaciones }} opinión{{ total_calificaciones|pluralize:"es" }}</p>
                         </div>
                         <div class="flex-1 ml-8">
                             {% for puntuacion, cantidad in stats_calificaciones.items reversed %}
                             <div class="flex items-center mb-2">
-                                <span class="text-sm font-medium text-gray-700 w-8">{{ puntuacion }}<i class="fas fa-star text-xs ml-1"></i></span>
-                                <div class="flex-1 mx-3 bg-gray-200 rounded-full h-2">
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300 w-8">{{ puntuacion }}<i class="fas fa-star text-xs ml-1"></i></span>
+                                <div class="flex-1 mx-3 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                                     {% widthratio cantidad total_calificaciones 100 as porcentaje %}
                                     <div class="bg-yellow-400 h-2 rounded-full" style="width: {{ porcentaje }}%"></div>
                                 </div>
-                                <span class="text-sm text-gray-600 w-8 text-right">{{ cantidad }}</span>
+                                <span class="text-sm text-gray-600 dark:text-gray-300 w-8 text-right">{{ cantidad }}</span>
                             </div>
                             {% endfor %}
                         </div>
@@ -614,7 +614,7 @@
                 <!-- Lista de Opiniones -->
                 <div class="space-y-4">
                     {% for calificacion in calificaciones %}
-                    <div class="border-b border-gray-200 pb-4 last:border-b-0">
+                    <div class="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-b-0">
                         <div class="flex items-start">
                             <div class="flex-shrink-0">
                                 <div class="w-10 h-10 bg-sky-100 rounded-full flex items-center justify-center">
@@ -623,10 +623,10 @@
                             </div>
                             <div class="ml-4 flex-1">
                                 <div class="flex items-center justify-between">
-                                    <h4 class="font-semibold text-gray-900">
+                                    <h4 class="font-semibold text-gray-900 dark:text-white">
                                         {{ calificacion.usuario.get_full_name|default:calificacion.usuario.correo }}
                                     </h4>
-                                    <span class="text-sm text-gray-500">{{ calificacion.fecha_creacion|date:"d M Y" }}</span>
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">{{ calificacion.fecha_creacion|date:"d M Y" }}</span>
                                 </div>
                                 <div class="flex items-center mt-1">
                                     {% for i in "12345" %}
@@ -636,10 +636,10 @@
                                         <i class="far fa-star text-gray-300 text-sm"></i>
                                         {% endif %}
                                     {% endfor %}
-                                    <span class="ml-2 text-sm text-gray-600">{{ calificacion.servicio.nombre }}</span>
+                                    <span class="ml-2 text-sm text-gray-600 dark:text-gray-300">{{ calificacion.servicio.nombre }}</span>
                                 </div>
                                 {% if calificacion.comentario %}
-                                <p class="mt-2 text-gray-700">{{ calificacion.comentario }}</p>
+                                <p class="mt-2 text-gray-700 dark:text-gray-300">{{ calificacion.comentario }}</p>
                                 {% endif %}
                             </div>
                         </div>
@@ -655,15 +655,15 @@
         <div class="lg:col-span-1 space-y-6">
             
             <!-- Tarjeta de Precio -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
                 <div class="text-center mb-6">
-                    <p class="text-sm text-gray-600 mb-2">Rango de precios por día</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Rango de precios por día</p>
                     <div class="flex items-center justify-center">
                         <span class="text-3xl font-bold text-sky-600">${{ destino.precio_promedio_minimo|floatformat:0 }}</span>
                         <span class="text-gray-400 mx-2">-</span>
                         <span class="text-3xl font-bold text-sky-600">${{ destino.precio_promedio_maximo|floatformat:0 }}</span>
                     </div>
-                    <p class="text-xs text-gray-500 mt-2">Precios aproximados por persona</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Precios aproximados por persona</p>
                 </div>
 
                 <div class="space-y-3">
@@ -681,29 +681,29 @@
             </div>
 
             <!-- Información Adicional -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">Información Adicional</h3>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Información Adicional</h3>
                 <div class="space-y-3">
                     <div class="flex items-start">
                         <i class="fas fa-map-marker-alt text-sky-600 mt-1 mr-3"></i>
                         <div>
-                            <p class="text-sm font-medium text-gray-900">Ubicación</p>
-                            <p class="text-sm text-gray-600">{{ destino.provincia }}, {{ destino.get_region_display }}</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">Ubicación</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">{{ destino.provincia }}, {{ destino.get_region_display }}</p>
                         </div>
                     </div>
                     <div class="flex items-start">
                         <i class="fas fa-eye text-sky-600 mt-1 mr-3"></i>
                         <div>
-                            <p class="text-sm font-medium text-gray-900">Visitas</p>
-                            <p class="text-sm text-gray-600">{{ destino.visitas }} visualizacion{{ destino.visitas|pluralize:"es" }}</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">Visitas</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">{{ destino.visitas }} visualizacion{{ destino.visitas|pluralize:"es" }}</p>
                         </div>
                     </div>
                     {% if destino.categoria %}
                     <div class="flex items-start">
                         <i class="fas fa-tag text-sky-600 mt-1 mr-3"></i>
                         <div>
-                            <p class="text-sm font-medium text-gray-900">Categoría</p>
-                            <p class="text-sm text-gray-600">{{ destino.categoria.nombre }}</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">Categoría</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">{{ destino.categoria.nombre }}</p>
                         </div>
                     </div>
                     {% endif %}
@@ -712,8 +712,8 @@
 
             <!-- Destinos Relacionados -->
             {% if destinos_relacionados %}
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">Destinos Similares</h3>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Destinos Similares</h3>
                 <div class="space-y-4">
                     {% for relacionado in destinos_relacionados %}
                     <a href="{% url 'destinos:detalle_destino' relacionado.slug %}" 
@@ -723,13 +723,13 @@
                                  alt="{{ relacionado.nombre }}" 
                                  class="w-20 h-20 object-cover rounded-lg">
                             <div class="ml-3 flex-1">
-                                <h4 class="font-semibold text-gray-900 group-hover:text-sky-600 transition-colors">
+                                <h4 class="font-semibold text-gray-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                                     {{ relacionado.nombre }}
                                 </h4>
-                                <p class="text-sm text-gray-600">{{ relacionado.provincia }}</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">{{ relacionado.provincia }}</p>
                                 <div class="flex items-center mt-1">
                                     <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
-                                    <span class="text-sm font-medium">{{ relacionado.calificacion_promedio|floatformat:1 }}</span>
+                                    <span class="text-sm font-medium text-gray-900 dark:text-gray-200">{{ relacionado.calificacion_promedio|floatformat:1 }}</span>
                                 </div>
                             </div>
                         </div>
@@ -741,8 +741,8 @@
 
             <!-- Botones de Administrador -->
             {% if user.is_authenticated and user.es_administrador %}
-            <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-                <h3 class="text-sm font-bold text-yellow-900 mb-3 flex items-center">
+            <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4">
+                <h3 class="text-sm font-bold text-yellow-900 dark:text-yellow-200 mb-3 flex items-center">
                     <i class="fas fa-user-shield mr-2"></i>
                     Panel de Administrador
                 </h3>

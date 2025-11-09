@@ -3,7 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-from django.db import transaction
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import never_cache
+from django.db import transaction, connection
 from django.db.models import Sum, Count, Q, Avg
 from django.core.paginator import Paginator
 from django.utils import timezone
@@ -61,6 +63,15 @@ def solo_turistas(view_func):
 # ============================================
 # VISTAS DEL CARRITO DE COMPRAS
 # ============================================
+
+@login_required
+@solo_turistas
+def obtener_carrito_count(request):
+    """
+    API: Devuelve la cantidad de items en el carrito del usuario
+    """
+    count = ItemCarrito.objects.filter(usuario=request.user).count()
+    return JsonResponse({'count': count})
 
 @login_required
 @solo_turistas
@@ -126,7 +137,6 @@ def agregar_al_carrito(request, servicio_id):
     """
     RF-003: Agregar servicio al carrito
     Valida disponibilidad, capacidad y fechas
-    MEJORADO: Soporta reserva rápida
     """
     servicio = get_object_or_404(Servicio, id=servicio_id, activo=True, disponible=True)
     
@@ -281,6 +291,27 @@ def vaciar_carrito(request):
 # ============================================
 # VISTAS DE RESERVAS
 # ============================================
+
+@login_required
+@rol_requerido(['proveedor'])
+def obtener_reservas_pendientes_count(request):
+    """
+    API: Devuelve la cantidad de reservas pendientes para el proveedor
+    """
+    # Obtener servicios del proveedor
+    servicios_ids = Servicio.objects.filter(
+        proveedor=request.user,
+        activo=True
+    ).values_list('id', flat=True)
+    
+    # Contar reservas pendientes de esos servicios
+    count = Reserva.objects.filter(
+        servicio_id__in=servicios_ids,
+        estado=Reserva.PENDIENTE
+    ).count()
+    
+    return JsonResponse({'count': count})
+
 
 @login_required
 @solo_turistas
@@ -561,6 +592,44 @@ def reservas_proveedor(request):
     return render(request, 'reservas/proveedor.html', context)
 
 
+from django.views.decorators.cache import never_cache
+from django.db import connection
+
+@never_cache
+@login_required
+@require_http_methods(["GET"])
+def verificar_estado_reserva(request, reserva_id):
+    """
+    Endpoint para verificar el estado actual de una reserva
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT estado 
+                FROM reservas 
+                WHERE id = %s
+            """, [reserva_id])
+            result = cursor.fetchone()
+
+        if result:
+            return JsonResponse({
+                'success': True,
+                'estado': result[0]
+            })
+        else:
+            return JsonResponse({
+                'success': False,
+                'error': 'Reserva no encontrada'
+            }, status=404)
+            
+    except Exception as e:
+        print(f"Error al verificar estado: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+@never_cache
 @login_required
 @rol_requerido(['proveedor'])
 @require_http_methods(["POST"])
@@ -568,35 +637,38 @@ def confirmar_reserva_proveedor(request, reserva_id):
     """
     Permite al proveedor confirmar una reserva pendiente
     """
-    reserva = get_object_or_404(Reserva, id=reserva_id)
-    
-    # Verificar que el proveedor es dueño del servicio
-    if reserva.servicio.proveedor != request.user:
-        return JsonResponse({
-            'success': False,
-            'error': 'No tienes permiso para modificar esta reserva'
-        }, status=403)
-    
-    if reserva.estado != Reserva.PENDIENTE:
-        return JsonResponse({
-            'success': False,
-            'error': 'Solo se pueden confirmar reservas pendientes'
-        }, status=400)
-    
     try:
-        reserva.confirmar()
-        return JsonResponse({
-            'success': True,
-            'message': 'Reserva confirmada exitosamente',
-            'nuevo_estado': 'Confirmada'
-        })
+        # Obtener la reserva con un select_for_update para bloqueo
+        with transaction.atomic():
+            reserva = Reserva.objects.select_related('servicio').select_for_update(nowait=True).get(
+                id=reserva_id,
+                servicio__proveedor=request.user
+            )
+            
+            # Verificar el estado
+            if reserva.estado != Reserva.PENDIENTE:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'La reserva debe estar pendiente para poder confirmarla'
+                }, status=400)
+            
+            # Actualizar usando el método del modelo
+            reserva.confirmar()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Reserva confirmada exitosamente'
+            })
+                
     except Exception as e:
+        print(f"Error al confirmar reserva: {str(e)}")
         return JsonResponse({
-            'success': False,
-            'error': str(e)
+            'success': False, 
+            'error': 'Error al procesar la solicitud'
         }, status=500)
 
 
+@never_cache
 @login_required
 @rol_requerido(['proveedor'])
 @require_http_methods(["POST"])
@@ -605,32 +677,58 @@ def completar_reserva_proveedor(request, reserva_id):
     Permite al proveedor marcar una reserva como completada
     Esto habilita la posibilidad de calificar para el turista
     """
-    reserva = get_object_or_404(Reserva, id=reserva_id)
-    
-    # Verificar que el proveedor es dueño del servicio
-    if reserva.servicio.proveedor != request.user:
-        return JsonResponse({
-            'success': False,
-            'error': 'No tienes permiso para modificar esta reserva'
-        }, status=403)
-    
-    if reserva.estado != Reserva.CONFIRMADA:
-        return JsonResponse({
-            'success': False,
-            'error': 'Solo se pueden completar reservas confirmadas'
-        }, status=400)
-    
     try:
-        reserva.completar()
-        return JsonResponse({
-            'success': True,
-            'message': 'Reserva marcada como completada',
-            'nuevo_estado': 'Completada'
-        })
+        with transaction.atomic():
+            with connection.cursor() as cursor:
+                # Verificar estado actual y proveedor
+                cursor.execute("""
+                    SELECT r.id, r.estado, s.proveedor_id 
+                    FROM reservas r 
+                    JOIN servicios s ON r.servicio_id = s.id 
+                    WHERE r.id = %s 
+                    FOR UPDATE
+                """, [reserva_id])
+                result = cursor.fetchone()
+                
+                if not result:
+                    return JsonResponse({
+                        'success': False,
+                        'error': 'Reserva no encontrada'
+                    }, status=404)
+                
+                _, estado, proveedor_id = result
+                
+                # Verificar que el proveedor es dueño del servicio
+                if proveedor_id != request.user.id:
+                    return JsonResponse({
+                        'success': False,
+                        'error': 'No tienes permiso para modificar esta reserva'
+                    }, status=403)
+                
+                # Verificar el estado
+                if estado != 'confirmada':
+                    return JsonResponse({
+                        'success': False,
+                        'error': 'La reserva debe estar confirmada para poder completarla'
+                    }, status=400)
+                
+                # Actualizar el estado directamente
+                cursor.execute("""
+                    UPDATE reservas 
+                    SET estado = %s 
+                    WHERE id = %s
+                """, ['completada', reserva_id])
+                
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Reserva marcada como completada exitosamente'
+                })
+                
     except Exception as e:
+        print(f"Error al completar reserva: {str(e)}")
         return JsonResponse({
-            'success': False,
-            'error': str(e)
+            'success': False, 
+            'error': 'Error al procesar la solicitud'
         }, status=500)
 
 

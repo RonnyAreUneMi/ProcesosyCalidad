@@ -1,0 +1,5 @@
+WARNING 2025-11-08 21:14:22,517 security 25040 22596 Patrón peligroso detectado en campo nombre: <script
+WARNING 2025-11-08 21:15:29,516 security 8440 23156 Patrón peligroso detectado en campo nombre: <script
+WARNING 2025-11-08 21:18:09,264 middleware 19900 13816 Rate limiting deshabilitado: Error 10061 connecting to 127.0.0.1:6379. No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+WARNING 2025-11-08 21:24:58,171 log 9128 14444 Forbidden (CSRF token from the 'X-Csrftoken' HTTP header incorrect.): /chatbot/message/
+WARNING 2025-11-08 21:25:06,569 log 9128 14444 Forbidden (CSRF token from the 'X-Csrftoken' HTTP header incorrect.): /chatbot/message/

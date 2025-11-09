@@ -1,0 +1,1042 @@
+{
+  "terminales_terrestres": [
+    {
+      "id": "term_guayaquil",
+      "nombre": "Terminal Terrestre Guayaquil",
+      "ciudad": "Guayaquil",
+      "provincia": "Guayas",
+      "region": "costa",
+      "latitud": -2.1894,
+      "longitud": -79.8881,
+      "tipo": "terrestre",
+      "servicios": [
+        "buses_interprovinciales",
+        "taxis",
+        "restaurantes"
+      ],
+      "destinos_principales": [
+        "Quito",
+        "Cuenca",
+        "Manta",
+        "Machala",
+        "Loja",
+        "Santo Domingo"
+      ]
+    },
+    {
+      "id": "term_quito",
+      "nombre": "Terminal Terrestre Quitumbe",
+      "ciudad": "Quito",
+      "provincia": "Pichincha",
+      "region": "sierra",
+      "latitud": -0.298,
+      "longitud": -78.55,
+      "tipo": "terrestre",
+      "servicios": [
+        "buses_interprovinciales",
+        "taxis",
+        "restaurantes",
+        "cajeros"
+      ],
+      "destinos_principales": [
+        "Guayaquil",
+        "Cuenca",
+        "Ambato",
+        "Riobamba",
+        "Manta",
+        "Esmeraldas"
+      ]
+    },
+    {
+      "id": "term_carcelén",
+      "nombre": "Terminal Terrestre Carcelén",
+      "ciudad": "Quito",
+      "provincia": "Pichincha",
+      "region": "sierra",
+      "latitud": -0.1039,
+      "longitud": -78.4813,
+      "tipo": "terrestre",
+      "servicios": [
+        "buses_interprovinciales",
+        "taxis"
+      ],
+      "destinos_principales": [
+        "Otavalo",
+        "Ibarra",
+        "Tulcán",
+        "Esmeraldas"
+      ]
+    },
+    {
+      "id": "term_cuenca",
+      "nombre": "Terminal Terrestre Cuenca",
+      "ciudad": "Cuenca",
+      "provincia": "Azuay",
+      "region": "sierra",
+      "latitud": -2.9137,
+      "longitud": -79.0081,
+      "tipo": "terrestre",
+      "servicios": [
+        "buses_interprovinciales",
+        "taxis",
+        "restaurantes"
+      ],
+      "destinos_principales": [
+        "Guayaquil",
+        "Quito",
+        "Loja",
+        "Machala",
+        "Azogues"
+      ]
+    },
+    {
+      "id": "term_milagro",
+      "nombre": "Terminal Terrestre Milagro",
+      "ciudad": "Milagro",
+      "provincia": "Guayas",
+      "region": "costa",
+      "latitud": -2.1344,
+      "longitud": -79.5931,
+      "tipo": "terrestre",
+      "servicios": [
+        "buses_interprovinciales",
+        "taxis"
+      ],
+      "destinos_principales": [
+        "Guayaquil",
+        "Durán",
+        "Babahoyo",
+        "Yaguachi"
+      ]
+    },
+    {
+      "id": "term_manta",
+      "nombre": "Terminal Terrestre Manta",
+      "ciudad": "Manta",
+      "provincia": "Manabí",
+      "region": "costa",
+      "latitud": -0.9677,
+      "longitud": -80.7089,
+      "tipo": "terrestre",
+      "servicios": [
+        "buses_interprovinciales",
+        "taxis",
+        "restaurantes"
+      ],
+      "destinos_principales": [
+        "Guayaquil",
+        "Quito",
+        "Portoviejo",
+        "Bahía de Caráquez"
+      ]
+    },
+    {
+      "id": "term_ambato",
+      "nombre": "Terminal Terrestre Ambato",
+      "ciudad": "Ambato",
+      "provincia": "Tungurahua",
+      "region": "sierra",
+      "latitud": -1.2635,
+      "longitud": -78.6215,
+      "tipo": "terrestre",
+      "servicios": [
+        "buses_interprovinciales",
+        "taxis",
+        "restaurantes"
+      ],
+      "destinos_principales": [
+        "Quito",
+        "Guayaquil",
+        "Riobamba",
+        "Baños",
+        "Latacunga"
+      ]
+    },
+    {
+      "id": "term_riobamba",
+      "nombre": "Terminal Terrestre Riobamba",
+      "ciudad": "Riobamba",
+      "provincia": "Chimborazo",
+      "region": "sierra",
+      "latitud": -1.6635,
+      "longitud": -78.6592,
+      "tipo": "terrestre",
+      "servicios": [
+        "buses_interprovinciales",
+        "taxis"
+      ],
+      "destinos_principales": [
+        "Quito",
+        "Guayaquil",
+        "Ambato",
+        "Cuenca",
+        "Guaranda"
+      ]
+    },
+    {
+      "id": "term_machala",
+      "nombre": "Terminal Terrestre Machala",
+      "ciudad": "Machala",
+      "provincia": "El Oro",
+      "region": "costa",
+      "latitud": -3.2581,
+      "longitud": -79.9553,
+      "tipo": "terrestre",
+      "servicios": [
+        "buses_interprovinciales",
+        "taxis"
+      ],
+      "destinos_principales": [
+        "Guayaquil",
+        "Cuenca",
+        "Loja",
+        "Huaquillas"
+      ]
+    },
+    {
+      "id": "term_loja",
+      "nombre": "Terminal Terrestre Loja",
+      "ciudad": "Loja",
+      "provincia": "Loja",
+      "region": "sierra",
+      "latitud": -3.9961,
+      "longitud": -79.2044,
+      "tipo": "terrestre",
+      "servicios": [
+        "buses_interprovinciales",
+        "taxis",
+        "restaurantes"
+      ],
+      "destinos_principales": [
+        "Quito",
+        "Guayaquil",
+        "Cuenca",
+        "Machala",
+        "Zamora"
+      ]
+    },
+    {
+      "id": "term_esmeraldas",
+      "nombre": "Terminal Terrestre Esmeraldas",
+      "ciudad": "Esmeraldas",
+      "provincia": "Esmeraldas",
+      "region": "costa",
+      "latitud": 0.9592,
+      "longitud": -79.6519,
+      "tipo": "terrestre",
+      "servicios": [
+        "buses_interprovinciales",
+        "taxis"
+      ],
+      "destinos_principales": [
+        "Quito",
+        "Guayaquil",
+        "Santo Domingo",
+        "Atacames"
+      ]
+    },
+    {
+      "id": "term_santo_domingo",
+      "nombre": "Terminal Terrestre Santo Domingo",
+      "ciudad": "Santo Domingo de los Tsáchilas",
+      "provincia": "Santo Domingo de los Tsáchilas",
+      "region": "costa",
+      "latitud": -0.2501,
+      "longitud": -79.1753,
+      "tipo": "terrestre",
+      "servicios": [
+        "buses_interprovinciales",
+        "taxis",
+        "restaurantes"
+      ],
+      "destinos_principales": [
+        "Quito",
+        "Guayaquil",
+        "Esmeraldas",
+        "Manta",
+        "Quevedo"
+      ]
+    }
+  ],
+  "aeropuertos": [
+    {
+      "id": "aero_guayaquil",
+      "nombre": "Aeropuerto Internacional José Joaquín de Olmedo",
+      "codigo_iata": "GYE",
+      "ciudad": "Guayaquil",
+      "provincia": "Guayas",
+      "region": "costa",
+      "latitud": -2.1574,
+      "longitud": -79.8838,
+      "tipo": "aereo",
+      "categoria": "internacional",
+      "servicios": [
+        "vuelos_nacionales",
+        "vuelos_internacionales",
+        "restaurantes",
+        "tiendas"
+      ],
+      "destinos_nacionales": [
+        "Quito",
+        "Cuenca",
+        "Galápagos (San Cristóbal)",
+        "Galápagos (Baltra)",
+        "Loja",
+        "Coca"
+      ],
+      "destinos_internacionales": [
+        "Miami",
+        "Madrid",
+        "Ciudad de Panamá",
+        "Lima",
+        "Bogotá",
+        "Ciudad de México"
+      ]
+    },
+    {
+      "id": "aero_quito",
+      "nombre": "Aeropuerto Internacional Mariscal Sucre",
+      "codigo_iata": "UIO",
+      "ciudad": "Quito",
+      "provincia": "Pichincha",
+      "region": "sierra",
+      "latitud": -0.1292,
+      "longitud": -78.3575,
+      "tipo": "aereo",
+      "categoria": "internacional",
+      "servicios": [
+        "vuelos_nacionales",
+        "vuelos_internacionales",
+        "restaurantes",
+        "tiendas",
+        "hotel"
+      ],
+      "destinos_nacionales": [
+        "Guayaquil",
+        "Cuenca",
+        "Galápagos (Baltra)",
+        "Coca",
+        "Lago Agrio",
+        "Loja"
+      ],
+      "destinos_internacionales": [
+        "Miami",
+        "Madrid",
+        "Ciudad de Panamá",
+        "Lima",
+        "Bogotá",
+        "Houston"
+      ]
+    },
+    {
+      "id": "aero_galapagos_scr",
+      "nombre": "Aeropuerto San Cristóbal",
+      "codigo_iata": "SCY",
+      "ciudad": "Puerto Baquerizo Moreno",
+      "provincia": "Galápagos",
+      "region": "galapagos",
+      "latitud": -0.9102,
+      "longitud": -89.6174,
+      "tipo": "aereo",
+      "categoria": "nacional",
+      "servicios": [
+        "vuelos_nacionales",
+        "restaurantes"
+      ],
+      "destinos_nacionales": [
+        "Guayaquil",
+        "Quito"
+      ]
+    },
+    {
+      "id": "aero_galapagos_baltra",
+      "nombre": "Aeropuerto Ecológico Galápagos",
+      "codigo_iata": "GPS",
+      "ciudad": "Baltra",
+      "provincia": "Galápagos",
+      "region": "galapagos",
+      "latitud": -0.4537,
+      "longitud": -90.2659,
+      "tipo": "aereo",
+      "categoria": "nacional",
+      "servicios": [
+        "vuelos_nacionales",
+        "restaurantes"
+      ],
+      "destinos_nacionales": [
+        "Guayaquil",
+        "Quito"
+      ]
+    },
+    {
+      "id": "aero_cuenca",
+      "nombre": "Aeropuerto Mariscal Lamar",
+      "codigo_iata": "CUE",
+      "ciudad": "Cuenca",
+      "provincia": "Azuay",
+      "region": "sierra",
+      "latitud": -2.8894,
+      "longitud": -78.9844,
+      "tipo": "aereo",
+      "categoria": "nacional",
+      "servicios": [
+        "vuelos_nacionales",
+        "restaurantes"
+      ],
+      "destinos_nacionales": [
+        "Quito",
+        "Guayaquil"
+      ]
+    },
+    {
+      "id": "aero_manta",
+      "nombre": "Aeropuerto Eloy Alfaro Internacional",
+      "codigo_iata": "MEC",
+      "ciudad": "Manta",
+      "provincia": "Manabí",
+      "region": "costa",
+      "latitud": -0.9461,
+      "longitud": -80.6789,
+      "tipo": "aereo",
+      "categoria": "internacional",
+      "servicios": [
+        "vuelos_nacionales",
+        "vuelos_internacionales",
+        "restaurantes"
+      ],
+      "destinos_nacionales": [
+        "Quito"
+      ],
+      "destinos_internacionales": [
+        "Ciudad de Panamá"
+      ]
+    },
+    {
+      "id": "aero_loja",
+      "nombre": "Aeropuerto Ciudad de Catamayo",
+      "codigo_iata": "LOH",
+      "ciudad": "Catamayo (Loja)",
+      "provincia": "Loja",
+      "region": "sierra",
+      "latitud": -3.9959,
+      "longitud": -79.3719,
+      "tipo": "aereo",
+      "categoria": "nacional",
+      "servicios": [
+        "vuelos_nacionales"
+      ],
+      "destinos_nacionales": [
+        "Quito",
+        "Guayaquil"
+      ]
+    },
+    {
+      "id": "aero_coca",
+      "nombre": "Aeropuerto Francisco de Orellana",
+      "codigo_iata": "OCC",
+      "ciudad": "Puerto Francisco de Orellana (Coca)",
+      "provincia": "Orellana",
+      "region": "oriente",
+      "latitud": -0.4629,
+      "longitud": -76.9869,
+      "tipo": "aereo",
+      "categoria": "nacional",
+      "servicios": [
+        "vuelos_nacionales"
+      ],
+      "destinos_nacionales": [
+        "Quito",
+        "Guayaquil"
+      ]
+    }
+  ],
+  "puertos_maritimos": [
+    {
+      "id": "puerto_guayaquil",
+      "nombre": "Puerto Marítimo de Guayaquil",
+      "ciudad": "Guayaquil",
+      "provincia": "Guayas",
+      "region": "costa",
+      "latitud": -2.2661,
+      "longitud": -79.9067,
+      "tipo": "maritimo",
+      "servicios": [
+        "cruceros",
+        "carga",
+        "ferry"
+      ],
+      "destinos": [
+        "Galápagos (Santa Cruz)",
+        "Galápagos (San Cristóbal)",
+        "Galápagos (Isabela)"
+      ]
+    },
+    {
+      "id": "puerto_manta",
+      "nombre": "Puerto de Manta",
+      "ciudad": "Manta",
+      "provincia": "Manabí",
+      "region": "costa",
+      "latitud": -0.9489,
+      "longitud": -80.7328,
+      "tipo": "maritimo",
+      "servicios": [
+        "cruceros",
+        "carga",
+        "pesca"
+      ],
+      "destinos": [
+        "Galápagos (tours especializados)"
+      ]
+    },
+    {
+      "id": "puerto_galapagos_santa_cruz",
+      "nombre": "Puerto Ayora",
+      "ciudad": "Puerto Ayora",
+      "provincia": "Galápagos",
+      "region": "galapagos",
+      "latitud": -0.7393,
+      "longitud": -90.3127,
+      "tipo": "maritimo",
+      "servicios": [
+        "ferry_interislas",
+        "tours",
+        "cruceros"
+      ],
+      "destinos": [
+        "San Cristóbal",
+        "Isabela",
+        "Floreana"
+      ]
+    },
+    {
+      "id": "puerto_galapagos_scr",
+      "nombre": "Puerto Baquerizo Moreno",
+      "ciudad": "Puerto Baquerizo Moreno",
+      "provincia": "Galápagos",
+      "region": "galapagos",
+      "latitud": -0.9026,
+      "longitud": -89.6108,
+      "tipo": "maritimo",
+      "servicios": [
+        "ferry_interislas",
+        "tours"
+      ],
+      "destinos": [
+        "Santa Cruz",
+        "Isabela"
+      ]
+    },
+    {
+      "id": "puerto_galapagos_isabela",
+      "nombre": "Puerto Villamil",
+      "ciudad": "Puerto Villamil",
+      "provincia": "Galápagos",
+      "region": "galapagos",
+      "latitud": -0.9578,
+      "longitud": -90.9658,
+      "tipo": "maritimo",
+      "servicios": [
+        "ferry_interislas",
+        "tours"
+      ],
+      "destinos": [
+        "Santa Cruz",
+        "San Cristóbal"
+      ]
+    },
+    {
+      "id": "puerto_esmeraldas",
+      "nombre": "Puerto de Esmeraldas",
+      "ciudad": "Esmeraldas",
+      "provincia": "Esmeraldas",
+      "region": "costa",
+      "latitud": 0.9681,
+      "longitud": -79.6536,
+      "tipo": "maritimo",
+      "servicios": [
+        "carga",
+        "pesca"
+      ],
+      "destinos": []
+    }
+  ],
+  "rutas_recomendadas": {
+    "milagro_galapagos": [
+      {
+        "tipo": "recomendada",
+        "nombre": "Ruta Aérea Rápida",
+        "descripcion": "La forma más rápida de llegar a Galápagos",
+        "tramos": [
+          {
+            "orden": 1,
+            "desde": "Milagro",
+            "hasta": "Guayaquil",
+            "medio_transporte": "terrestre",
+            "punto_partida": "term_milagro",
+            "punto_llegada": "term_guayaquil",
+            "duracion_aprox": "1 hora",
+            "distancia_km": 45,
+            "costo_aprox": 2.5
+          },
+          {
+            "orden": 2,
+            "desde": "Guayaquil",
+            "hasta": "Galápagos (San Cristóbal)",
+            "medio_transporte": "aereo",
+            "punto_partida": "aero_guayaquil",
+            "punto_llegada": "aero_galapagos_scr",
+            "duracion_aprox": "2 horas",
+            "distancia_km": 1000,
+            "costo_aprox": 350
+          }
+        ],
+        "duracion_total": "3 horas",
+        "costo_total": 352.5
+      },
+      {
+        "tipo": "alternativa",
+        "nombre": "Ruta Vía Quito",
+        "descripcion": "Alternativa pasando por la capital",
+        "tramos": [
+          {
+            "orden": 1,
+            "desde": "Milagro",
+            "hasta": "Guayaquil",
+            "medio_transporte": "terrestre",
+            "punto_partida": "term_milagro",
+            "punto_llegada": "term_guayaquil",
+            "duracion_aprox": "1 hora",
+            "distancia_km": 45,
+            "costo_aprox": 2.5
+          },
+          {
+            "orden": 2,
+            "desde": "Guayaquil",
+            "hasta": "Quito",
+            "medio_transporte": "aereo",
+            "punto_partida": "aero_guayaquil",
+            "punto_llegada": "aero_quito",
+            "duracion_aprox": "1 hora",
+            "distancia_km": 420,
+            "costo_aprox": 80
+          },
+          {
+            "orden": 3,
+            "desde": "Quito",
+            "hasta": "Galápagos (Baltra)",
+            "medio_transporte": "aereo",
+            "punto_partida": "aero_quito",
+            "punto_llegada": "aero_galapagos_baltra",
+            "duracion_aprox": "2.5 horas",
+            "distancia_km": 1000,
+            "costo_aprox": 350
+          }
+        ],
+        "duracion_total": "4.5 horas",
+        "costo_total": 432.5
+      }
+    ],
+    "milagro_quito": [
+      {
+        "tipo": "recomendada",
+        "nombre": "Ruta Terrestre Directa",
+        "descripcion": "Ruta más económica y popular",
+        "tramos": [
+          {
+            "orden": 1,
+            "desde": "Milagro",
+            "hasta": "Guayaquil",
+            "medio_transporte": "terrestre",
+            "punto_partida": "term_milagro",
+            "punto_llegada": "term_guayaquil",
+            "duracion_aprox": "1 hora",
+            "distancia_km": 45,
+            "costo_aprox": 2.5
+          },
+          {
+            "orden": 2,
+            "desde": "Guayaquil",
+            "hasta": "Quito",
+            "medio_transporte": "terrestre",
+            "punto_partida": "term_guayaquil",
+            "punto_llegada": "term_quito",
+            "duracion_aprox": "8 horas",
+            "distancia_km": 420,
+            "costo_aprox": 12
+          }
+        ],
+        "duracion_total": "9 horas",
+        "costo_total": 14.5
+      },
+      {
+        "tipo": "alternativa",
+        "nombre": "Ruta Aérea Rápida",
+        "descripcion": "La forma más rápida pero más costosa",
+        "tramos": [
+          {
+            "orden": 1,
+            "desde": "Milagro",
+            "hasta": "Guayaquil",
+            "medio_transporte": "terrestre",
+            "punto_partida": "term_milagro",
+            "punto_llegada": "aero_guayaquil",
+            "duracion_aprox": "1 hora",
+            "distancia_km": 45,
+            "costo_aprox": 5
+          },
+          {
+            "orden": 2,
+            "desde": "Guayaquil",
+            "hasta": "Quito",
+            "medio_transporte": "aereo",
+            "punto_partida": "aero_guayaquil",
+            "punto_llegada": "aero_quito",
+            "duracion_aprox": "1 hora",
+            "distancia_km": 420,
+            "costo_aprox": 80
+          }
+        ],
+        "duracion_total": "2 horas",
+        "costo_total": 85
+      }
+    ],
+    "quito_galapagos": [
+      {
+        "tipo": "recomendada",
+        "nombre": "Vuelo Directo Quito-Galápagos",
+        "descripcion": "Vuelo directo desde la capital",
+        "tramos": [
+          {
+            "orden": 1,
+            "desde": "Quito",
+            "hasta": "Galápagos (Baltra)",
+            "medio_transporte": "aereo",
+            "punto_partida": "aero_quito",
+            "punto_llegada": "aero_galapagos_baltra",
+            "duracion_aprox": "2.5 horas",
+            "distancia_km": 1000,
+            "costo_aprox": 350
+          }
+        ],
+        "duracion_total": "2.5 horas",
+        "costo_total": 350
+      }
+    ],
+    "guayaquil_galapagos": [
+      {
+        "tipo": "recomendada",
+        "nombre": "Vuelo Directo Guayaquil-Galápagos",
+        "descripcion": "La forma más rápida desde Guayaquil",
+        "tramos": [
+          {
+            "orden": 1,
+            "desde": "Guayaquil",
+            "hasta": "Galápagos (San Cristóbal)",
+            "medio_transporte": "aereo",
+            "punto_partida": "aero_guayaquil",
+            "punto_llegada": "aero_galapagos_scr",
+            "duracion_aprox": "2 horas",
+            "distancia_km": 1000,
+            "costo_aprox": 350
+          }
+        ],
+        "duracion_total": "2 horas",
+        "costo_total": 350
+      }
+    ],
+    "cuenca_galapagos": [
+      {
+        "tipo": "recomendada",
+        "nombre": "Ruta Aérea vía Guayaquil",
+        "descripcion": "Trasbordo en Guayaquil para vuelo a Galápagos",
+        "tramos": [
+          {
+            "orden": 1,
+            "desde": "Cuenca",
+            "hasta": "Guayaquil",
+            "medio_transporte": "terrestre",
+            "punto_partida": "term_cuenca",
+            "punto_llegada": "term_guayaquil",
+            "duracion_aprox": "6 horas",
+            "distancia_km": 300,
+            "costo_aprox": 10
+          },
+          {
+            "orden": 2,
+            "desde": "Guayaquil",
+            "hasta": "Galápagos (San Cristóbal)",
+            "medio_transporte": "aereo",
+            "punto_partida": "aero_guayaquil",
+            "punto_llegada": "aero_galapagos_scr",
+            "duracion_aprox": "2 horas",
+            "distancia_km": 1000,
+            "costo_aprox": 350
+          }
+        ],
+        "duracion_total": "8 horas",
+        "costo_total": 360
+      },
+      {
+        "tipo": "alternativa",
+        "nombre": "Ruta Aérea vía Quito",
+        "descripcion": "Alternativa pasando por Quito",
+        "tramos": [
+          {
+            "orden": 1,
+            "desde": "Cuenca",
+            "hasta": "Quito",
+            "medio_transporte": "terrestre",
+            "punto_partida": "term_cuenca",
+            "punto_llegada": "term_quito",
+            "duracion_aprox": "10 horas",
+            "distancia_km": 500,
+            "costo_aprox": 15
+          },
+          {
+            "orden": 2,
+            "desde": "Quito",
+            "hasta": "Galápagos (Baltra)",
+            "medio_transporte": "aereo",
+            "punto_partida": "aero_quito",
+            "punto_llegada": "aero_galapagos_baltra",
+            "duracion_aprox": "2.5 horas",
+            "distancia_km": 1000,
+            "costo_aprox": 350
+          }
+        ],
+        "duracion_total": "12.5 horas",
+        "costo_total": 365
+      }
+    ],
+    "manta_galapagos": [
+      {
+        "tipo": "recomendada",
+        "nombre": "Ruta Aérea vía Guayaquil",
+        "descripcion": "Trasbordo en Guayaquil para vuelo a Galápagos",
+        "tramos": [
+          {
+            "orden": 1,
+            "desde": "Manta",
+            "hasta": "Guayaquil",
+            "medio_transporte": "terrestre",
+            "punto_partida": "term_manta",
+            "punto_llegada": "term_guayaquil",
+            "duracion_aprox": "6 horas",
+            "distancia_km": 300,
+            "costo_aprox": 10
+          },
+          {
+            "orden": 2,
+            "desde": "Guayaquil",
+            "hasta": "Galápagos (San Cristóbal)",
+            "medio_transporte": "aereo",
+            "punto_partida": "aero_guayaquil",
+            "punto_llegada": "aero_galapagos_scr",
+            "duracion_aprox": "2 horas",
+            "distancia_km": 1000,
+            "costo_aprox": 350
+          }
+        ],
+        "duracion_total": "8 horas",
+        "costo_total": 360
+      }
+    ],
+    "ambato_galapagos": [
+      {
+        "tipo": "recomendada",
+        "nombre": "Ruta Aérea vía Guayaquil",
+        "descripcion": "Trasbordo en Guayaquil para vuelo a Galápagos",
+        "tramos": [
+          {
+            "orden": 1,
+            "desde": "Ambato",
+            "hasta": "Guayaquil",
+            "medio_transporte": "terrestre",
+            "punto_partida": "term_ambato",
+            "punto_llegada": "term_guayaquil",
+            "duracion_aprox": "6 horas",
+            "distancia_km": 300,
+            "costo_aprox": 10
+          },
+          {
+            "orden": 2,
+            "desde": "Guayaquil",
+            "hasta": "Galápagos (San Cristóbal)",
+            "medio_transporte": "aereo",
+            "punto_partida": "aero_guayaquil",
+            "punto_llegada": "aero_galapagos_scr",
+            "duracion_aprox": "2 horas",
+            "distancia_km": 1000,
+            "costo_aprox": 350
+          }
+        ],
+        "duracion_total": "8 horas",
+        "costo_total": 360
+      }
+    ],
+    "riobamba_galapagos": [
+      {
+        "tipo": "recomendada",
+        "nombre": "Ruta Aérea vía Guayaquil",
+        "descripcion": "Trasbordo en Guayaquil para vuelo a Galápagos",
+        "tramos": [
+          {
+            "orden": 1,
+            "desde": "Riobamba",
+            "hasta": "Guayaquil",
+            "medio_transporte": "terrestre",
+            "punto_partida": "term_riobamba",
+            "punto_llegada": "term_guayaquil",
+            "duracion_aprox": "6 horas",
+            "distancia_km": 300,
+            "costo_aprox": 10
+          },
+          {
+            "orden": 2,
+            "desde": "Guayaquil",
+            "hasta": "Galápagos (San Cristóbal)",
+            "medio_transporte": "aereo",
+            "punto_partida": "aero_guayaquil",
+            "punto_llegada": "aero_galapagos_scr",
+            "duracion_aprox": "2 horas",
+            "distancia_km": 1000,
+            "costo_aprox": 350
+          }
+        ],
+        "duracion_total": "8 horas",
+        "costo_total": 360
+      }
+    ],
+    "machala_galapagos": [
+      {
+        "tipo": "recomendada",
+        "nombre": "Ruta Aérea vía Guayaquil",
+        "descripcion": "Trasbordo en Guayaquil para vuelo a Galápagos",
+        "tramos": [
+          {
+            "orden": 1,
+            "desde": "Machala",
+            "hasta": "Guayaquil",
+            "medio_transporte": "terrestre",
+            "punto_partida": "term_machala",
+            "punto_llegada": "term_guayaquil",
+            "duracion_aprox": "6 horas",
+            "distancia_km": 300,
+            "costo_aprox": 10
+          },
+          {
+            "orden": 2,
+            "desde": "Guayaquil",
+            "hasta": "Galápagos (San Cristóbal)",
+            "medio_transporte": "aereo",
+            "punto_partida": "aero_guayaquil",
+            "punto_llegada": "aero_galapagos_scr",
+            "duracion_aprox": "2 horas",
+            "distancia_km": 1000,
+            "costo_aprox": 350
+          }
+        ],
+        "duracion_total": "8 horas",
+        "costo_total": 360
+      }
+    ],
+    "loja_galapagos": [
+      {
+        "tipo": "recomendada",
+        "nombre": "Ruta Aérea vía Guayaquil",
+        "descripcion": "Trasbordo en Guayaquil para vuelo a Galápagos",
+        "tramos": [
+          {
+            "orden": 1,
+            "desde": "Loja",
+            "hasta": "Guayaquil",
+            "medio_transporte": "terrestre",
+            "punto_partida": "term_loja",
+            "punto_llegada": "term_guayaquil",
+            "duracion_aprox": "6 horas",
+            "distancia_km": 300,
+            "costo_aprox": 10
+          },
+          {
+            "orden": 2,
+            "desde": "Guayaquil",
+            "hasta": "Galápagos (San Cristóbal)",
+            "medio_transporte": "aereo",
+            "punto_partida": "aero_guayaquil",
+            "punto_llegada": "aero_galapagos_scr",
+            "duracion_aprox": "2 horas",
+            "distancia_km": 1000,
+            "costo_aprox": 350
+          }
+        ],
+        "duracion_total": "8 horas",
+        "costo_total": 360
+      },
+      {
+        "tipo": "alternativa",
+        "nombre": "Ruta Aérea vía Quito",
+        "descripcion": "Alternativa pasando por Quito",
+        "tramos": [
+          {
+            "orden": 1,
+            "desde": "Loja",
+            "hasta": "Quito",
+            "medio_transporte": "terrestre",
+            "punto_partida": "term_loja",
+            "punto_llegada": "term_quito",
+            "duracion_aprox": "10 horas",
+            "distancia_km": 500,
+            "costo_aprox": 15
+          },
+          {
+            "orden": 2,
+            "desde": "Quito",
+            "hasta": "Galápagos (Baltra)",
+            "medio_transporte": "aereo",
+            "punto_partida": "aero_quito",
+            "punto_llegada": "aero_galapagos_baltra",
+            "duracion_aprox": "2.5 horas",
+            "distancia_km": 1000,
+            "costo_aprox": 350
+          }
+        ],
+        "duracion_total": "12.5 horas",
+        "costo_total": 365
+      }
+    ],
+    "esmeraldas_galapagos": [
+      {
+        "tipo": "recomendada",
+        "nombre": "Ruta Aérea vía Guayaquil",
+        "descripcion": "Trasbordo en Guayaquil para vuelo a Galápagos",
+        "tramos": [
+          {
+            "orden": 1,
+            "desde": "Esmeraldas",
+            "hasta": "Guayaquil",
+            "medio_transporte": "terrestre",
+            "punto_partida": "term_esmeraldas",
+            "punto_llegada": "term_guayaquil",
+            "duracion_aprox": "6 horas",
+            "distancia_km": 300,
+            "costo_aprox": 10
+          },
+          {
+            "orden": 2,
+            "desde": "Guayaquil",
+            "hasta": "Galápagos (San Cristóbal)",
+            "medio_transporte": "aereo",
+            "punto_partida": "aero_guayaquil",
+            "punto_llegada": "aero_galapagos_scr",
+            "duracion_aprox": "2 horas",
+            "distancia_km": 1000,
+            "costo_aprox": 350
+          }
+        ],
+        "duracion_total": "8 horas",
+        "costo_total": 360
+      }
+    ]
+  }
+}

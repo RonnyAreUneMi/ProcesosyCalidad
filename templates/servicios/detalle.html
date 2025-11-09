@@ -3,7 +3,7 @@
 {% load calificaciones_extra %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     
     <!-- Hero Section con Galería -->
     <div class="relative h-[500px] overflow-hidden">
@@ -38,7 +38,7 @@
                     <div class="lg:col-span-2">
                         <!-- Badges -->
                         <div class="flex flex-wrap items-center gap-2 mb-3">
-                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold bg-white text-gray-800">
+                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
                                 {% if servicio.tipo == 'alojamiento' %}
                                     <i class="fas fa-hotel mr-2 text-purple-600"></i>
                                 {% elif servicio.tipo == 'tour' %}
@@ -102,14 +102,14 @@
                         {% if imagenes_secundarias %}
                         <div class="flex gap-2 overflow-x-auto pb-2">
                             {% if imagen_principal %}
-                            <button onclick="cambiarImagen('{{ imagen_principal.imagen.url }}')" 
-                                    class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 border-white shadow-lg hover:scale-105 transition-transform">
+                            <button onclick="cambiarImagen('{{ imagen_principal.imagen.url }}')"
+                                    class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 border-white dark:border-cyan-500 shadow-lg hover:scale-105 transition-transform">
                                 <img src="{{ imagen_principal.imagen.url }}" class="w-full h-full object-cover">
                             </button>
                             {% endif %}
                             {% for imagen in imagenes_secundarias %}
-                            <button onclick="cambiarImagen('{{ imagen.imagen.url }}')" 
-                                    class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 border-white/60 hover:border-white shadow-lg hover:scale-105 transition-transform">
+                            <button onclick="cambiarImagen('{{ imagen.imagen.url }}')"
+                                    class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 border-white/60 dark:border-cyan-500/60 hover:border-white dark:hover:border-cyan-500 shadow-lg hover:scale-105 transition-transform">
                                 <img src="{{ imagen.imagen.url }}" class="w-full h-full object-cover">
                             </button>
                             {% endfor %}
@@ -119,12 +119,12 @@
 
                     <!-- Card de Precio (Desktop) -->
                     <div class="hidden lg:block">
-                        <div class="bg-white rounded-xl shadow-2xl p-5 sticky top-4">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-5 sticky top-4">
                             <div class="text-center mb-4">
-                                <p class="text-xs text-gray-600 mb-1">Precio por persona</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mb-1">Precio por persona</p>
                                 <div class="flex items-baseline justify-center mb-3">
-                                    <span class="text-3xl font-bold text-gray-900">${{ servicio.precio|floatformat:0 }}</span>
-                                    <span class="text-base text-gray-500 ml-1">USD</span>
+                                    <span class="text-3xl font-bold text-gray-900 dark:text-white">${{ servicio.precio|floatformat:0 }}</span>
+                                    <span class="text-base text-gray-500 dark:text-gray-400 ml-1">USD</span>
                                 </div>
                             </div>
 
@@ -147,16 +147,16 @@
                             </a>
                             {% endif %}
 
-                            <div class="mt-3 pt-3 border-t border-gray-200 space-y-2">
-                                <div class="flex items-center text-xs text-gray-600">
+                            <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
+                                <div class="flex items-center text-xs text-gray-600 dark:text-gray-300">
                                     <i class="fas fa-shield-alt mr-2 text-green-600"></i>
                                     <span>Cancelación gratis</span>
                                 </div>
-                                <div class="flex items-center text-xs text-gray-600">
+                                <div class="flex items-center text-xs text-gray-600 dark:text-gray-300">
                                     <i class="fas fa-headset mr-2 text-sky-600"></i>
                                     <span>Soporte 24/7</span>
                                 </div>
-                                <div class="flex items-center text-xs text-gray-600">
+                                <div class="flex items-center text-xs text-gray-600 dark:text-gray-300">
                                     <i class="fas fa-medal mr-2 text-yellow-600"></i>
                                     <span>Calidad garantizada</span>
                                 </div>
@@ -174,24 +174,24 @@
             <!-- Columna Principal -->
             <div class="lg:col-span-2 space-y-5">
                 <!-- Descripción -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
                     <div class="flex items-center mb-3">
                         <div class="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center mr-2">
                             <i class="fas fa-info-circle text-sky-600"></i>
                         </div>
-                        <h2 class="text-xl font-bold text-gray-900">Descripción</h2>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Descripción</h2>
                     </div>
-                    <p class="text-gray-700 text-sm leading-relaxed">{{ servicio.descripcion }}</p>
+                    <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">{{ servicio.descripcion }}</p>
                 </div>
 
                 <!-- Horarios de Atención -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
                     <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
                         <div class="flex items-center">
                             <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center mr-2">
                                 <i class="fas fa-clock text-indigo-600"></i>
                             </div>
-                            <h2 class="text-xl font-bold text-gray-900">Horarios</h2>
+                            <h2 class="text-xl font-bold text-gray-900 dark:text-white">Horarios</h2>
                         </div>
                         
                         <div id="estadoActual" class="px-3 py-1.5 rounded-lg font-semibold text-xs">
@@ -202,24 +202,24 @@
 
                     <div class="space-y-2">
                         {% if horario_semana %}
-                        <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg">
+                        <div class="flex items-center justify-between p-2.5 bg-gray-50 dark:bg-gray-900 rounded-lg">
                             <div class="flex items-center space-x-2">
-                                <i class="fas fa-briefcase text-gray-600 text-sm"></i>
-                                <span class="font-medium text-gray-900 text-sm">Lunes a Viernes</span>
+                                <i class="fas fa-briefcase text-gray-600 dark:text-gray-300 text-sm"></i>
+                                <span class="font-medium text-gray-900 dark:text-white text-sm">Lunes a Viernes</span>
                             </div>
-                            <span class="text-gray-700 text-sm font-medium">
+                            <span class="text-gray-700 dark:text-gray-300 text-sm font-medium">
                                 {{ horario_semana.hora_apertura|time:"H:i" }} - {{ horario_semana.hora_cierre|time:"H:i" }}
                             </span>
                         </div>
                         {% endif %}
 
                         {% if horario_fin_semana %}
-                        <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg">
+                        <div class="flex items-center justify-between p-2.5 bg-gray-50 dark:bg-gray-900 rounded-lg">
                             <div class="flex items-center space-x-2">
-                                <i class="fas fa-calendar-week text-gray-600 text-sm"></i>
-                                <span class="font-medium text-gray-900 text-sm">Sábado y Domingo</span>
+                                <i class="fas fa-calendar-week text-gray-600 dark:text-gray-300 text-sm"></i>
+                                <span class="font-medium text-gray-900 dark:text-white text-sm">Sábado y Domingo</span>
                             </div>
-                            <span class="text-gray-700 text-sm font-medium">
+                            <span class="text-gray-700 dark:text-gray-300 text-sm font-medium">
                                 {{ horario_fin_semana.hora_apertura|time:"H:i" }} - {{ horario_fin_semana.hora_cierre|time:"H:i" }}
                             </span>
                         </div>
@@ -227,49 +227,49 @@
 
                         {% if not horario_semana and not horario_fin_semana %}
                         <div class="text-center py-4">
-                            <i class="fas fa-info-circle text-gray-400 text-2xl mb-2"></i>
-                            <p class="text-gray-500 text-sm">Horarios no disponibles</p>
+                            <i class="fas fa-info-circle text-gray-400 dark:text-gray-500 text-2xl mb-2"></i>
+                            <p class="text-gray-500 dark:text-gray-400 text-sm">Horarios no disponibles</p>
                         </div>
                         {% endif %}
                     </div>
                 </div>
 
                 <!-- Ubicación -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
                     <div class="flex items-center mb-3">
-                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-2">
+                        <div class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mr-2">
                             <i class="fas fa-map-marker-alt text-green-600"></i>
                         </div>
-                        <h2 class="text-xl font-bold text-gray-900">Ubicación</h2>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Ubicación</h2>
                     </div>
                     
                     <!-- Información de Dirección -->
                     <div class="space-y-3 mb-3">
-                        <div class="flex items-start space-x-2 p-2.5 bg-gray-50 rounded-lg">
+                        <div class="flex items-start space-x-2 p-2.5 bg-gray-50 dark:bg-gray-900 rounded-lg">
                             <div class="flex-shrink-0 mt-0.5">
                                 <i class="fas fa-location-dot text-blue-600 text-sm"></i>
                             </div>
                             <div class="flex-1">
-                                <p class="font-semibold text-gray-900 text-sm mb-0.5">Dirección</p>
-                                <p class="text-gray-700 text-xs leading-relaxed">{{ servicio.direccion }}</p>
+                                <p class="font-semibold text-gray-900 dark:text-white text-sm mb-0.5">Dirección</p>
+                                <p class="text-gray-700 dark:text-gray-300 text-xs leading-relaxed">{{ servicio.direccion }}</p>
                             </div>
                         </div>
                         
                         {% if servicio.zona_referencia %}
-                        <div class="flex items-start space-x-2 p-2.5 bg-amber-50 rounded-lg border border-amber-100">
+                        <div class="flex items-start space-x-2 p-2.5 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-100 dark:border-amber-800">
                             <div class="flex-shrink-0 mt-0.5">
-                                <i class="fas fa-map-signs text-amber-600 text-sm"></i>
+                                <i class="fas fa-map-signs text-amber-600 dark:text-amber-400 text-sm"></i>
                             </div>
                             <div class="flex-1">
-                                <p class="font-semibold text-gray-900 text-sm mb-0.5">Referencia</p>
-                                <p class="text-gray-700 text-xs leading-relaxed">{{ servicio.zona_referencia }}</p>
+                                <p class="font-semibold text-gray-900 dark:text-white text-sm mb-0.5">Referencia</p>
+                                <p class="text-gray-700 dark:text-gray-300 text-xs leading-relaxed">{{ servicio.zona_referencia }}</p>
                             </div>
                         </div>
                         {% endif %}
                     </div>
 
                     <!-- Mapa -->
-                    <div id="mapContainer" class="rounded-xl overflow-hidden shadow-lg border-2 border-gray-200 mb-3" style="height: 350px;">
+                    <div id="mapContainer" class="rounded-xl overflow-hidden shadow-lg border-2 border-gray-200 dark:border-gray-700 mb-3" style="height: 350px;">
                         <div id="map" style="height: 100%; width: 100%; z-index:0;"></div>
                     </div>
                     
@@ -291,15 +291,15 @@
                 </div>
 
                 <!-- SECCIÓN DE CALIFICACIONES -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5" id="seccion-calificaciones">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5" id="seccion-calificaciones">
                     <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
                         <div class="flex items-center">
-                            <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center mr-2">
+                            <div class="w-8 h-8 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center mr-2">
                                 <i class="fas fa-star text-yellow-600"></i>
                             </div>
                             <div>
-                                <h2 class="text-xl font-bold text-gray-900">Calificaciones</h2>
-                                <p class="text-xs text-gray-600">{{ servicio.total_calificaciones }} opiniones</p>
+                                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Calificaciones</h2>
+                                <p class="text-xs text-gray-600 dark:text-gray-300">{{ servicio.total_calificaciones }} opiniones</p>
                             </div>
                         </div>
                         
@@ -312,18 +312,18 @@
                             </button>
                             {% elif ya_califico %}
                             <div class="flex items-center space-x-2">
-                                <span class="px-2.5 py-1 bg-green-100 text-green-700 rounded-lg font-semibold text-xs">
+                                <span class="px-2.5 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-lg font-semibold text-xs">
                                     <i class="fas fa-check-circle mr-1"></i>
                                     Ya calificaste
                                 </span>
                                 {% if calificacion_usuario %}
                                 <button onclick="mostrarModalEditarCalificacion()" 
-                                        class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                        class="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
                                         title="Editar">
                                     <i class="fas fa-edit text-sm"></i>
                                 </button>
                                 <button onclick="confirmarEliminarCalificacion({{ calificacion_usuario.id }})" 
-                                        class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                        class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                                         title="Eliminar">
                                     <i class="fas fa-trash text-sm"></i>
                                 </button>
@@ -340,10 +340,10 @@
                     </div>
 
                     <!-- Resumen de Calificaciones -->
-                    <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4 mb-4">
+                    <div class="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-xl p-4 mb-4 dark:border dark:border-yellow-500/20">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="text-center">
-                                <div class="text-4xl font-bold text-gray-900 mb-1">
+                                <div class="text-4xl font-bold text-yellow-800 dark:text-yellow-100 mb-1">
                                     {{ servicio.calificacion_promedio|floatformat:1 }}
                                 </div>
                                 <div class="flex items-center justify-center mb-1">
@@ -355,24 +355,24 @@
                                         {% endif %}
                                     {% endfor %}
                                 </div>
-                                <p class="text-xs text-gray-600">Basado en {{ servicio.total_calificaciones }} reseñas</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-300">Basado en {{ servicio.total_calificaciones }} reseñas</p>
                             </div>
 
                             <div class="space-y-1.5">
                                 {% for rating in "54321" %}
                                 <div class="flex items-center space-x-2">
-                                    <div class="flex items-center text-xs text-gray-600 w-10">
+                                    <div class="flex items-center text-xs text-gray-600 dark:text-gray-300 w-10">
                                         <span>{{ rating }}</span>
                                         <i class="fas fa-star text-yellow-400 text-xs ml-1"></i>
                                     </div>
-                                    <div class="flex-1 bg-gray-200 rounded-full h-1.5">
+                                    <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
                                         {% with total=servicio.total_calificaciones count=stats_calificaciones|get_item:rating %}
                                         <div class="bg-yellow-400 h-full rounded-full transition-all"
                                              style="width: {% if total > 0 %}{{ count|mul:100|div:total|floatformat:0 }}{% else %}0{% endif %}%">
                                         </div>
                                         {% endwith %}
                                     </div>
-                                    <span class="text-xs text-gray-600 w-6 text-right">
+                                    <span class="text-xs text-gray-600 dark:text-gray-300 w-6 text-right">
                                         {{ stats_calificaciones|get_item:rating }}
                                     </span>
                                 </div>
@@ -384,10 +384,10 @@
                     <!-- Lista de Reseñas -->
                     <div class="space-y-4">
                         {% for calificacion in calificaciones %}
-                        <div class="border-b border-gray-100 pb-4 last:border-0">
+                        <div class="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-0">
                             <div class="flex items-start space-x-3">
                                 <div class="flex-shrink-0">
-                                    <div class="w-10 h-10 bg-gradient-to-br from-sky-500 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-sky-500 to-blue-600 dark:from-sky-600 dark:to-blue-700 rounded-full flex items-center justify-center text-white text-sm font-bold">
                                         {{ calificacion.usuario.nombre|first|upper }}
                                     </div>
                                 </div>
@@ -395,42 +395,42 @@
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-start justify-between mb-1">
                                         <div>
-                                            <h4 class="font-semibold text-gray-900 text-sm">{{ calificacion.usuario.nombre }}</h4>
+                                            <h4 class="font-semibold text-gray-900 dark:text-white text-sm">{{ calificacion.usuario.nombre }}</h4>
                                             <div class="flex items-center space-x-2 mt-0.5">
                                                 <div class="flex items-center">
                                                     {% for i in "12345" %}
                                                         {% if forloop.counter <= calificacion.puntuacion %}
-                                                        <i class="fas fa-star text-yellow-400 text-xs"></i>
+                                                        <i class="fas fa-star text-yellow-500 dark:text-yellow-400 text-xs"></i>
                                                         {% else %}
-                                                        <i class="far fa-star text-yellow-400 text-xs"></i>
+                                                        <i class="far fa-star text-yellow-500 dark:text-yellow-400 text-xs"></i>
                                                         {% endif %}
                                                     {% endfor %}
                                                 </div>
-                                                <span class="text-xs text-gray-500">{{ calificacion.fecha_creacion|date:"d M Y" }}</span>
+                                                <span class="text-xs text-gray-500 dark:text-gray-400">{{ calificacion.fecha_creacion|date:"d M Y" }}</span>
                                             </div>
                                         </div>
                                     </div>
 
                                     {% if calificacion.comentario %}
-                                    <p class="text-gray-700 text-xs leading-relaxed mb-2">{{ calificacion.comentario }}</p>
+                                    <p class="text-gray-700 dark:text-gray-300 text-xs leading-relaxed mb-2">{{ calificacion.comentario }}</p>
                                     {% endif %}
 
                                     {% if calificacion.respuesta %}
-                                    <div class="bg-sky-50 rounded-lg p-3 border-l-4 border-sky-500">
+                                    <div class="bg-sky-50 dark:bg-sky-900/20 rounded-lg p-3 border-l-4 border-sky-500 dark:border-sky-400">
                                         <div class="flex items-start space-x-2">
-                                            <i class="fas fa-reply text-sky-600 mt-0.5 text-xs"></i>
+                                            <i class="fas fa-reply text-sky-600 dark:text-sky-300 mt-0.5 text-xs"></i>
                                             <div class="flex-1">
                                                 <div class="flex items-center justify-between mb-0.5">
-                                                    <p class="font-semibold text-sky-900 text-xs">Respuesta del proveedor</p>
+                                                    <p class="font-semibold text-sky-900 dark:text-sky-100 text-xs">Respuesta del proveedor</p>
                                                     {% if user.is_authenticated and user == servicio.proveedor %}
                                                     <button onclick="editarRespuesta({{ calificacion.respuesta.id }}, '{{ calificacion.respuesta.respuesta|escapejs }}')" 
-                                                            class="text-xs text-blue-600 hover:text-blue-800">
+                                                            class="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-200">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
                                                     {% endif %}
                                                 </div>
-                                                <p class="text-sky-900 text-xs" id="respuesta-texto-{{ calificacion.respuesta.id }}">{{ calificacion.respuesta.respuesta }}</p>
-                                                <p class="text-xs text-sky-700 mt-0.5">{{ calificacion.respuesta.fecha_respuesta|date:"d M Y" }}</p>
+                                                <p class="text-sky-900 dark:text-sky-200 text-xs" id="respuesta-texto-{{ calificacion.respuesta.id }}">{{ calificacion.respuesta.respuesta }}</p>
+                                                <p class="text-xs text-sky-700 dark:text-sky-300 mt-0.5">{{ calificacion.respuesta.fecha_respuesta|date:"d M Y" }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -446,11 +446,11 @@
                         </div>
                         {% empty %}
                         <div class="text-center py-8">
-                            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                <i class="fas fa-comment-slash text-gray-400 text-2xl"></i>
+                            <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-comment-slash text-gray-400 dark:text-gray-500 text-2xl"></i>
                             </div>
-                            <h3 class="text-base font-semibold text-gray-700 mb-1">Aún no hay calificaciones</h3>
-                            <p class="text-gray-500 text-xs">Sé el primero en compartir tu experiencia</p>
+                            <h3 class="text-base font-semibold text-gray-700 dark:text-gray-300 mb-1">Aún no hay calificaciones</h3>
+                            <p class="text-gray-500 dark:text-gray-400 text-xs">Sé el primero en compartir tu experiencia</p>
                         </div>
                         {% endfor %}
                     </div>
@@ -460,12 +460,12 @@
             <!-- Sidebar -->
             <div class="space-y-4">
                 <!-- Servicios Relacionados -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sticky top-4">
-                    <h3 class="text-base font-bold text-gray-900 mb-3">Servicios Relacionados</h3>
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sticky top-4">
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white mb-3">Servicios Relacionados</h3>
                     <div class="space-y-2.5">
                         {% for relacionado in servicios_relacionados|slice:":3" %}
                         <a href="{% url 'servicios:detalle_servicio' relacionado.id %}" class="block group">
-                            <div class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-50 dark:bg-gray-900 transition-colors">
                                 {% if relacionado.imagenes.first %}
                                 <img src="{{ relacionado.imagenes.first.imagen.url }}" 
                                      class="w-12 h-12 rounded-lg object-cover flex-shrink-0">
@@ -475,11 +475,11 @@
                                 </div>
                                 {% endif %}
                                 <div class="flex-1 min-w-0">
-                                    <h4 class="font-semibold text-gray-900 group-hover:text-sky-600 transition-colors text-xs truncate mb-0.5">
+                                    <h4 class="font-semibold text-gray-900 dark:text-white group-hover:text-sky-600 transition-colors text-xs truncate mb-0.5">
                                         {{ relacionado.nombre }}
                                     </h4>
                                     <div class="flex items-center justify-between">
-                                        <span class="text-xs font-bold text-gray-900">${{ relacionado.precio|floatformat:0 }}</span>
+                                        <span class="text-xs font-bold text-gray-900 dark:text-white">${{ relacionado.precio|floatformat:0 }}</span>
                                         <div class="flex items-center text-xs text-yellow-500">
                                             <i class="fas fa-star mr-0.5 text-xs"></i>
                                             <span>{{ relacionado.calificacion_promedio|floatformat:1 }}</span>
@@ -489,64 +489,64 @@
                             </div>
                         </a>
                         {% empty %}
-                        <p class="text-gray-500 text-xs text-center py-3">No hay servicios relacionados</p>
+                        <p class="text-gray-500 dark:text-gray-400 text-xs text-center py-3">No hay servicios relacionados</p>
                         {% endfor %}
                     </div>
                 </div>
 
                 <!-- Proveedor y Contacto - Unificado y Minimalista -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
                     <div class="flex items-center mb-3">
                         <div class="w-10 h-10 bg-gradient-to-br from-sky-500 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
                             {{ servicio.proveedor.nombre|first|upper }}
                         </div>
                         <div class="ml-2.5 flex-1 min-w-0">
-                            <h3 class="text-sm font-bold text-gray-900 truncate">{{ servicio.proveedor.nombre }}</h3>
-                            <p class="text-xs text-gray-500">Proveedor del servicio</p>
+                            <h3 class="text-sm font-bold text-gray-900 dark:text-white truncate">{{ servicio.proveedor.nombre }}</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Proveedor del servicio</p>
                         </div>
                     </div>
                     
-                    <div class="pt-3 border-t border-gray-100 space-y-2">
-                        <a href="tel:{{ servicio.telefono }}" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors group">
-                            <div class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-500 transition-colors flex-shrink-0">
+                    <div class="pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
+                        <a href="tel:{{ servicio.telefono }}" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group">
+                            <div class="w-7 h-7 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center group-hover:bg-blue-500 transition-colors flex-shrink-0">
                                 <i class="fas fa-phone text-blue-600 group-hover:text-white text-xs"></i>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <p class="text-xs text-gray-500">Teléfono</p>
-                                <p class="font-semibold text-gray-900 text-xs truncate">{{ servicio.telefono }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Teléfono</p>
+                                <p class="font-semibold text-gray-900 dark:text-white text-xs truncate">{{ servicio.telefono }}</p>
                             </div>
                         </a>
 
                         {% if servicio.whatsapp %}
-                        <a href="https://wa.me/{{ servicio.whatsapp|cut:'+' }}" target="_blank" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors group">
-                            <div class="w-7 h-7 bg-green-100 rounded-lg flex items-center justify-center group-hover:bg-green-500 transition-colors flex-shrink-0">
+                        <a href="https://wa.me/{{ servicio.whatsapp|cut:'+' }}" target="_blank" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 dark:bg-gray-900 transition-colors group">
+                            <div class="w-7 h-7 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center group-hover:bg-green-500 transition-colors flex-shrink-0">
                                 <i class="fab fa-whatsapp text-green-600 group-hover:text-white text-sm"></i>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <p class="text-xs text-gray-500">WhatsApp</p>
-                                <p class="font-semibold text-gray-900 text-xs truncate">{{ servicio.whatsapp }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">WhatsApp</p>
+                                <p class="font-semibold text-gray-900 dark:text-white text-xs truncate">{{ servicio.whatsapp }}</p>
                             </div>
                         </a>
                         {% endif %}
 
-                        <a href="mailto:{{ servicio.email_contacto }}" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors group">
-                            <div class="w-7 h-7 bg-red-100 rounded-lg flex items-center justify-center group-hover:bg-red-500 transition-colors flex-shrink-0">
+                        <a href="mailto:{{ servicio.email_contacto }}" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 dark:bg-gray-900 transition-colors group">
+                            <div class="w-7 h-7 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center group-hover:bg-red-500 transition-colors flex-shrink-0">
                                 <i class="fas fa-envelope text-red-600 group-hover:text-white text-xs"></i>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <p class="text-xs text-gray-500">Email</p>
-                                <p class="font-semibold text-gray-900 text-xs truncate">{{ servicio.email_contacto }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Email</p>
+                                <p class="font-semibold text-gray-900 dark:text-white text-xs truncate">{{ servicio.email_contacto }}</p>
                             </div>
                         </a>
 
                         {% if servicio.sitio_web %}
-                        <a href="{{ servicio.sitio_web }}" target="_blank" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors group">
+                        <a href="{{ servicio.sitio_web }}" target="_blank" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 dark:bg-gray-900 transition-colors group">
                             <div class="w-7 h-7 bg-indigo-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-500 transition-colors flex-shrink-0">
                                 <i class="fas fa-globe text-indigo-600 group-hover:text-white text-xs"></i>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <p class="text-xs text-gray-500">Sitio Web</p>
-                                <p class="font-semibold text-gray-900 text-xs truncate">Visitar</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Sitio Web</p>
+                                <p class="font-semibold text-gray-900 dark:text-white text-xs truncate">Visitar</p>
                             </div>
                         </a>
                         {% endif %}
@@ -557,13 +557,13 @@
     </div>
 
     <!-- Sticky Bottom Bar (Mobile) -->
-    <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-40 shadow-lg">
+    <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 z-40 shadow-lg">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-xs text-gray-600">Precio por persona</p>
+                <p class="text-xs text-gray-600 dark:text-gray-300">Precio por persona</p>
                 <div class="flex items-baseline">
-                    <span class="text-2xl font-bold text-gray-900">${{ servicio.precio|floatformat:0 }}</span>
-                    <span class="text-sm text-gray-500 ml-1">USD</span>
+                    <span class="text-2xl font-bold text-gray-900 dark:text-white">${{ servicio.precio|floatformat:0 }}</span>
+                    <span class="text-sm text-gray-500 dark:text-gray-400 ml-1">USD</span>
                 </div>
             </div>
             {% if user.is_authenticated %}
@@ -584,23 +584,23 @@
 <!-- MODALES -->
 <!-- Modal Reserva Rápida -->
 <div id="modalReserva" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
         <div class="flex items-center justify-between mb-6">
-            <h3 class="text-2xl font-bold text-gray-900">
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
                 <i class="fas fa-calendar-check text-sky-600 mr-2"></i>
                 Reservar Servicio
             </h3>
-            <button onclick="cerrarModalReserva()" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <button onclick="cerrarModalReserva()" class="text-gray-400 hover:text-gray-600 dark:text-gray-300 transition-colors">
                 <i class="fas fa-times text-xl"></i>
             </button>
         </div>
 
-        <div class="bg-sky-50 rounded-xl p-4 mb-6 border border-sky-200">
+        <div class="bg-sky-50 dark:bg-sky-900/20 rounded-xl p-4 mb-6 border border-sky-200 dark:border-sky-800">
             <div class="flex items-start space-x-3">
-                <i class="fas fa-info-circle text-sky-600 mt-0.5"></i>
+                <i class="fas fa-info-circle text-sky-600 dark:text-sky-400 mt-0.5"></i>
                 <div>
-                    <h4 class="font-semibold text-sky-900 mb-1">{{ servicio.nombre }}</h4>
-                    <p class="text-sm text-sky-700">
+                    <h4 class="font-semibold text-sky-900 dark:text-sky-200 mb-1">{{ servicio.nombre }}</h4>
+                    <p class="text-sm text-sky-700 dark:text-sky-300">
                         Precio: <span class="font-bold">${{ servicio.precio|floatformat:0 }}</span> por persona
                     </p>
                 </div>
@@ -611,8 +611,8 @@
             {% csrf_token %}
             
             <div class="mb-5">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    <i class="fas fa-users text-gray-500 mr-1"></i>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    <i class="fas fa-users text-gray-500 dark:text-gray-400 dark:text-gray-500 mr-1"></i>
                     Número de personas
                 </label>
                 <input type="number" 
@@ -622,17 +622,17 @@
                        max="{{ servicio.capacidad_maxima }}"
                        value="1"
                        required
-                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none text-lg font-semibold"
+                       class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none text-lg font-semibold"
                        onchange="actualizarTotal()">
-                <p class="text-xs text-gray-500 mt-1.5">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1.5">
                     <i class="fas fa-info-circle mr-1"></i>
                     Capacidad máxima: {{ servicio.capacidad_maxima }} personas
                 </p>
             </div>
 
             <div class="mb-5">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    <i class="fas fa-calendar text-gray-500 mr-1"></i>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    <i class="fas fa-calendar text-gray-500 dark:text-gray-400 dark:text-gray-500 mr-1"></i>
                     Fecha del servicio
                 </label>
                 <input type="date" 
@@ -640,28 +640,28 @@
                        id="fechaServicio"
                        min="{{ fecha_minima }}"
                        required
-                       class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none text-lg">
-                <p class="text-xs text-gray-500 mt-1.5">
+                       class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none text-lg">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1.5">
                     <i class="fas fa-info-circle mr-1"></i>
                     Selecciona una fecha futura
                 </p>
             </div>
 
-            <div class="bg-gray-50 rounded-xl p-4 mb-6">
+            <div class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 mb-6">
                 <div class="flex items-center justify-between mb-1">
-                    <span class="text-sm text-gray-600">Subtotal:</span>
-                    <span class="text-lg font-bold text-gray-900" id="subtotalTexto">${{ servicio.precio|floatformat:0 }}</span>
+                    <span class="text-sm text-gray-600 dark:text-gray-300">Subtotal:</span>
+                    <span class="text-lg font-bold text-gray-900 dark:text-white" id="subtotalTexto">${{ servicio.precio|floatformat:0 }}</span>
                 </div>
-                <div class="flex items-center justify-between text-xs text-gray-500">
+                <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                     <span id="personasTexto">1 persona</span>
                     <span>× ${{ servicio.precio|floatformat:0 }}</span>
                 </div>
             </div>
 
             <div class="flex gap-3">
-                <button type="button" 
+                <button type="button"
                         onclick="cerrarModalReserva()"
-                        class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+                        class="flex-1 px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     <i class="fas fa-times mr-2"></i>
                     Cancelar
                 </button>
@@ -677,10 +677,10 @@
 
 <!-- Modal Calificar -->
 <div id="modalCalificar" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-6">
         <div class="flex items-center justify-between mb-6">
-            <h3 class="text-2xl font-bold text-gray-900">Calificar Servicio</h3>
-            <button onclick="cerrarModalCalificar()" class="text-gray-400 hover:text-gray-600">
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Calificar Servicio</h3>
+            <button onclick="cerrarModalCalificar()" class="text-gray-400 hover:text-gray-600 dark:text-gray-300">
                 <i class="fas fa-times text-xl"></i>
             </button>
         </div>
@@ -689,7 +689,7 @@
             {% csrf_token %}
             
             <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-700 mb-3">Tu calificación</label>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Tu calificación</label>
                 <div class="flex justify-center space-x-3" id="ratingStars">
                     {% for i in "12345" %}
                     <button type="button" onclick="setRating({{ i }})" 
@@ -699,22 +699,22 @@
                     {% endfor %}
                 </div>
                 <input type="hidden" name="puntuacion" id="ratingValue" required>
-                <p class="text-center text-sm text-gray-500 mt-2" id="ratingText">Selecciona una calificación</p>
+                <p class="text-center text-sm text-gray-500 dark:text-gray-400 mt-2" id="ratingText">Selecciona una calificación</p>
             </div>
 
             <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                     Tu comentario <span class="text-gray-400 font-normal">(opcional)</span>
                 </label>
                 <textarea name="comentario" 
                           id="comentarioCalificacion"
                           rows="4" 
                           maxlength="1000"
-                          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none resize-none"
+                          class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none resize-none placeholder-gray-500 dark:placeholder-gray-400"
                           placeholder="Cuéntanos sobre tu experiencia..."></textarea>
                 <div class="flex justify-between items-center mt-1">
-                    <p class="text-xs text-gray-500">Máximo 1000 caracteres</p>
-                    <p class="text-xs text-gray-500">
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Máximo 1000 caracteres</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
                         <span id="charCount">0</span>/1000
                     </p>
                 </div>
@@ -722,7 +722,7 @@
 
             <div class="flex gap-3">
                 <button type="button" onclick="cerrarModalCalificar()"
-                        class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50">
+                        class="flex-1 px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
                     Cancelar
                 </button>
                 <button type="submit" 
@@ -738,10 +738,10 @@
 <!-- Modal Editar Calificación -->
 {% if calificacion_usuario %}
 <div id="modalEditarCalificacion" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-6">
         <div class="flex items-center justify-between mb-6">
-            <h3 class="text-2xl font-bold text-gray-900">Editar Reseña</h3>
-            <button onclick="cerrarModalEditarCalificacion()" class="text-gray-400 hover:text-gray-600">
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Editar Reseña</h3>
+            <button onclick="cerrarModalEditarCalificacion()" class="text-gray-400 hover:text-gray-600 dark:text-gray-300">
                 <i class="fas fa-times text-xl"></i>
             </button>
         </div>
@@ -750,7 +750,7 @@
             {% csrf_token %}
             
             <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-700 mb-3">Tu calificación</label>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Tu calificación</label>
                 <div class="flex justify-center space-x-3" id="ratingStarsEditar">
                     {% for i in "12345" %}
                     <button type="button" onclick="setRatingEditar({{ i }})" 
@@ -763,17 +763,17 @@
             </div>
 
             <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Tu comentario</label>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Tu comentario</label>
                 <textarea name="comentario" 
                           rows="4" 
                           maxlength="1000"
-                          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none resize-none"
+                          class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none resize-none placeholder-gray-500 dark:placeholder-gray-400"
                           placeholder="Cuéntanos sobre tu experiencia...">{{ calificacion_usuario.comentario }}</textarea>
             </div>
 
             <div class="flex gap-3">
                 <button type="button" onclick="cerrarModalEditarCalificacion()"
-                        class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50">
+                        class="flex-1 px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
                     Cancelar
                 </button>
                 <button type="submit" 
@@ -789,20 +789,20 @@
 
 <!-- Modal Confirmar Eliminación Calificación -->
 <div id="modalEliminarCalificacion" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
         <div class="text-center mb-6">
-            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div class="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mx-auto mb-4">
                 <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-2">¿Eliminar calificación?</h3>
-            <p class="text-gray-600">Esta acción no se puede deshacer</p>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">¿Eliminar calificación?</h3>
+            <p class="text-gray-600 dark:text-gray-300">Esta acción no se puede deshacer</p>
         </div>
         
         <form id="formEliminarCalificacion" method="post" action="">
             {% csrf_token %}
             <div class="flex gap-3">
                 <button type="button" onclick="cerrarModalEliminarCalificacion()"
-                        class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50">
+                        class="flex-1 px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
                     Cancelar
                 </button>
                 <button type="submit" 
@@ -816,18 +816,18 @@
 
 <!-- Modal Responder Calificación -->
 <div id="modalResponder" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-6">
         <div class="flex items-center justify-between mb-6">
-            <h3 class="text-2xl font-bold text-gray-900">
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
                 <i class="fas fa-reply text-sky-600 mr-2"></i>
                 Responder Reseña
             </h3>
-            <button onclick="cerrarModalResponder()" class="text-gray-400 hover:text-gray-600">
+            <button onclick="cerrarModalResponder()" class="text-gray-400 hover:text-gray-600 dark:text-gray-300">
                 <i class="fas fa-times text-xl"></i>
             </button>
         </div>
 
-        <div class="bg-sky-50 rounded-xl p-4 mb-4 border border-sky-200">
+        <div class="bg-sky-50 dark:bg-sky-900/20 rounded-xl p-4 mb-4 border border-sky-200 dark:border-sky-800">
             <p class="text-sm font-semibold text-sky-900 mb-1">Comentario del cliente:</p>
             <p class="text-sm text-sky-800" id="comentarioOriginal"></p>
         </div>
@@ -835,17 +835,17 @@
         <form id="formResponder">
             {% csrf_token %}
             <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Tu respuesta</label>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Tu respuesta</label>
                 <textarea name="respuesta" 
                           id="textoRespuesta"
                           rows="4" 
                           maxlength="500"
                           required
-                          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none resize-none"
+                          class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none resize-none placeholder-gray-500 dark:placeholder-gray-400"
                           placeholder="Agradece al cliente y responde a sus comentarios..."></textarea>
                 <div class="flex justify-between items-center mt-1">
-                    <p class="text-xs text-gray-500">Máximo 500 caracteres</p>
-                    <p class="text-xs text-gray-500">
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Máximo 500 caracteres</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
                         <span id="charCountRespuesta">0</span>/500
                     </p>
                 </div>
@@ -853,7 +853,7 @@
 
             <div class="flex gap-3">
                 <button type="button" onclick="cerrarModalResponder()"
-                        class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50">
+                        class="flex-1 px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
                     Cancelar
                 </button>
                 <button type="submit" 
@@ -868,13 +868,13 @@
 
 <!-- Modal Editar Respuesta -->
 <div id="modalEditarRespuesta" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-6">
         <div class="flex items-center justify-between mb-6">
-            <h3 class="text-2xl font-bold text-gray-900">
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
                 <i class="fas fa-edit text-blue-600 mr-2"></i>
                 Editar Respuesta
             </h3>
-            <button onclick="cerrarModalEditarRespuesta()" class="text-gray-400 hover:text-gray-600">
+            <button onclick="cerrarModalEditarRespuesta()" class="text-gray-400 hover:text-gray-600 dark:text-gray-300">
                 <i class="fas fa-times text-xl"></i>
             </button>
         </div>
@@ -882,16 +882,16 @@
         <form id="formEditarRespuesta">
             {% csrf_token %}
             <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Tu respuesta</label>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Tu respuesta</label>
                 <textarea name="respuesta" 
                           id="textoEditarRespuesta"
                           rows="4" 
                           maxlength="500"
                           required
-                          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none resize-none"></textarea>
+                          class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none resize-none"></textarea>
                 <div class="flex justify-between items-center mt-1">
-                    <p class="text-xs text-gray-500">Máximo 500 caracteres</p>
-                    <p class="text-xs text-gray-500">
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Máximo 500 caracteres</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
                         <span id="charCountEditarRespuesta">0</span>/500
                     </p>
                 </div>
@@ -899,7 +899,7 @@
 
             <div class="flex gap-3">
                 <button type="button" onclick="cerrarModalEditarRespuesta()"
-                        class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl font-semibold text-gray-700 hover:bg-gray-50">
+                        class="flex-1 px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
                     Cancelar
                 </button>
                 <button type="submit" 
@@ -1019,7 +1019,7 @@ function initMap() {
                 <div class="text-center p-8">
                     <i class="fas fa-exclamation-triangle text-red-600 text-5xl mb-4"></i>
                     <p class="text-red-900 font-semibold text-lg">Coordenadas inválidas</p>
-                    <p class="text-red-700 text-sm mt-2">Lat: ${lat}, Lng: ${lng}</p>
+                    <p class="text-red-700 dark:text-red-300 text-sm mt-2">Lat: ${lat}, Lng: ${lng}</p>
                 </div>
             </div>
         `;
@@ -1034,7 +1034,7 @@ function initMap() {
                 <div class="text-center p-8">
                     <i class="fas fa-map-marked-alt text-yellow-600 text-5xl mb-4"></i>
                     <p class="text-yellow-900 font-semibold text-lg">Ubicación fuera de Ecuador</p>
-                    <p class="text-yellow-700 text-sm mt-2">Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}</p>
+                    <p class="text-yellow-700 dark:text-yellow-300 text-sm mt-2">Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}</p>
                 </div>
             </div>
         `;
@@ -1647,7 +1647,7 @@ function verificarEstadoAhora() {
     const estadoDiv = document.getElementById('estadoActual');
     
     if (!horario.apertura || !horario.cierre) {
-        estadoDiv.className = 'px-4 py-2 rounded-lg font-semibold text-sm bg-gray-100 text-gray-600';
+        estadoDiv.className = 'px-4 py-2 rounded-lg font-semibold text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300';
         estadoDiv.innerHTML = '<i class="fas fa-question-circle mr-2"></i>Sin horario definido';
         return;
     }
@@ -1662,10 +1662,10 @@ function verificarEstadoAhora() {
     const estaAbierto = horaActual >= apertura && horaActual < cierre;
     
     if (estaAbierto) {
-        estadoDiv.className = 'px-4 py-2 rounded-lg font-semibold text-sm bg-green-100 text-green-700 border border-green-200';
+        estadoDiv.className = 'px-4 py-2 rounded-lg font-semibold text-sm bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800';
         estadoDiv.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Abierto ahora';
     } else {
-        estadoDiv.className = 'px-4 py-2 rounded-lg font-semibold text-sm bg-red-100 text-red-700 border border-red-200';
+        estadoDiv.className = 'px-4 py-2 rounded-lg font-semibold text-sm bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800';
         estadoDiv.innerHTML = '<i class="fas fa-times-circle mr-2"></i>Cerrado ahora';
     }
 }

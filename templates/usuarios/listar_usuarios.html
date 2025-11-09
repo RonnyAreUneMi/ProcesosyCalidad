@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     
     <!-- Header Section -->
     <div class="gradient-bg py-12" data-aos="fade-down">
@@ -14,7 +14,7 @@
                     <p class="text-sky-100">Panel de administración y control del sistema</p>
                 </div>
                 <div class="hidden md:block">
-                    <div class="w-16 h-16 bg-white bg-opacity-20 backdrop-blur-custom rounded-2xl flex items-center justify-center">
+                    <div class="w-16 h-16 bg-white dark:bg-gray-800 bg-opacity-20 backdrop-blur-custom rounded-2xl flex items-center justify-center">
                         <i class="fas fa-users-cog text-white text-3xl"></i>
                     </div>
                 </div>
@@ -27,11 +27,11 @@
         <!-- Statistics Dashboard -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" data-aos="fade-up">
             <!-- Total Usuarios -->
-            <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 card-hover border-l-4 border-sky-500">
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 card-hover border-l-4 border-sky-500">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600 mb-1">Total Usuarios</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ total_usuarios }}</p>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Total Usuarios</p>
+                        <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ total_usuarios }}</p>
                     </div>
                     <div class="w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center">
                         <i class="fas fa-users text-sky-600 text-xl"></i>
@@ -40,24 +40,24 @@
             </div>
 
             <!-- Turistas -->
-            <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 card-hover border-l-4 border-green-500">
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 card-hover border-l-4 border-green-500">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600 mb-1">Turistas</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ usuarios_por_rol.Turista|default:0 }}</p>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Turistas</p>
+                        <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ usuarios_por_rol.Turista|default:0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
                         <i class="fas fa-user text-green-600 text-xl"></i>
                     </div>
                 </div>
             </div>
 
             <!-- Proveedores -->
-            <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 card-hover border-l-4 border-purple-500">
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 card-hover border-l-4 border-purple-500">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600 mb-1">Proveedores</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ usuarios_por_rol.Proveedor|default:0 }}</p>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Proveedores</p>
+                        <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ usuarios_por_rol.Proveedor|default:0 }}</p>
                     </div>
                     <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                         <i class="fas fa-briefcase text-purple-600 text-xl"></i>
@@ -66,13 +66,13 @@
             </div>
 
             <!-- Administradores -->
-            <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 card-hover border-l-4 border-red-500">
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 card-hover border-l-4 border-red-500">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600 mb-1">Administradores</p>
-                        <p class="text-3xl font-bold text-gray-900">{{ usuarios_por_rol.Administrador|default:0 }}</p>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Administradores</p>
+                        <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ usuarios_por_rol.Administrador|default:0 }}</p>
                     </div>
-                    <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
                         <i class="fas fa-user-shield text-red-600 text-xl"></i>
                     </div>
                 </div>
@@ -80,30 +80,30 @@
         </div>
 
         <!-- Filters Section -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-8" data-aos="fade-up">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8" data-aos="fade-up">
             <div class="flex items-center mb-4">
                 <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center mr-3">
                     <i class="fas fa-filter text-white"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900">Filtros de búsqueda</h3>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Filtros de búsqueda</h3>
             </div>
             
             <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <!-- Search Input -->
                 <div class="relative md:col-span-2">
-                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
                     <input type="text" 
                            name="q" 
                            value="{{ busqueda }}" 
                            placeholder="Buscar por nombre o correo" 
-                           class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
+                           class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400">
                 </div>
                 
                 <!-- Role Select -->
                 <div class="relative">
-                    <i class="fas fa-user-shield absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                    <i class="fas fa-user-shield absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none"></i>
                     <select name="rol" 
-                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all appearance-none bg-white">
+                            class="text-gray-900 dark:text-white w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all appearance-none bg-white dark:bg-gray-800">
                         <option value="">Todos los roles</option>
                         {% for rol in roles %}
                         <option value="{{ rol.nombre }}" {% if rol_filtro == rol.nombre %}selected{% endif %}>
@@ -123,10 +123,10 @@
         </div>
 
         <!-- Users Table -->
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8" data-aos="fade-up">
-            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mb-8" data-aos="fade-up">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 dark:bg-gray-900">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-bold text-gray-900">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">
                         <i class="fas fa-list text-sky-600 mr-2"></i>
                         Lista de Usuarios
                     </h3>
@@ -138,51 +138,51 @@
 
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                    <thead class="bg-gray-50 dark:bg-gray-900">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                 Usuario
                             </th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                 Correo
                             </th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                 Rol
                             </th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                 Estado
                             </th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                 Último acceso
                             </th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                 Acciones
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                         {% for usuario in usuarios %}
-                        <tr class="hover:bg-gray-50 transition-colors duration-150">
+                        <tr class="hover:bg-gray-50 dark:bg-gray-900 transition-colors duration-150">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="w-10 h-10 gradient-bg rounded-full flex items-center justify-center text-white font-semibold mr-3 shadow-sm">
                                         {{ usuario.nombre|first|upper }}
                                     </div>
                                     <div>
-                                        <div class="text-sm font-semibold text-gray-900">{{ usuario.nombre }}</div>
-                                        <div class="text-xs text-gray-500">ID: {{ usuario.id }}</div>
+                                        <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ usuario.nombre }}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">ID: {{ usuario.id }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ usuario.correo }}</div>
+                                <div class="text-sm text-gray-900 dark:text-white">{{ usuario.correo }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <form method="post" action="{% url 'usuarios:cambiar_rol' usuario.id %}" class="inline">
                                     {% csrf_token %}
                                     <select name="rol_id" 
                                             onchange="this.form.submit()" 
-                                            class="text-sm px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all bg-white font-medium">
+                                            class="text-gray-900 dark:text-white text-sm px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all bg-white dark:bg-gray-800 font-medium">
                                         {% for rol in roles_disponibles %}
                                         <option value="{{ rol.id }}" {% if usuario.rol.id == rol.id %}selected{% endif %}>
                                             {{ rol.get_nombre_display }}
@@ -193,26 +193,26 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 {% if usuario.is_active %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
                                     <span class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1.5"></span>
                                     Activo
                                 </span>
                                 {% else %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
                                     <span class="w-1.5 h-1.5 bg-red-400 rounded-full mr-1.5"></span>
                                     Inactivo
                                 </span>
                                 {% endif %}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ usuario.ultimo_acceso|date:"d/m/Y" }}</div>
-                                <div class="text-xs text-gray-500">{{ usuario.ultimo_acceso|date:"H:i" }}</div>
+                                <div class="text-sm text-gray-900 dark:text-white">{{ usuario.ultimo_acceso|date:"d/m/Y" }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ usuario.ultimo_acceso|date:"H:i" }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <form method="post" action="{% url 'usuarios:toggle_estado' usuario.id %}" class="inline">
                                     {% csrf_token %}
                                     <button type="submit" 
-                                            class="inline-flex items-center px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 {% if usuario.is_active %}bg-yellow-100 text-yellow-700 hover:bg-yellow-200{% else %}bg-green-100 text-green-700 hover:bg-green-200{% endif %}">
+                                            class="inline-flex items-center px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 {% if usuario.is_active %}bg-yellow-100 text-yellow-700 hover:bg-yellow-200{% else %}bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 hover:bg-green-200{% endif %}">
                                         {% if usuario.is_active %}
                                         <i class="fas fa-ban mr-1.5"></i>
                                         Desactivar
@@ -228,11 +228,11 @@
                         <tr>
                             <td colspan="6" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center">
-                                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                        <i class="fas fa-users text-gray-400 text-2xl"></i>
+                                    <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+                                        <i class="fas fa-users text-gray-400 dark:text-gray-500 text-2xl"></i>
                                     </div>
-                                    <h3 class="text-lg font-semibold text-gray-700 mb-1">No se encontraron usuarios</h3>
-                                    <p class="text-sm text-gray-500">Intenta ajustar los filtros de búsqueda</p>
+                                    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1">No se encontraron usuarios</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Intenta ajustar los filtros de búsqueda</p>
                                 </div>
                             </td>
                         </tr>
@@ -243,9 +243,9 @@
 
             <!-- Pagination -->
             {% if usuarios.has_other_pages %}
-            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 dark:bg-gray-900">
                 <div class="flex items-center justify-between">
-                    <div class="text-sm text-gray-700">
+                    <div class="text-sm text-gray-700 dark:text-gray-300">
                         Mostrando 
                         <span class="font-semibold">{{ usuarios.start_index }}</span>
                         a 
@@ -258,18 +258,18 @@
                     <nav class="inline-flex rounded-lg shadow-sm" aria-label="Paginación">
                         {% if usuarios.has_previous %}
                         <a href="?page=1{% if busqueda %}&q={{ busqueda }}{% endif %}{% if rol_filtro %}&rol={{ rol_filtro }}{% endif %}" 
-                           class="relative inline-flex items-center px-3 py-2 rounded-l-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                           class="relative inline-flex items-center px-3 py-2 rounded-l-lg border border-gray-300 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-900 transition-colors">
                             <i class="fas fa-angle-double-left"></i>
                         </a>
                         <a href="?page={{ usuarios.previous_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if rol_filtro %}&rol={{ rol_filtro }}{% endif %}" 
-                           class="relative inline-flex items-center px-3 py-2 border-t border-b border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                           class="relative inline-flex items-center px-3 py-2 border-t border-b border-gray-300 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-900 transition-colors">
                             <i class="fas fa-angle-left"></i>
                         </a>
                         {% else %}
-                        <span class="relative inline-flex items-center px-3 py-2 rounded-l-lg border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                        <span class="relative inline-flex items-center px-3 py-2 rounded-l-lg border border-gray-300 bg-gray-100 dark:bg-gray-700 text-sm font-medium text-gray-400 cursor-not-allowed">
                             <i class="fas fa-angle-double-left"></i>
                         </span>
-                        <span class="relative inline-flex items-center px-3 py-2 border-t border-b border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                        <span class="relative inline-flex items-center px-3 py-2 border-t border-b border-gray-300 bg-gray-100 dark:bg-gray-700 text-sm font-medium text-gray-400 cursor-not-allowed">
                             <i class="fas fa-angle-left"></i>
                         </span>
                         {% endif %}
@@ -282,7 +282,7 @@
                             </span>
                             {% elif num > usuarios.number|add:'-3' and num < usuarios.number|add:'3' %}
                             <a href="?page={{ num }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if rol_filtro %}&rol={{ rol_filtro }}{% endif %}" 
-                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-900 transition-colors">
                                 {{ num }}
                             </a>
                             {% endif %}
@@ -290,18 +290,18 @@
 
                         {% if usuarios.has_next %}
                         <a href="?page={{ usuarios.next_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if rol_filtro %}&rol={{ rol_filtro }}{% endif %}" 
-                           class="relative inline-flex items-center px-3 py-2 border-t border-b border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                           class="relative inline-flex items-center px-3 py-2 border-t border-b border-gray-300 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-900 transition-colors">
                             <i class="fas fa-angle-right"></i>
                         </a>
                         <a href="?page={{ usuarios.paginator.num_pages }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if rol_filtro %}&rol={{ rol_filtro }}{% endif %}" 
-                           class="relative inline-flex items-center px-3 py-2 rounded-r-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                           class="relative inline-flex items-center px-3 py-2 rounded-r-lg border border-gray-300 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-900 transition-colors">
                             <i class="fas fa-angle-double-right"></i>
                         </a>
                         {% else %}
-                        <span class="relative inline-flex items-center px-3 py-2 border-t border-b border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                        <span class="relative inline-flex items-center px-3 py-2 border-t border-b border-gray-300 bg-gray-100 dark:bg-gray-700 text-sm font-medium text-gray-400 cursor-not-allowed">
                             <i class="fas fa-angle-right"></i>
                         </span>
-                        <span class="relative inline-flex items-center px-3 py-2 rounded-r-lg border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                        <span class="relative inline-flex items-center px-3 py-2 rounded-r-lg border border-gray-300 bg-gray-100 dark:bg-gray-700 text-sm font-medium text-gray-400 cursor-not-allowed">
                             <i class="fas fa-angle-double-right"></i>
                         </span>
                         {% endif %}
@@ -313,42 +313,42 @@
 
         <!-- Quick Stats -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" data-aos="fade-up">
-            <div class="bg-white rounded-xl p-6 shadow-lg border-t-4 border-green-500">
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-t-4 border-green-500">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600 mb-1">Usuarios Activos</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ usuarios_activos }}</p>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Usuarios Activos</p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ usuarios_activos }}</p>
                         <p class="text-xs text-green-600 mt-1">
                             <i class="fas fa-arrow-up"></i>
                             {{ usuarios_activos|floatformat:0 }}% del total
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
                         <i class="fas fa-user-check text-green-600 text-xl"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl p-6 shadow-lg border-t-4 border-red-500">
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-t-4 border-red-500">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600 mb-1">Usuarios Inactivos</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ usuarios_inactivos }}</p>
-                        <p class="text-xs text-gray-500 mt-1">
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Usuarios Inactivos</p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ usuarios_inactivos }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                             Cuentas desactivadas
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
                         <i class="fas fa-user-times text-red-600 text-xl"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl p-6 shadow-lg border-t-4 border-sky-500">
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border-t-4 border-sky-500">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600 mb-1">Nuevos Este Mes</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ usuarios_nuevos_mes }}</p>
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Nuevos Este Mes</p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ usuarios_nuevos_mes }}</p>
                         <p class="text-xs text-sky-600 mt-1">
                             <i class="fas fa-calendar-alt"></i>
                             Registros recientes

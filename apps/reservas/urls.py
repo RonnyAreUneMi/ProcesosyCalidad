@@ -10,6 +10,8 @@ urlpatterns = [
     path('carrito/actualizar/<int:item_id>/', views.actualizar_item_carrito, name='actualizar_item_carrito'),
     path('carrito/eliminar/<int:item_id>/', views.eliminar_item_carrito, name='eliminar_item_carrito'),
     path('carrito/vaciar/', views.vaciar_carrito, name='vaciar_carrito'),
+    path('carrito/count/', views.obtener_carrito_count, name='carrito_count'),
+    path('proveedor/reservas/count/', views.obtener_reservas_pendientes_count, name='reservas_pendientes_count'),
     
     # Reservas - Turistas
     path('confirmar/', views.confirmar_reserva, name='confirmar_reserva'),
@@ -22,6 +24,7 @@ urlpatterns = [
     path('proveedor/detalle/<int:reserva_id>/', views.detalle_reserva, name='detalle_reserva_proveedor'),  # ⬅️ AGREGAR ESTA LÍNEA
     path('proveedor/confirmar/<int:reserva_id>/', views.confirmar_reserva_proveedor, name='confirmar_reserva_proveedor'),
     path('proveedor/completar/<int:reserva_id>/', views.completar_reserva_proveedor, name='completar_reserva_proveedor'),
+    path('estado/<int:reserva_id>/', views.verificar_estado_reserva, name='verificar_estado_reserva'),
     
     # APIs AJAX para estadísticas (Chatbot)
     path('api/estadisticas/', views.estadisticas_reservas_ajax, name='estadisticas_ajax'),

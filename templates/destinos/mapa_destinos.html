@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     
     <!-- Header -->
     <div class="bg-gradient-to-r from-sky-600 to-blue-600 text-white py-12">
@@ -19,13 +19,13 @@
     </div>
 
     <!-- Controles y Filtros -->
-    <div class="bg-white shadow-md sticky top-0 z-40 border-b border-gray-200">
+    <div class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex flex-wrap items-center justify-between gap-4">
                 
                 <!-- Botón Volver -->
                 <a href="{% url 'destinos:lista_destinos' %}" 
-                   class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:bg-gray-900 transition-colors">
                     <i class="fas fa-arrow-left mr-2"></i>
                     Volver a la lista
                 </a>
@@ -65,7 +65,7 @@
                 </div>
 
                 <!-- Contador de destinos -->
-                <div class="text-sm font-semibold text-gray-700">
+                <div class="text-sm font-semibold text-gray-700 dark:text-gray-300">
                     <i class="fas fa-map-pin text-sky-600 mr-1"></i>
                     <span id="destinosCount">0</span> destinos
                 </div>
@@ -75,17 +75,17 @@
 
     <!-- Contenedor centrado y limitado -->
    <div class="flex justify-center py-8">
-    <div class="relative w-full max-w-5xl bg-white rounded-xl shadow-lg overflow-visible" style="height: 600px; z-index: 0;">
+    <div class="relative w-full max-w-5xl bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-visible" style="height: 600px; z-index: 0;">
         <!-- Mapa centrado -->
         <div class="flex justify-center items-center w-full h-full">
             <div id="map" class="w-full h-full"></div>
         </div>
         
         <!-- Loading overlay -->
-        <div id="mapLoading" class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-10">
+        <div id="mapLoading" class="absolute inset-0 bg-white dark:bg-gray-800 bg-opacity-90 flex items-center justify-center z-10">
             <div class="text-center">
                 <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mb-4"></div>
-                <p class="text-gray-600 font-semibold">Cargando mapa...</p>
+                <p class="text-gray-600 dark:text-gray-300 font-semibold">Cargando mapa...</p>
             </div>
         </div>
     </div>
@@ -240,8 +240,8 @@
             loadingDiv.innerHTML = `
                 <div class="text-center">
                     <i class="fas fa-exclamation-triangle text-red-600 text-4xl mb-4"></i>
-                    <p class="text-gray-900 font-semibold mb-2">Error al cargar el mapa</p>
-                    <p class="text-gray-600 text-sm">${error.message}</p>
+                    <p class="text-gray-900 dark:text-white font-semibold mb-2">Error al cargar el mapa</p>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm">${error.message}</p>
                     <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700">
                         Recargar página
                     </button>
@@ -378,9 +378,9 @@ function crearMarcadores() {
             const loadingDiv = document.getElementById('mapLoading');
             loadingDiv.innerHTML = `
                 <div class="text-center">
-                    <i class="fas fa-map-marked-alt text-gray-400 text-5xl mb-4"></i>
-                    <p class="text-gray-900 font-semibold mb-2">No hay destinos disponibles</p>
-                    <p class="text-gray-600 text-sm mb-4">Crea tu primer destino turístico</p>
+                    <i class="fas fa-map-marked-alt text-gray-400 dark:text-gray-500 text-5xl mb-4"></i>
+                    <p class="text-gray-900 dark:text-white font-semibold mb-2">No hay destinos disponibles</p>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">Crea tu primer destino turístico</p>
                     {% if user.is_authenticated and user.es_administrador %}
                     <a href="{% url 'destinos:crear_destino' %}" class="inline-block px-6 py-3 bg-sky-600 text-white rounded-lg hover:bg-sky-700 font-semibold">
                         <i class="fas fa-plus mr-2"></i>

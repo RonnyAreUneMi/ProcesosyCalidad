@@ -3,35 +3,354 @@
 
 {% block title %}Panel de Reservas - Proveedor{% endblock %}
 
+{% block extra_css %}
+<!-- SweetAlert2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
+{% endblock %}
+
+{% block extra_js %}
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+// Función para verificar el estado de la reserva
+async function verificarEstadoReserva(reservaId, estadoEsperado, maxIntentos = 3) {
+    for (let intento = 0; intento < maxIntentos; intento++) {
+        try {
+            const response = await fetch(`/reservas/estado/${reservaId}/`, {
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log(`Intento ${intento + 1}: Estado actual = ${data.estado}, Estado esperado = ${estadoEsperado}`);
+            
+            if (data.success && data.estado === estadoEsperado) {
+                return true;
+            }
+            // Esperar 2 segundos antes del siguiente intento
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        } catch (error) {
+            console.error('Error al verificar estado:', error);
+            // Esperar antes de reintentar en caso de error
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+    }
+    console.warn(`No se pudo confirmar el cambio de estado a ${estadoEsperado} después de ${maxIntentos} intentos`);
+    return false;
+}
+
+// Función para actualizar el estado de una fila de reserva
+function actualizarFilaReserva(reservaId, nuevoEstado, nuevoColor) {
+    const fila = document.querySelector(`[data-reserva-id="${reservaId}"]`);
+    if (fila) {
+        // Actualizar el badge de estado
+        const estadoBadge = fila.querySelector('.estado-badge');
+        if (estadoBadge) {
+            estadoBadge.className = `inline-flex px-2 py-1 text-xs font-semibold rounded-full ${nuevoColor}`;
+            estadoBadge.textContent = nuevoEstado;
+        }
+        
+        // Ocultar los botones de acción
+        const botonesAccion = fila.querySelectorAll('.btn-accion');
+        botonesAccion.forEach(btn => btn.style.display = 'none');
+    }
+}
+
+async function confirmarReservaSwal(reservaId) {
+    console.log('Iniciando confirmación de reserva:', reservaId);
+    const result = await Swal.fire({
+        title: '¿Confirmar reserva?',
+        text: '¿Estás seguro de que deseas confirmar esta reserva?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, confirmar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#10B981',
+        cancelButtonColor: '#6B7280',
+        background: document.documentElement.classList.contains('dark') ? '#1F2937' : '#FFFFFF',
+        color: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            Swal.fire({
+                title: 'Procesando...',
+                text: 'Por favor espera mientras se confirma la reserva',
+                icon: 'info',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const response = await fetch(`/reservas/proveedor/confirmar/${reservaId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'same-origin'
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Actualizar la UI inmediatamente
+                actualizarFilaReserva(reservaId, 'Confirmada', 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200');
+                
+                // Mostrar mensaje de éxito
+                await Swal.fire({
+                    title: '¡Reserva Confirmada!',
+                    text: 'La reserva ha sido confirmada exitosamente',
+                    icon: 'success',
+                    confirmButtonColor: '#10B981',
+                    background: document.documentElement.classList.contains('dark') ? '#1F2937' : '#FFFFFF',
+                    color: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000'
+                });
+                
+                // Verificar que el cambio se haya registrado en la base de datos
+                const cambioConfirmado = await verificarEstadoReserva(reservaId, 'confirmada');
+                if (cambioConfirmado) {
+                    window.location.reload();
+                } else {
+                    // Si el cambio no se confirmó, mostrar mensaje y recargar
+                    await Swal.fire({
+                        title: 'Sincronizando...',
+                        text: 'Actualizando datos con el servidor',
+                        icon: 'info',
+                        showConfirmButton: false,
+                        timer: 2000,
+                        background: document.documentElement.classList.contains('dark') ? '#1F2937' : '#FFFFFF',
+                        color: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000'
+                    });
+                    window.location.reload();
+                }
+            } else {
+                throw new Error(data.error || 'Error al confirmar la reserva');
+            }
+        } catch (error) {
+            console.error('Error al confirmar reserva:', error);
+            Swal.fire({
+                title: '¡Error!',
+                text: error.message,
+                icon: 'error',
+                confirmButtonColor: '#EF4444',
+                background: document.documentElement.classList.contains('dark') ? '#1F2937' : '#FFFFFF',
+                color: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000'
+            });
+        }
+    }
+}
+
+async function completarReservaSwal(reservaId) {
+    try {
+        // Mostrar confirmación inicial
+        const result = await Swal.fire({
+            title: '¿Completar reserva?',
+            text: '¿Estás seguro de que deseas marcar esta reserva como completada?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, completar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#0EA5E9',
+            cancelButtonColor: '#6B7280',
+            background: document.documentElement.classList.contains('dark') ? '#1F2937' : '#FFFFFF',
+            color: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000'
+        });
+
+        if (!result.isConfirmed) return;
+
+        // Mostrar loading
+        Swal.fire({
+            title: 'Procesando...',
+            text: 'Completando la reserva',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Hacer la petición
+        const response = await fetch(`/reservas/proveedor/completar/${reservaId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.error || 'Error al completar la reserva');
+        }
+
+        // Actualizar UI y mostrar éxito
+        actualizarFilaReserva(reservaId, 'Completada', 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200');
+        
+        await Swal.fire({
+            title: '¡Reserva Completada!',
+            text: 'La reserva ha sido completada exitosamente',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+        });
+
+        // Recargar página
+        window.location.reload();
+
+    } catch (error) {
+        console.error('Error:', error);
+        await Swal.fire({
+            title: 'Error',
+            text: error.message || 'Error al completar la reserva',
+            icon: 'error',
+            confirmButtonColor: '#EF4444'
+        });
+    }
+}
+
+async function cancelarReservaSwal(reservaId, codigoReserva) {
+    console.log('Iniciando cancelación de reserva:', reservaId, codigoReserva);
+    const { value: motivo, isConfirmed } = await Swal.fire({
+        title: 'Cancelar Reserva',
+        text: `¿Estás seguro de que deseas cancelar la reserva #${codigoReserva}?`,
+        icon: 'warning',
+        input: 'textarea',
+        inputLabel: 'Motivo de cancelación',
+        inputPlaceholder: 'Escribe el motivo de la cancelación...',
+        inputAttributes: {
+            'aria-label': 'Escribe el motivo de la cancelación'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Sí, cancelar',
+        cancelButtonText: 'Volver',
+        confirmButtonColor: '#EF4444',
+        cancelButtonColor: '#6B7280',
+        background: document.documentElement.classList.contains('dark') ? '#1F2937' : '#FFFFFF',
+        color: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000',
+        inputValidator: (value) => {
+            if (!value) {
+                return 'Debes escribir un motivo de cancelación';
+            }
+        }
+    });
+
+    if (isConfirmed) {
+        try {
+            Swal.fire({
+                title: 'Procesando...',
+                text: 'Por favor espera mientras se cancela la reserva',
+                icon: 'info',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const formData = new FormData();
+            formData.append('motivo', motivo);
+
+            const response = await fetch(`/reservas/cancelar/${reservaId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al cancelar la reserva');
+            }
+
+            // Actualizar la UI inmediatamente
+            actualizarFilaReserva(reservaId, 'Cancelada', 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200');
+            
+            // Mostrar mensaje de éxito
+            await Swal.fire({
+                title: '¡Reserva Cancelada!',
+                text: 'La reserva ha sido cancelada exitosamente',
+                icon: 'success',
+                confirmButtonColor: '#10B981',
+                background: document.documentElement.classList.contains('dark') ? '#1F2937' : '#FFFFFF',
+                color: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000'
+            });
+            
+            // Verificar que el cambio se haya registrado en la base de datos
+            const cambioConfirmado = await verificarEstadoReserva(reservaId, 'cancelada');
+            if (cambioConfirmado) {
+                window.location.reload();
+            } else {
+                // Si el cambio no se confirmó, mostrar mensaje y recargar
+                await Swal.fire({
+                    title: 'Sincronizando...',
+                    text: 'Actualizando datos con el servidor',
+                    icon: 'info',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    background: document.documentElement.classList.contains('dark') ? '#1F2937' : '#FFFFFF',
+                    color: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000'
+                });
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error('Error al cancelar reserva:', error);
+            Swal.fire({
+                title: '¡Error!',
+                text: error.message,
+                icon: 'error',
+                confirmButtonColor: '#EF4444',
+                background: document.documentElement.classList.contains('dark') ? '#1F2937' : '#FFFFFF',
+                color: document.documentElement.classList.contains('dark') ? '#FFFFFF' : '#000000'
+            });
+        }
+    }
+}
+</script>
+{% endblock %}
+
 {% block content %}
-<div class="min-h-screen bg-gray-50 py-8">
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
     <div class="container mx-auto px-4 max-w-7xl">
         <!-- Encabezado -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Panel de Reservas</h1>
-            <p class="text-gray-600">Gestiona las reservas de tus servicios</p>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Panel de Reservas</h1>
+            <p class="text-gray-600 dark:text-gray-300">Gestiona las reservas de tus servicios</p>
         </div>
 
         <!-- Estadísticas principales -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             <!-- Total de reservas -->
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <div class="flex items-center justify-between mb-2">
-                    <p class="text-sm text-gray-600">Total Reservas</p>
-                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">Total Reservas</p>
+                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
                         <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                         </svg>
                     </div>
                 </div>
-                <p class="text-2xl font-bold text-gray-900">{{ total_reservas }}</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ total_reservas }}</p>
             </div>
 
             <!-- Pendientes -->
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <div class="flex items-center justify-between mb-2">
-                    <p class="text-sm text-gray-600">Pendientes</p>
-                    <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">Pendientes</p>
+                    <div class="w-10 h-10 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center">
                         <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
@@ -44,10 +363,10 @@
             </div>
 
             <!-- Confirmadas -->
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <div class="flex items-center justify-between mb-2">
-                    <p class="text-sm text-gray-600">Confirmadas</p>
-                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">Confirmadas</p>
+                    <div class="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
                         <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
@@ -57,10 +376,10 @@
             </div>
 
             <!-- Completadas -->
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <div class="flex items-center justify-between mb-2">
-                    <p class="text-sm text-gray-600">Completadas</p>
-                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">Completadas</p>
+                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
                         <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                         </svg>
@@ -70,10 +389,10 @@
             </div>
 
             <!-- Ingresos totales -->
-            <div class="bg-white rounded-lg shadow p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <div class="flex items-center justify-between mb-2">
-                    <p class="text-sm text-gray-600">Ingresos</p>
-                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">Ingresos</p>
+                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
                         <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
@@ -84,14 +403,14 @@
         </div>
 
         <!-- Filtros -->
-        <div class="bg-white rounded-lg shadow p-4 mb-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
             <form method="GET" class="flex flex-col lg:flex-row gap-4">
                 <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
                     <!-- Filtro por servicio -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Servicio</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Servicio</label>
                         <select name="servicio" 
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             <option value="">Todos los servicios</option>
                             {% for servicio in servicios %}
                             <option value="{{ servicio.id }}" {% if filtros.servicio == servicio.id|stringformat:"s" %}selected{% endif %}>
@@ -103,9 +422,9 @@
 
                     <!-- Filtro por estado -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Estado</label>
                         <select name="estado" 
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             <option value="">Todos los estados</option>
                             <option value="pendiente" {% if filtros.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
                             <option value="confirmada" {% if filtros.estado == 'confirmada' %}selected{% endif %}>Confirmada</option>
@@ -116,11 +435,11 @@
 
                     <!-- Filtro por fecha -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Fecha del servicio</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fecha del servicio</label>
                         <input type="date" 
                                name="fecha" 
                                value="{{ filtros.fecha }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                               class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
                 </div>
 
@@ -130,7 +449,7 @@
                         Filtrar
                     </button>
                     <a href="{% url 'reservas:reservas_proveedor' %}" 
-                       class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium transition-colors">
+                       class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 font-medium transition-colors">
                         Limpiar
                     </a>
                 </div>
@@ -139,125 +458,120 @@
 
         <!-- Lista de reservas -->
         {% if page_obj %}
-            <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full">
-                        <thead class="bg-gray-50 border-b">
+                        <thead class="bg-gray-50 dark:bg-gray-900 border-b">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Código
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Cliente
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Servicio
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Fecha Servicio
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Personas
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Total
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Estado
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Acciones
                                 </th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                             {% for reserva in page_obj %}
-                            <tr class="hover:bg-gray-50">
+                            <tr class="hover:bg-gray-50 dark:bg-gray-900" data-reserva-id="{{ reserva.id }}">
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="text-sm font-medium text-gray-900">#{{ reserva.codigo_reserva }}</span>
-                                    <p class="text-xs text-gray-500">{{ reserva.fecha_reserva|date:"d/m/Y" }}</p>
+                                    <span class="text-sm font-medium text-gray-900 dark:text-white">#{{ reserva.codigo_reserva }}</span>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ reserva.fecha_reserva|date:"d/m/Y" }}</p>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
-                                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                        <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mr-3">
                                             <span class="text-sm font-medium text-blue-600">
                                                 {{ reserva.usuario.nombre|slice:":1"|upper }}
                                             </span>
                                         </div>
                                         <div>
-                                            <p class="text-sm font-medium text-gray-900">{{ reserva.usuario.nombre }}</p>
-                                            <p class="text-xs text-gray-500">{{ reserva.usuario.email }}</p>
+                                            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ reserva.usuario.nombre }}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ reserva.usuario.email }}</p>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <p class="text-sm font-medium text-gray-900">{{ reserva.servicio.nombre }}</p>
-                                    <p class="text-xs text-gray-500">{{ reserva.servicio.destino.nombre }}</p>
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ reserva.servicio.nombre }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ reserva.servicio.destino.nombre }}</p>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <p class="text-sm text-gray-900">{{ reserva.fecha_servicio|date:"d/m/Y" }}</p>
+                                    <p class="text-sm text-gray-900 dark:text-white">{{ reserva.fecha_servicio|date:"d/m/Y" }}</p>
 
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                                     {{ reserva.cantidad_personas }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
                                     ${{ reserva.costo_total|floatformat:2 }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
-                                        {% if reserva.estado == 'pendiente' %}bg-yellow-100 text-yellow-800
-                                        {% elif reserva.estado == 'confirmada' %}bg-green-100 text-green-800
-                                        {% elif reserva.estado == 'completada' %}bg-blue-100 text-blue-800
-                                        {% elif reserva.estado == 'cancelada' %}bg-red-100 text-red-800
+                                    <span class="estado-badge inline-flex px-2 py-1 text-xs font-semibold rounded-full
+                                        {% if reserva.estado == 'pendiente' %}bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200
+                                        {% elif reserva.estado == 'confirmada' %}bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200
+                                        {% elif reserva.estado == 'completada' %}bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200
+                                        {% elif reserva.estado == 'cancelada' %}bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200
                                         {% endif %}">
                                         {{ reserva.get_estado_display }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center gap-2">
                                         <!-- Ver detalles -->
                                         <a href="{% url 'reservas:detalle_reserva' reserva.id %}" 
-                                           class="text-blue-600 hover:text-blue-800"
+                                           class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors group"
                                            title="Ver detalles">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                            </svg>
+                                            <i class="fas fa-eye text-sm group-hover:scale-110 transition-transform"></i>
                                         </a>
 
                                         <!-- Confirmar -->
                                         {% if reserva.estado == 'pendiente' %}
-                                        <button onclick="confirmarReserva('{{ reserva.id }}')" 
-                                                class="text-green-600 hover:text-green-800"
-                                                title="Confirmar">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
+                                        <button type="button" 
+                                                onclick="confirmarReservaSwal('{{ reserva.id }}')" 
+                                                class="btn-accion inline-flex items-center justify-center w-8 h-8 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/40 transition-all duration-300 group cursor-pointer"
+                                                title="Confirmar reserva">
+                                            <i class="fas fa-check text-sm group-hover:scale-110 transition-transform"></i>
                                         </button>
                                         {% endif %}
 
                                         <!-- Completar -->
                                         {% if reserva.estado == 'confirmada' %}
-                                        <button onclick="completarReserva('{{ reserva.id }}')" 
-                                                class="text-blue-600 hover:text-blue-800"
+                                        <button type="button"
+                                                onclick="completarReservaSwal('{{ reserva.id }}')" 
+                                                class="btn-accion inline-flex items-center justify-center w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-900/20 text-sky-600 dark:text-sky-400 hover:bg-sky-100 dark:hover:bg-sky-900/40 transition-all duration-300 group cursor-pointer"
                                                 title="Marcar como completada">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                            </svg>
+                                            <i class="fas fa-flag-checkered text-sm group-hover:scale-110 transition-transform"></i>
                                         </button>
                                         {% endif %}
 
                                         <!-- Cancelar -->
                                         {% if reserva.estado == 'pendiente' or reserva.estado == 'confirmada' %}
-                                        <button onclick="mostrarModalCancelar('{{ reserva.id }}', '{{ reserva.codigo_reserva }}')" 
-                                                class="text-red-600 hover:text-red-800"
-                                                title="Cancelar">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                            </svg>
+                                        <button type="button"
+                                                onclick="cancelarReservaSwal('{{ reserva.id }}', '{{ reserva.codigo_reserva }}')" 
+                                                class="btn-accion inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 transition-all duration-300 group cursor-pointer"
+                                                title="Cancelar reserva">
+                                            <i class="fas fa-times text-sm group-hover:scale-110 transition-transform"></i>
                                         </button>
                                         {% endif %}
+                                    </div>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -268,24 +582,24 @@
                 <!-- Paginación -->
                 {% if page_obj.has_other_pages %}
                 <div class="px-6 py-4 border-t flex items-center justify-between">
-                    <div class="text-sm text-gray-600">
+                    <div class="text-sm text-gray-600 dark:text-gray-300">
                         Mostrando {{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }} reservas
                     </div>
                     <nav class="flex items-center gap-2">
                         {% if page_obj.has_previous %}
                         <a href="?page={{ page_obj.previous_page_number }}{% if filtros.servicio %}&servicio={{ filtros.servicio }}{% endif %}{% if filtros.estado %}&estado={{ filtros.estado }}{% endif %}{% if filtros.fecha %}&fecha={{ filtros.fecha }}{% endif %}" 
-                           class="px-3 py-1 border rounded hover:bg-gray-50">
+                           class="px-3 py-1 border rounded hover:bg-gray-50 dark:bg-gray-900">
                             ← Anterior
                         </a>
                         {% endif %}
 
-                        <span class="px-3 py-1 text-gray-700">
+                        <span class="px-3 py-1 text-gray-700 dark:text-gray-300">
                             Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
                         </span>
 
                         {% if page_obj.has_next %}
                         <a href="?page={{ page_obj.next_page_number }}{% if filtros.servicio %}&servicio={{ filtros.servicio }}{% endif %}{% if filtros.estado %}&estado={{ filtros.estado }}{% endif %}{% if filtros.fecha %}&fecha={{ filtros.fecha }}{% endif %}" 
-                           class="px-3 py-1 border rounded hover:bg-gray-50">
+                           class="px-3 py-1 border rounded hover:bg-gray-50 dark:bg-gray-900">
                             Siguiente →
                         </a>
                         {% endif %}
@@ -295,12 +609,12 @@
             </div>
         {% else %}
             <!-- Sin reservas -->
-            <div class="bg-white rounded-lg shadow p-12 text-center">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center">
                 <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">No hay reservas</h2>
-                <p class="text-gray-600">No se encontraron reservas con los filtros seleccionados.</p>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">No hay reservas</h2>
+                <p class="text-gray-600 dark:text-gray-300">No se encontraron reservas con los filtros seleccionados.</p>
             </div>
         {% endif %}
 
@@ -308,104 +622,6 @@
     </div>
 </div>
 
-<!-- Modal de cancelación -->
-<div id="modalCancelar" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-lg max-w-md w-full p-6">
-        <h3 class="text-xl font-bold text-gray-900 mb-4">Cancelar Reserva</h3>
-        <p class="text-gray-600 mb-4">¿Estás seguro de que deseas cancelar la reserva <strong id="codigoReserva"></strong>?</p>
-        
-        <form id="formCancelar" method="POST" action="">
-            {% csrf_token %}
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Motivo de cancelación <span class="text-red-500">*</span>
-                </label>
-                <textarea name="motivo" 
-                          rows="3"
-                          required
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="Explica el motivo de la cancelación..."></textarea>
-            </div>
 
-            <div class="flex gap-3">
-                <button type="button" 
-                        onclick="cerrarModalCancelar()"
-                        class="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium">
-                    Volver
-                </button>
-                <button type="submit"
-                        class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium">
-                    Confirmar Cancelación
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script>
-function confirmarReserva(reservaId) {
-    if (confirm('¿Confirmar esta reserva?')) {
-        fetch(`/reservas/proveedor/confirmar/${reservaId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'Content-Type': 'application/json',
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error: ' + data.error);
-            }
-        })
-        .catch(error => {
-            alert('Error al confirmar la reserva');
-            console.error(error);
-        });
-    }
-}
-
-function completarReserva(reservaId) {
-    if (confirm('¿Marcar esta reserva como completada?')) {
-        fetch(`/reservas/proveedor/completar/${reservaId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'Content-Type': 'application/json',
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error: ' + data.error);
-            }
-        })
-        .catch(error => {
-            alert('Error al completar la reserva');
-            console.error(error);
-        });
-    }
-}
-
-function mostrarModalCancelar(reservaId, codigoReserva) {
-    document.getElementById('modalCancelar').classList.remove('hidden');
-    document.getElementById('codigoReserva').textContent = '#' + codigoReserva;
-    document.getElementById('formCancelar').action = `/reservas/cancelar/${reservaId}/`;
-}
-
-function cerrarModalCancelar() {
-    document.getElementById('modalCancelar').classList.add('hidden');
-}
-
-// Cerrar modal al hacer click fuera
-document.getElementById('modalCancelar').addEventListener('click', function(e) {
-    if (e.target === this) {
-        cerrarModalCancelar();
-    }
-});
 </script>
 {% endblock %}

@@ -1,16 +1,89 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Ecuador Turismo - Descubre lo Extraordinario{% endblock %}</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configurar Tailwind para modo oscuro
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0052A3',
+                        'primary-dark': '#003875',
+                        'primary-light': '#4A90E2',
+                    }
+                }
+            }
+        }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
+    <!-- Script para cargar el tema antes de renderizar -->
+    <script>
+        // Cargar tema guardado antes de que se renderice la página (evita parpadeo)
+        (function() {
+            const theme = localStorage.getItem('theme') || 'light';
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+
+        // Función para actualizar el contador del carrito
+        function actualizarContadorCarrito() {
+            fetch('{% url "reservas:carrito_count" %}')
+                .then(response => response.json())
+                .then(data => {
+                    const contador = document.getElementById('carritoCount');
+                    if (contador) {
+                        contador.textContent = data.count;
+                        if (data.count > 0) {
+                            contador.classList.add('animate-pulse');
+                        } else {
+                            contador.classList.remove('animate-pulse');
+                        }
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Función para actualizar el contador de reservas pendientes
+        function actualizarContadorReservas() {
+            fetch('{% url "reservas:reservas_pendientes_count" %}')
+                .then(response => response.json())
+                .then(data => {
+                    const contador = document.getElementById('reservasCount');
+                    if (contador) {
+                        contador.textContent = data.count;
+                        if (data.count > 0) {
+                            contador.classList.add('animate-pulse');
+                        } else {
+                            contador.classList.remove('animate-pulse');
+                        }
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Actualizar contadores cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarContadorCarrito();
+            actualizarContadorReservas();
+        });
+
+        // Establecer intervalos para actualizar los contadores cada minuto
+        setInterval(actualizarContadorCarrito, 60000);
+        setInterval(actualizarContadorReservas, 60000);
+    </script>
+
     <style>
         :root {
             --primary: #0052A3;
@@ -20,6 +93,15 @@
             --accent-red: #CE1126;
             --dark: #1a2332;
             --light: #f0f4f8;
+        }
+
+        /* Variables para modo oscuro */
+        .dark {
+            --primary: #4A90E2;
+            --primary-dark: #0052A3;
+            --primary-light: #81B4E0;
+            --dark: #0f172a;
+            --light: #1e293b;
         }
         
         .gradient-bg { background: linear-gradient(135deg, #0052A3 0%, #003875 100%); }
@@ -114,6 +196,10 @@
             justify-content: center;
             opacity: 0;
             transition: opacity 0.3s ease;
+        }
+
+        .dark .loader-overlay {
+            background: rgba(15, 23, 42, 0.85);
         }
         
         .loader-overlay.active {
@@ -218,6 +304,22 @@
             right: 24px;
             z-index: 1000;
         }
+
+        /* Footer spacing para evitar solapamiento con chatbot */
+        footer {
+            padding-bottom: 70px !important;
+        }
+
+        /* En pantallas pequeñas, ajustar el espacio */
+        @media (max-width: 640px) {
+            footer {
+                padding-bottom: 85px !important;
+            }
+            .chatbot-container {
+                bottom: 16px;
+                right: 16px;
+            }
+        }
         
         @keyframes borderPulse {
             0%, 100% { 
@@ -285,6 +387,12 @@
             transition: all 0.3s ease;
             border: 2px solid #e2e8f0;
         }
+
+        .dark .chatbot-window {
+            background: #1e293b;
+            border-color: #334155;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+        }
         
         .chatbot-window.active {
             opacity: 1;
@@ -308,6 +416,10 @@
             overflow-y: auto;
             background: #f8fafc;
         }
+
+        .dark .chatbot-messages {
+            background: #0f172a;
+        }
         
         .chatbot-messages::-webkit-scrollbar { width: 6px; }
         .chatbot-messages::-webkit-scrollbar-track { background: #e2e8f0; }
@@ -320,6 +432,11 @@
             padding: 16px;
             background: white;
             border-top: 1px solid #e2e8f0;
+        }
+
+        .dark .chatbot-input-area {
+            background: #1e293b;
+            border-top-color: #334155;
         }
         
         .chat-message {
@@ -366,6 +483,11 @@
             border-bottom-left-radius: 4px;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
+
+        .dark .chat-message.bot .chat-bubble {
+            background: #334155;
+            color: #e2e8f0;
+        }
         
         .chat-message.user .chat-bubble {
             background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
@@ -407,8 +529,14 @@
     
     {% block extra_css %}{% endblock %}
 </head>
-<body class="bg-gray-50 min-h-screen">
-    
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-200">
+
+    <!-- CSRF Token para JavaScript -->
+    <script>
+        // Asegurar que el CSRF token esté disponible
+        window.CSRF_TOKEN = '{{ csrf_token }}';
+    </script>
+
     <div class="loader-overlay" id="loaderOverlay">
         <div class="loader-container">
             <div class="loader-ecuador">
@@ -421,151 +549,171 @@
         </div>
     </div>
     
-    <header class="bg-white shadow-md sticky top-0 z-50 border-b border-gray-200">
+    <header class="bg-white/80 dark:bg-gray-800/90 backdrop-blur-sm shadow-md sticky top-0 z-50 border-b border-gray-200/50 dark:border-gray-700/50 transition-colors duration-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <a href="{% url 'home' %}" class="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition">
-                    <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center text-white text-xl font-bold">ET</div>
+            <div class="flex justify-between items-center py-3">
+                <a href="{% url 'home' %}" class="flex items-center space-x-3 cursor-pointer hover:opacity-90 transition group">
+                    <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center text-white text-xl font-bold shadow-lg group-hover:shadow-xl transition-all duration-300">ET</div>
                     <div>
-                        <h1 class="text-xl font-bold text-gray-900">Ecuador Turismo</h1>
-                        <p class="text-xs text-gray-500">Descubre lo Extraordinario</p>
+                        <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-sky-500 dark:from-blue-400 dark:to-sky-300">Ecuador Turismo</h1>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Descubre lo Extraordinario</p>
                     </div>
                 </a>
                 
-                <nav class="hidden md:flex items-center space-x-1">
-                    <a href="{% url 'home' %}" class="text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition font-medium px-4 py-2 rounded-lg">
-                        <i class="fas fa-home mr-2"></i>Inicio
+                <nav class="hidden md:flex items-center space-x-2">
+                    <a href="{% url 'home' %}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700/50 transition-all duration-300 font-medium px-4 py-2 rounded-lg group">
+                        <i class="fas fa-home mr-2 group-hover:scale-110 transform transition-transform"></i>Inicio
                     </a>
-                    <a href="{% url 'destinos:lista_destinos' %}" class="text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition font-medium px-4 py-2 rounded-lg">
-                        <i class="fas fa-map-marked-alt mr-2"></i>Destinos
+                    <a href="{% url 'destinos:lista_destinos' %}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700/50 transition-all duration-300 font-medium px-4 py-2 rounded-lg group">
+                        <i class="fas fa-map-marked-alt mr-2 group-hover:scale-110 transform transition-transform"></i>Destinos
                     </a>
-                    <a href="{% url 'servicios:listar_servicios' %}" class="text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition font-medium px-4 py-2 rounded-lg">
-                        <i class="fas fa-concierge-bell mr-2"></i>Servicios
+                    <a href="{% url 'servicios:listar_servicios' %}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700/50 transition-all duration-300 font-medium px-4 py-2 rounded-lg group">
+                        <i class="fas fa-concierge-bell mr-2 group-hover:scale-110 transform transition-transform"></i>Servicios
                     </a>
-                    <a href="{% url 'destinos:mapa_destinos' %}" class="text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition font-medium px-4 py-2 rounded-lg">
-                        <i class="fas fa-route mr-2"></i>Rutas
+                    <a href="{% url 'rutas:crear_ruta' %}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700/50 transition-all duration-300 font-medium px-4 py-2 rounded-lg group">
+                        <i class="fas fa-route mr-2 group-hover:scale-110 transform transition-transform"></i>Rutas
                     </a>
-                    
+
+                    <!-- Separador -->
+                    <div class="w-px h-6 bg-gray-200 dark:bg-gray-700/50"></div>
+
                     {% if user.is_authenticated %}
+                        <!-- Contadores según el rol -->
                         {% if user.rol.nombre == 'turista' %}
-                            <a href="{% url 'reservas:ver_carrito' %}" class="relative p-2 hover:bg-blue-50 rounded-lg transition ml-2" title="Carrito de compras">
-                                <i class="fas fa-shopping-cart text-gray-700 text-lg"></i>
-                                <span id="carritoCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold pulse">0</span>
+                            <a href="{% url 'reservas:ver_carrito' %}" class="relative p-2 hover:bg-blue-50 dark:hover:bg-gray-700/50 rounded-lg transition-all duration-300 group">
+                                <i class="fas fa-shopping-cart text-xl text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-all"></i>
+                                <span id="carritoCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center group-hover:scale-110 transition-transform">0</span>
+                            </a>
+                        {% elif user.rol.nombre == 'proveedor' %}
+                            <a href="{% url 'reservas:reservas_proveedor' %}" class="relative p-2 hover:bg-blue-50 dark:hover:bg-gray-700/50 rounded-lg transition-all duration-300 group" title="Reservas pendientes">
+                                <i class="fas fa-calendar-alt text-xl text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-all"></i>
+                                <span id="reservasCount" class="absolute -top-1 -right-1 bg-yellow-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center group-hover:scale-110 transition-transform">0</span>
                             </a>
                         {% endif %}
+                    {% endif %}
+
+                    <!-- Botón de modo oscuro -->
+                    <button onclick="toggleDarkMode()" class="p-2 hover:bg-blue-50 dark:hover:bg-gray-700/50 rounded-lg transition-all duration-300 group ml-2" title="Cambiar tema">
+                        <i class="fas fa-moon text-gray-700 dark:text-gray-300 text-lg dark:hidden group-hover:text-blue-600 group-hover:rotate-12 transform transition-all"></i>
+                        <i class="fas fa-sun text-amber-400 text-lg hidden dark:inline group-hover:text-amber-300 group-hover:rotate-12 transform transition-all"></i>
+                    </button>
+                    
+                    {% if user.is_authenticated %}
                         
                         <div class="relative ml-3" x-data="{ open: false }">
-                            <button @click="open = !open" class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
-                                <div class="w-8 h-8 gradient-bg rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                            <button @click="open = !open" class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-700/50 transition-all duration-300 group">
+                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-sky-400 dark:from-blue-600 dark:to-sky-500 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md group-hover:shadow-lg transition-all">
                                     {{ user.nombre|slice:":1"|upper }}
                                 </div>
-                                <span class="text-gray-700 font-medium text-sm">{{ user.nombre|truncatewords:2 }}</span>
-                                <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                                <span class="text-gray-700 dark:text-gray-300 font-medium text-sm group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ user.nombre|truncatewords:2 }}</span>
+                                <i class="fas fa-chevron-down text-xs text-gray-400 dark:text-gray-500"></i>
                             </button>
-                            
-                            <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-1 slide-down">
-                                <div class="px-4 py-3 border-b border-gray-100">
-                                    <p class="text-sm font-semibold text-gray-900">{{ user.nombre }}</p>
-                                    <p class="text-xs text-gray-500 mt-1">{{ user.correo }}</p>
+
+                            <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 slide-down">
+                                <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ user.nombre }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ user.correo }}</p>
                                     {% if user.rol %}
-                                        <span class="inline-block mt-2 px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700">
+                                        <span class="inline-block mt-2 px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300">
                                             {% if user.rol.nombre == 'turista' %}<i class="fas fa-user mr-1"></i>Turista
                                             {% elif user.rol.nombre == 'proveedor' %}<i class="fas fa-briefcase mr-1"></i>Proveedor
                                             {% elif user.rol.nombre == 'administrador' %}<i class="fas fa-user-shield mr-1"></i>Administrador{% endif %}
                                         </span>
                                     {% endif %}
                                 </div>
-                                
-                                <a href="{% url 'usuarios:perfil' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                    <i class="fas fa-user-circle mr-3 text-blue-600 w-4"></i>Mi Perfil
+
+                                <a href="{% url 'usuarios:perfil' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                    <i class="fas fa-user-circle mr-3 text-blue-600 dark:text-blue-400 w-4"></i>Mi Perfil
                                 </a>
                                 
                                 {% if user.rol.nombre == 'turista' %}
-                                    <a href="{% url 'reservas:mis_reservas' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                        <i class="fas fa-calendar-check mr-3 text-blue-600 w-4"></i>Mis Reservas
+                                    <a href="{% url 'reservas:mis_reservas' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                        <i class="fas fa-calendar-check mr-3 text-blue-600 dark:text-blue-400 w-4"></i>Mis Reservas
                                     </a>
-                                    <a href="{% url 'reservas:ver_carrito' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                        <i class="fas fa-shopping-cart mr-3 text-blue-600 w-4"></i>Mi Carrito
+                                    <a href="{% url 'reservas:ver_carrito' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                        <i class="fas fa-shopping-cart mr-3 text-blue-600 dark:text-blue-400 w-4"></i>Mi Carrito
                                     </a>
                                 {% elif user.rol.nombre == 'proveedor' %}
-                                    <a href="{% url 'reservas:reservas_proveedor' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                        <i class="fas fa-calendar-alt mr-3 text-blue-600 w-4"></i>Gestionar Reservas
-                                    </a>
-                                    <a href="{% url 'servicios:mis_servicios' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                        <i class="fas fa-briefcase mr-3 text-blue-600 w-4"></i>Mis Servicios
+                                    <a href="{% url 'servicios:mis_servicios' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                        <i class="fas fa-briefcase mr-3 text-blue-600 dark:text-blue-400 w-4"></i>Mis Servicios
                                     </a>
                                 {% elif user.rol.nombre == 'administrador' %}
-                                    <a href="{% url 'usuarios:listar_usuarios' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                        <i class="fas fa-users-cog mr-3 text-blue-600 w-4"></i>Gestión de Usuarios
-                                    </a>
-                                    <a href="/admin/" target="_blank" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
-                                        <i class="fas fa-cog mr-3 text-gray-600 w-4"></i>Panel Django
+                                    <a href="{% url 'usuarios:listar_usuarios' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                        <i class="fas fa-users-cog mr-3 text-blue-600 dark:text-blue-400 w-4"></i>Gestión de Usuarios
                                     </a>
                                 {% endif %}
-                                
-                                <div class="border-t border-gray-100 my-1"></div>
-                                
-                                <a href="{% url 'usuarios:logout' %}" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
+
+                                <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+
+                                <a href="{% url 'usuarios:logout' %}" class="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition">
                                     <i class="fas fa-sign-out-alt mr-3 w-4"></i>Cerrar Sesión
                                 </a>
                             </div>
                         </div>
                     {% else %}
-                        <a href="{% url 'usuarios:login' %}" class="ml-4 px-4 py-2 text-blue-700 border border-blue-700 rounded-lg hover:bg-blue-50 transition font-medium">Iniciar Sesión</a>
+                        <a href="{% url 'usuarios:login' %}" class="ml-4 px-4 py-2 text-blue-700 dark:text-blue-400 border border-blue-700 dark:border-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition font-medium">Iniciar Sesión</a>
                         <a href="{% url 'usuarios:register' %}" class="px-4 py-2 btn-primary text-white rounded-lg font-medium shadow-sm">Registrarse</a>
                     {% endif %}
                 </nav>
-                
-                <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
+
+                <div class="md:hidden flex items-center space-x-2">
+                    <!-- Botón de modo oscuro móvil -->
+                    <button onclick="toggleDarkMode()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition" title="Cambiar tema">
+                        <i class="fas fa-moon text-gray-700 dark:text-gray-300 text-lg dark:hidden"></i>
+                        <i class="fas fa-sun text-yellow-400 text-lg hidden dark:inline"></i>
+                    </button>
+
+                    <button onclick="toggleMobileMenu()" class="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
             </div>
         </div>
         
-        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-gray-200 mobile-menu-enter">
+        <div id="mobileMenu" class="hidden md:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mobile-menu-enter">
             <div class="px-4 py-3 space-y-1">
-                <a href="{% url 'home' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+                <a href="{% url 'home' %}" class="block py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-3 transition">
                     <i class="fas fa-home mr-2"></i>Inicio
                 </a>
-                <a href="{% url 'destinos:lista_destinos' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+                <a href="{% url 'destinos:lista_destinos' %}" class="block py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-3 transition">
                     <i class="fas fa-map-marked-alt mr-2"></i>Destinos
                 </a>
-                <a href="{% url 'servicios:listar_servicios' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+                <a href="{% url 'servicios:listar_servicios' %}" class="block py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-3 transition">
                     <i class="fas fa-concierge-bell mr-2"></i>Servicios
                 </a>
-                <a href="{% url 'destinos:mapa_destinos' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+                <a href="{% url 'destinos:mapa_destinos' %}" class="block py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-3 transition">
                     <i class="fas fa-route mr-2"></i>Rutas
                 </a>
                 
                 {% if user.is_authenticated %}
                     {% if user.rol.nombre == 'turista' %}
-                        <a href="{% url 'reservas:ver_carrito' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+                        <a href="{% url 'reservas:ver_carrito' %}" class="block py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-3 transition">
                             <i class="fas fa-shopping-cart mr-2"></i>Mi Carrito
                         </a>
-                        <a href="{% url 'reservas:mis_reservas' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+                        <a href="{% url 'reservas:mis_reservas' %}" class="block py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-3 transition">
                             <i class="fas fa-calendar-check mr-2"></i>Mis Reservas
                         </a>
                     {% elif user.rol.nombre == 'proveedor' %}
-                        <a href="{% url 'reservas:reservas_proveedor' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+                        <a href="{% url 'reservas:reservas_proveedor' %}" class="block py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-3 transition">
                             <i class="fas fa-calendar-alt mr-2"></i>Gestionar Reservas
                         </a>
-                        <a href="{% url 'servicios:mis_servicios' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+                        <a href="{% url 'servicios:mis_servicios' %}" class="block py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-3 transition">
                             <i class="fas fa-briefcase mr-2"></i>Mis Servicios
                         </a>
                     {% elif user.rol.nombre == 'administrador' %}
-                        <a href="{% url 'usuarios:listar_usuarios' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+                        <a href="{% url 'usuarios:listar_usuarios' %}" class="block py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-3 transition">
                             <i class="fas fa-users-cog mr-2"></i>Gestión de Usuarios
                         </a>
                     {% endif %}
-                    
-                    <a href="{% url 'usuarios:perfil' %}" class="block py-2 text-gray-700 hover:bg-gray-50 rounded-lg px-3 transition">
+
+                    <a href="{% url 'usuarios:perfil' %}" class="block py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-3 transition">
                         <i class="fas fa-user-circle mr-2"></i>Mi Perfil
                     </a>
-                    <a href="{% url 'usuarios:logout' %}" class="block py-2 text-red-600 hover:bg-red-50 rounded-lg px-3 transition">
+                    <a href="{% url 'usuarios:logout' %}" class="block py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg px-3 transition">
                         <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
                     </a>
                 {% else %}
-                    <a href="{% url 'usuarios:login' %}" class="block py-2 text-blue-700 hover:bg-blue-50 rounded-lg px-3 transition font-medium">Iniciar Sesión</a>
+                    <a href="{% url 'usuarios:login' %}" class="block py-2 text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg px-3 transition font-medium">Iniciar Sesión</a>
                     <a href="{% url 'usuarios:register' %}" class="block py-2 gradient-bg text-white rounded-lg px-3 font-medium">Registrarse</a>
                 {% endif %}
             </div>
@@ -622,8 +770,8 @@
 
             <div class="chatbot-input-area">
                 <div class="flex space-x-2">
-                    <input type="text" id="chatbotInput" placeholder="Escribe tu mensaje..." 
-                           class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    <input type="text" id="chatbotInput" placeholder="Escribe tu mensaje..."
+                           class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                            onkeypress="handleChatKeyPress(event)">
                     <button onclick="sendChatMessage()" class="btn-primary text-white px-4 py-2 rounded-lg hover:opacity-90 transition">
                         <i class="fas fa-paper-plane"></i>
@@ -633,57 +781,58 @@
         </div>
     </div>
     
-    <footer class="bg-gray-900 text-white mt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                    <div class="flex items-center space-x-2 mb-3">
-                        <div class="w-9 h-9 gradient-bg rounded-lg flex items-center justify-center text-white font-bold text-sm">ET</div>
-                        <h3 class="text-base font-bold">Ecuador Turismo</h3>
+    <!-- FOOTER OPTIMIZADO -->
+    <footer class="bg-gray-900 dark:bg-gray-900 text-white py-4 mt-auto border-t border-gray-700/50 dark:border-cyan-500/20 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row items-center justify-between">
+                <div class="flex items-center space-x-3 mb-2 sm:mb-0">
+                    <div class="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center text-white text-sm font-bold shadow-md">
+                        ET
                     </div>
-                    <p class="text-gray-400 text-sm">Descubre las maravillas de las cuatro regiones naturales de Ecuador.</p>
-                </div>
-                
-                <div>
-                    <h4 class="font-semibold mb-3 text-sm">Enlaces</h4>
-                    <ul class="space-y-1 text-sm">
-                        <li><a href="{% url 'destinos:lista_destinos' %}" class="text-gray-400 hover:text-yellow-400 transition">Destinos</a></li>
-                        <li><a href="{% url 'servicios:listar_servicios' %}" class="text-gray-400 hover:text-yellow-400 transition">Servicios</a></li>
-                        <li><a href="{% url 'destinos:mapa_destinos' %}" class="text-gray-400 hover:text-yellow-400 transition">Rutas</a></li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h4 class="font-semibold mb-3 text-sm">Contacto</h4>
-                    <ul class="space-y-2 text-sm text-gray-400">
-                        <li class="flex items-center"><i class="fas fa-envelope mr-2 text-yellow-400 text-xs"></i>info@ecuadorturismo.ec</li>
-                        <li class="flex items-center"><i class="fas fa-phone mr-2 text-yellow-400 text-xs"></i>+593 2 123 4567</li>
-                    </ul>
-                    <div class="flex space-x-2 mt-3">
-                        <a href="#" class="w-8 h-8 bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center transition text-sm">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="#" class="w-8 h-8 bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center transition text-sm">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="#" class="w-8 h-8 bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center justify-center transition text-sm">
-                            <i class="fab fa-twitter"></i>
-                        </a>
+                    <div class="flex items-center space-x-2 divide-x divide-gray-700">
+                        <span class="text-sm font-medium text-gray-300">&copy; 2025 Ecuador Turismo</span>
+                        <span class="text-xs text-gray-400 pl-2">Todos los derechos reservados</span>
                     </div>
                 </div>
-            </div>
-            
-            <div class="border-t border-gray-800 mt-6 pt-6 text-center">
-                <p class="text-gray-400 text-xs">&copy; 2025 Ecuador Turismo. Todos los derechos reservados.</p>
-                <p class="text-gray-500 text-xs mt-1">Proyecto Académico - Universidad Estatal de Milagro (UNEMI)</p>
+                
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-graduation-cap text-xs mr-1"></i>
+                    Proyecto Académico - UNEMI
+                </p>
             </div>
         </div>
     </footer>
+            </div>
+        </div>
+    </footer>
+
     
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
     <script>
-// INICIALIZACIÓN
+/// MODO OSCURO
+function toggleDarkMode() {
+    const html = document.documentElement;
+    const isDark = html.classList.contains('dark');
+
+    if (isDark) {
+        html.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+    } else {
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+    }
+}
+
+// Aplicar tema guardado al cargar
+document.addEventListener('DOMContentLoaded', function() {
+    const theme = localStorage.getItem('theme') || 'light';
+    if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+    }
+});
+
+/// INICIALIZACIÓN
 AOS.init({ duration: 600, once: true, offset: 80, easing: 'ease-out' });
 
 // LOADER AUTOMÁTICO
@@ -778,7 +927,7 @@ function actualizarContadorCarrito() {
     setInterval(actualizarContadorCarrito, 30000);
 {% endif %}
 
-// CHATBOT GPT-4 + HISTORIAL
+// CHATBOT OPTIMIZADO
 const CHAT_HISTORY_KEY = 'ecuadorTurismoChatHistory';
 let isProcessing = false;
 
@@ -789,9 +938,13 @@ function cargarHistorialChat() {
     
     if (historial.length === 0) {
         addChatMessage(
-            '¡Hola! 👋 Soy tu asistente de Ecuador Turismo.\n\n' +
-            '🔍 Buscar servicios\n📊 Comparar opciones\n💰 Ofertas\n🗺️ Recomendar destinos\n\n' +
-            '¿Qué deseas explorar?',
+            'Hola, soy tu asistente de Ecuador Turismo.\n\n' +
+            'Puedo ayudarte con:\n' +
+            '• Buscar servicios turísticos\n' +
+            '• Explorar destinos\n' +
+            '• Comparar opciones\n' +
+            '• Obtener recomendaciones\n\n' +
+            '¿Qué te gustaría saber?',
             'bot', false
         );
     } else {
@@ -836,15 +989,23 @@ async function sendChatMessage() {
     guardarMensajeHistorial(message, 'user');
     input.value = '';
     
-    const typingId = mostrarIndicadorEscritura();
+    const tipoConsulta = detectarTipoConsulta(message);
+    const typingId = mostrarIndicadorEscritura(tipoConsulta);
     
     try {
         const historial = obtenerHistorialChat();
+        const csrfToken = getCSRFToken();
+
+        if (!csrfToken) {
+            console.error('CSRF token no encontrado');
+            throw new Error('Token de seguridad no disponible');
+        }
+
         const response = await fetch('/chatbot/message/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
+                'X-CSRFToken': csrfToken
             },
             body: JSON.stringify({ message: message, history: historial })
         });
@@ -859,17 +1020,33 @@ async function sendChatMessage() {
             addChatMessage(data.response, 'bot', true);
             guardarMensajeHistorial(data.response, 'assistant');
         } else {
-            addChatMessage('😔 Error: ' + (data.error || 'Desconocido'), 'bot', true);
+            addChatMessage('Error: ' + (data.error || 'Desconocido'), 'bot', true);
         }
         
     } catch (error) {
         removerIndicadorEscritura(typingId);
-        addChatMessage(`❌ Error: ${error.message}`, 'bot', true);
+        addChatMessage(`Error: ${error.message}`, 'bot', true);
     } finally {
         isProcessing = false;
         input.disabled = false;
         input.focus();
     }
+}
+
+function detectarTipoConsulta(mensaje) {
+    const mensajeLower = mensaje.toLowerCase();
+    
+    const patternsSaludos = ['hola', 'buenos dias', 'buenas tardes', 'quien eres', 'que eres', 'como te llamas', 'adios', 'gracias', 'que puedes hacer'];
+    if (patternsSaludos.some(p => mensajeLower.includes(p))) {
+        return 'instantanea';
+    }
+    
+    const patternsConsulta = ['buscar', 'recomendar', 'quiero', 'necesito', 'precio', 'costo', 'hotel', 'tour', 'destino', 'servicio'];
+    if (patternsConsulta.some(p => mensajeLower.includes(p))) {
+        return 'consulta';
+    }
+    
+    return 'general';
 }
 
 function addChatMessage(text, sender, animate = true) {
@@ -906,13 +1083,13 @@ function addChatMessage(text, sender, animate = true) {
 
 function convertirMarkdownAHTML(text) {
     let html = text.replace(/\n/g, '<br>');
-    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-600 hover:underline font-medium" target="_blank">$1 <i class="fas fa-external-link-alt text-xs"></i></a>');
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-600 hover:underline font-medium">$1</a>');
     html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-    html = html.replace(/⭐/g, '<span class="text-yellow-400">⭐</span>');
+    html = html.replace(/• /g, '<span class="text-blue-600">•</span> ');
     return html;
 }
 
-function mostrarIndicadorEscritura() {
+function mostrarIndicadorEscritura(tipoConsulta) {
     const container = document.getElementById('chatbotMessages');
     const typingDiv = document.createElement('div');
     typingDiv.className = 'chat-message bot slide-in-right';
@@ -920,17 +1097,58 @@ function mostrarIndicadorEscritura() {
     
     const avatarDiv = document.createElement('div');
     avatarDiv.className = 'chat-avatar';
-    avatarDiv.innerHTML = '<i class="fas fa-robot"></i>';
+    const img = document.createElement('img');
+    img.src = '/media/bot.png';
+    img.alt = 'Bot';
+    img.className = 'w-full h-full rounded-full object-cover';
+    img.onerror = function() {
+        this.style.display = 'none';
+        this.parentElement.innerHTML = '<i class="fas fa-robot"></i>';
+    };
+    avatarDiv.appendChild(img);
     
     const bubbleDiv = document.createElement('div');
     bubbleDiv.className = 'chat-bubble';
-    bubbleDiv.innerHTML = '<div class="flex space-x-1"><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div></div>';
+    
+    if (tipoConsulta === 'instantanea') {
+        bubbleDiv.innerHTML = crearIndicadorCarga('Procesando...');
+    } else if (tipoConsulta === 'consulta') {
+        bubbleDiv.innerHTML = crearIndicadorCarga('Consultando base de datos...');
+        
+        setTimeout(() => {
+            if (typingDiv.parentElement) {
+                bubbleDiv.innerHTML = crearIndicadorCarga('Analizando resultados...');
+            }
+        }, 2000);
+    } else {
+        bubbleDiv.innerHTML = crearIndicadorCarga('Analizando tu consulta...');
+        
+        setTimeout(() => {
+            if (typingDiv.parentElement) {
+                bubbleDiv.innerHTML = crearIndicadorCarga('Buscando información...');
+            }
+        }, 2000);
+    }
     
     typingDiv.appendChild(avatarDiv);
     typingDiv.appendChild(bubbleDiv);
     container.appendChild(typingDiv);
     container.scrollTop = container.scrollHeight;
+    
     return typingDiv.id;
+}
+
+function crearIndicadorCarga(texto) {
+    return `
+        <div class="flex items-center space-x-2">
+            <div class="flex space-x-1">
+                <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+            </div>
+            <span class="text-gray-600 text-sm">${texto}</span>
+        </div>
+    `;
 }
 
 function removerIndicadorEscritura(id) {
@@ -960,15 +1178,48 @@ function getCookie(name) {
     return cookieValue;
 }
 
+// Obtener CSRF token al cargar la página
+function getCSRFToken() {
+    // 1. Intentar obtener de variable global
+    if (window.CSRF_TOKEN) {
+        return window.CSRF_TOKEN;
+    }
+
+    // 2. Intentar obtener de cookie
+    let token = getCookie('csrftoken');
+    if (token) {
+        return token;
+    }
+
+    // 3. Intentar obtener del meta tag
+    const metaTag = document.querySelector('meta[name="csrf-token"]');
+    if (metaTag) {
+        token = metaTag.getAttribute('content');
+        if (token) return token;
+    }
+
+    // 4. Intentar obtener del input hidden
+    const inputTag = document.querySelector('input[name="csrfmiddlewaretoken"]');
+    if (inputTag && inputTag.value) {
+        return inputTag.value;
+    }
+
+    console.error('CSRF token no encontrado en ninguna fuente');
+    return null;
+}
+
 function configurarLimpiezaAlCerrarSesion() {
     {% if user.is_authenticated %}
     document.querySelectorAll('a[href="{% url "usuarios:logout" %}"]').forEach(link => {
         link.addEventListener('click', function(e) {
             sessionStorage.removeItem(CHAT_HISTORY_KEY);
-            fetch('/chatbot/limpiar/', {
-                method: 'POST',
-                headers: { 'X-CSRFToken': getCookie('csrftoken') }
-            }).catch(err => console.log('Limpieza fallida'));
+            const csrfToken = getCSRFToken();
+            if (csrfToken) {
+                fetch('/chatbot/limpiar/', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken }
+                }).catch(err => console.log('Limpieza fallida'));
+            }
         });
     });
     {% endif %}

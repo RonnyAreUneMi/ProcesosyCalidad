@@ -1,21 +1,21 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50 py-8">
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Header -->
         <div class="mb-8">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                         <i class="fas fa-edit text-sky-600 mr-2"></i>
                         Editar Destino
                     </h1>
-                    <p class="text-gray-600">Actualiza la información de <strong>{{ destino.nombre }}</strong></p>
+                    <p class="text-gray-600 dark:text-gray-300">Actualiza la información de <strong>{{ destino.nombre }}</strong></p>
                 </div>
                 <a href="{% url 'destinos:lista_destinos' %}" 
-                   class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:bg-gray-900 transition-colors">
                     <i class="fas fa-arrow-left mr-2"></i>
                     Volver
                 </a>
@@ -27,8 +27,8 @@
             {% csrf_token %}
 
             <!-- Información Básica -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
                     <div class="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center mr-3">
                         <i class="fas fa-info-circle text-sky-600"></i>
                     </div>
@@ -38,25 +38,25 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Nombre -->
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Nombre del Destino <span class="text-red-500">*</span>
                         </label>
                         <input type="text" 
                                name="nombre" 
                                required
                                value="{{ destino.nombre }}"
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                               class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                placeholder="Ej: Montañita, Baños de Agua Santa">
                     </div>
 
                     <!-- Región -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Región <span class="text-red-500">*</span>
                         </label>
                         <select name="region" 
                                 required
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
+                                class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
                             <option value="">Selecciona una región</option>
                             {% for value, label in regiones %}
                             <option value="{{ value }}" {% if destino.region == value %}selected{% endif %}>{{ label }}</option>
@@ -66,11 +66,11 @@
 
                     <!-- Categoría -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Categoría
                         </label>
                         <select name="categoria" 
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
+                                class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
                             <option value="">Selecciona una categoría</option>
                             {% for categoria in categorias %}
                             <option value="{{ categoria.id }}" {% if destino.categoria and destino.categoria.id == categoria.id %}selected{% endif %}>{{ categoria.nombre }}</option>
@@ -80,13 +80,13 @@
 
                     <!-- Provincia -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Provincia <span class="text-red-500">*</span>
                         </label>
                         <select name="provincia" 
                                 id="provincia"
                                 required
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
+                                class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
                             <option value="">Selecciona una provincia</option>
                             {% for provincia in provincias %}
                             <option value="{{ provincia }}" {% if destino.provincia == provincia %}selected{% endif %}>{{ provincia }}</option>
@@ -96,20 +96,20 @@
 
                     <!-- Ciudad/Cantón -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Ciudad / Cantón
                         </label>
                         <select name="ciudad" 
                                 id="ciudad"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
+                                class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
                             <option value="">Selecciona un cantón</option>
                         </select>
-                        <p class="mt-1 text-sm text-gray-500">Selecciona primero la provincia</p>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Selecciona primero la provincia</p>
                     </div>
 
                     <!-- Descripción Corta -->
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Descripción Corta <span class="text-red-500">*</span>
                         </label>
                         <input type="text" 
@@ -118,31 +118,31 @@
                                required
                                maxlength="300"
                                value="{{ destino.descripcion_corta }}"
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                               class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                placeholder="Resumen breve (máx. 300 caracteres)">
-                        <p class="mt-1 text-sm text-gray-500">
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                             <span id="charCount">{{ destino.descripcion_corta|length }}</span> / 300 caracteres
                         </p>
                     </div>
 
                     <!-- Descripción Completa -->
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Descripción Completa <span class="text-red-500">*</span>
                         </label>
                         <textarea name="descripcion" 
                                   required
                                   rows="6"
-                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                                  class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                   placeholder="Descripción detallada del destino...">{{ destino.descripcion }}</textarea>
                     </div>
                 </div>
             </div>
 
             <!-- Ubicación -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                    <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+                    <div class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mr-3">
                         <i class="fas fa-map-marker-alt text-green-600"></i>
                     </div>
                     Ubicación Geográfica
@@ -151,7 +151,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Latitud -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Latitud <span class="text-red-500">*</span>
                         </label>
                         <input type="number" 
@@ -161,14 +161,14 @@
                                min="-90"
                                max="90"
                                value="{{ valores_numericos.latitud }}"
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                               class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                placeholder="Ej: -2.1894">
-                        <p class="mt-1 text-sm text-gray-500">Coordenada geográfica (decimal)</p>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Coordenada geográfica (decimal)</p>
                     </div>
 
                     <!-- Longitud -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Longitud <span class="text-red-500">*</span>
                         </label>
                         <input type="number" 
@@ -178,53 +178,53 @@
                                min="-180"
                                max="180"
                                value="{{ valores_numericos.longitud }}"
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                               class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                placeholder="Ej: -79.8843">
-                        <p class="mt-1 text-sm text-gray-500">Coordenada geográfica (decimal)</p>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Coordenada geográfica (decimal)</p>
                     </div>
 
                     <!-- Altitud -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Altitud (msnm)
                         </label>
                         <input type="number" 
                                name="altitud" 
                                value="{{ valores_numericos.altitud }}"
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                               class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                placeholder="Ej: 2850">
                     </div>
 
                     <!-- Clima -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Clima
                         </label>
                         <input type="text" 
                                name="clima" 
                                value="{{ destino.clima|default:'' }}"
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                               class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                placeholder="Ej: Tropical húmedo">
                     </div>
 
                     <!-- Mejor Época -->
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Mejor Época para Visitar
                         </label>
                         <input type="text" 
                                name="mejor_epoca" 
                                value="{{ destino.mejor_epoca|default:'' }}"
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                               class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                placeholder="Ej: Junio a Septiembre">
                     </div>
                 </div>
             </div>
 
             <!-- Precios -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                    <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center mr-3">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+                    <div class="w-8 h-8 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center mr-3">
                         <i class="fas fa-dollar-sign text-yellow-600"></i>
                     </div>
                     Información de Precios
@@ -233,7 +233,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Precio Mínimo -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Precio Promedio Mínimo (USD) <span class="text-red-500">*</span>
                         </label>
                         <input type="number" 
@@ -242,14 +242,14 @@
                                step="0.01"
                                min="0"
                                value="{{ valores_numericos.precio_min }}"
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                               class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                placeholder="Ej: 50.00">
-                        <p class="mt-1 text-sm text-gray-500">Costo mínimo por persona por día</p>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Costo mínimo por persona por día</p>
                     </div>
 
                     <!-- Precio Máximo -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                             Precio Promedio Máximo (USD) <span class="text-red-500">*</span>
                         </label>
                         <input type="number" 
@@ -258,16 +258,16 @@
                                step="0.01"
                                min="0"
                                value="{{ valores_numericos.precio_max }}"
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
+                               class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all placeholder-gray-500 dark:placeholder-gray-400"
                                placeholder="Ej: 150.00">
-                        <p class="mt-1 text-sm text-gray-500">Costo máximo por persona por día</p>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Costo máximo por persona por día</p>
                     </div>
                 </div>
             </div>
 
             <!-- Opciones Adicionales -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
                     <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
                         <i class="fas fa-cog text-purple-600"></i>
                     </div>
@@ -281,8 +281,8 @@
                                name="destacado" 
                                id="destacado"
                                {% if destino.destacado %}checked{% endif %}
-                               class="w-5 h-5 text-sky-600 border-gray-300 rounded focus:ring-sky-500">
-                        <label for="destacado" class="ml-3 text-sm font-medium text-gray-700">
+                               class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-5 h-5 text-sky-600 border-gray-300 dark:border-gray-600 rounded focus:ring-sky-500">
+                        <label for="destacado" class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
                             Marcar como destino destacado
                         </label>
                     </div>
@@ -293,8 +293,8 @@
                                name="activo" 
                                id="activo"
                                {% if destino.activo %}checked{% endif %}
-                               class="w-5 h-5 text-sky-600 border-gray-300 rounded focus:ring-sky-500">
-                        <label for="activo" class="ml-3 text-sm font-medium text-gray-700">
+                               class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-5 h-5 text-sky-600 border-gray-300 dark:border-gray-600 rounded focus:ring-sky-500">
+                        <label for="activo" class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
                             Destino activo (visible públicamente)
                         </label>
                     </div>
@@ -302,9 +302,9 @@
             </div>
 
             <!-- Imagen Principal -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                    <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+                    <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mr-3">
                         <i class="fas fa-image text-blue-600"></i>
                     </div>
                     Imagen Principal
@@ -313,14 +313,14 @@
                 <div>
                     <!-- Imagen Actual -->
                     <div class="mb-6">
-                        <p class="text-sm font-semibold text-gray-700 mb-3">
+                        <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
                             Imagen actual:
                         </p>
                         <div class="relative inline-block">
                             <img id="currentImage" 
                                 src="{{ destino.get_imagen_principal }}" 
                                 alt="{{ destino.nombre }}" 
-                                class="w-64 h-48 object-cover rounded-lg shadow-md border-2 border-gray-200">
+                                class="w-64 h-48 object-cover rounded-lg shadow-md border-2 border-gray-200 dark:border-gray-700">
                             {% if not destino.imagen_principal %}
                                 <div class="absolute top-2 right-2 bg-gray-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-md">
                                     <i class="fas fa-image mr-1"></i>
@@ -331,21 +331,21 @@
                     </div>
 
                     <!-- Subir Nueva Imagen -->
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                         Cambiar imagen
                     </label>
                     <input type="file" 
                            name="imagen_principal" 
                            accept="image/*"
                            id="imagen_principal"
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
-                    <p class="mt-2 text-sm text-gray-500">
+                           class="text-gray-900 dark:text-white bg-white dark:bg-gray-700 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all">
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                         Formatos aceptados: JPG, PNG, WEBP (máx. 5MB). Deja vacío para mantener la imagen actual.
                     </p>
                     
                     <!-- Preview de nueva imagen -->
                     <div id="imagePreviewContainer" class="mt-6 hidden">
-                        <p class="text-sm font-semibold text-gray-700 mb-3">
+                        <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
                             Nueva imagen:
                         </p>
                         <div class="relative inline-block">
@@ -371,7 +371,7 @@
             <!-- Botones de Acción -->
             <div class="flex items-center justify-end space-x-4 pt-6">
                 <a href="{% url 'destinos:lista_destinos' %}" 
-                   class="px-6 py-3 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+                   class="px-6 py-3 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 dark:bg-gray-900 transition-colors">
                     Cancelar
                 </a>
                 <button type="submit" 

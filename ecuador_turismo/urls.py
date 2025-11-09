@@ -18,7 +18,7 @@ urlpatterns = [
     path('destinos/', include('apps.destinos.urls')),
     path('servicios/', include('apps.servicios.urls')),
 
-    # path('rutas/', include('apps.rutas.urls')),
+    path('rutas/', include('apps.rutas.urls')),
     path('reservas/', include('apps.reservas.urls')),
     path('calificaciones/', include('apps.calificaciones.urls')),
     path('chatbot/', include('apps.chatbot.urls')),
