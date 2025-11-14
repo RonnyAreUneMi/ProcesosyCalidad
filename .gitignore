@@ -1,29 +1,270 @@
-# Archivo .gitignore para proyectos Django
+# ============================================
+# 🔒 ARCHIVOS SENSIBLES Y SECRETOS
+# ============================================
 
-# 1. Entorno Virtual
-# Ignorar el entorno virtual completo
+# Variables de entorno con datos sensibles
+.env
+.env.local
+.env.production
+.env.staging
+*.env
+
+# Claves y certificados
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+*.cer
+secrets/
+keys/
+
+# Configuraciones de base de datos
+database.ini
+db_config.py
+local_settings.py
+
+# ============================================
+# 📝 LOGS Y ARCHIVOS TEMPORALES
+# ============================================
+
+# Logs de seguridad
+logs/
+*.log
+security.log
+security_alerts.log
+django.log
+error.log
+
+# Archivos temporales
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ============================================
+# 🐍 PYTHON Y DJANGO
+# ============================================
+
+# Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribución / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Entornos virtuales
 venv/
-.venv/ 
-
 env/
+ENV/
+.venv/
 .env/
 
-# 2. Archivos de Base de Datos
-# Base de datos local de desarrollo (SQLite)
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# ============================================
+# 🗄️ BASE DE DATOS
+# ============================================
+
+# SQLite
+*.sqlite3
+*.db
 db.sqlite3
 
-# 3. Directorios de Python
-# Archivos de caché
-__pycache__/
-*.pyc
-*~$
-*.egg-info/
+# PostgreSQL dumps
+*.sql
+*.dump
+*.backup
+
+# Migraciones locales (opcional)
+# */migrations/0*.py
+
+# ============================================
+# 📁 ARCHIVOS ESTÁTICOS Y MEDIA
+# ============================================
+
+# Archivos estáticos compilados
+/staticfiles/
+/static_root/
+/collected_static/
+
+# Archivos de media subidos por usuarios
+/media/
+/uploads/
+user_uploads/
+
+# Imágenes temporales
+*.jpg.tmp
+*.png.tmp
+*.gif.tmp
+
+# ============================================
+# 🛠️ HERRAMIENTAS DE DESARROLLO
+# ============================================
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.spyderproject
+.spyproject
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
 .pytest_cache/
 
-# 4. Archivos de Medios y Static
-# Ignorar archivos generados automáticamente para producción
-staticfiles/
+# Tox
+.tox/
 
-# Directorio de archivos cargados por los usuarios (media)
-# (Si bien la carpeta 'media' existe, ignoramos el contenido para no subir datos grandes)
-media/.env
+# ============================================
+# 🌐 FRONTEND Y NODE.JS
+# ============================================
+
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Bower
+bower_components/
+
+# ============================================
+# ☁️ SERVICIOS EN LA NUBE
+# ============================================
+
+# AWS
+.aws/
+aws-credentials.json
+
+# Google Cloud
+gcloud-credentials.json
+service-account.json
+
+# Supabase
+supabase-config.json
+
+# ============================================
+# 🔧 CONFIGURACIONES LOCALES
+# ============================================
+
+# Configuraciones específicas del desarrollador
+local_config.py
+dev_settings.py
+personal_settings.py
+
+# Archivos de prueba
+test_data/
+fixtures/local/
+test_uploads/
+
+# Scripts de prueba de seguridad
+attack_test.py
+test_security_attacks.py
+advanced_attacks.py
+test_url_validation.py
+test_input_sanitization.py
+setup_security_test.py
+run_all_security_tests.py
+
+# ============================================
+# 📦 ARCHIVOS DE SISTEMA
+# ============================================
+
+# Windows
+*.exe
+*.msi
+*.cab
+*.dmp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*.AppImage
+*.deb
+*.rpm
+
+# ============================================
+# 🚀 DEPLOYMENT
+# ============================================
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+.docker/
+
+# Kubernetes
+k8s-secrets.yaml
+*.kubeconfig
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# ============================================
+# 📊 MONITOREO Y ANALYTICS
+# ============================================
+
+# Sentry
+.sentryclirc
+
+# New Relic
+newrelic.ini
+
+# ============================================
+# 🔐 BACKUPS Y DUMPS
+# ============================================
+
+# Backups de base de datos
+*.backup
+*.dump
+*.sql.gz
+backup_*/
+
+# Backups de archivos
+backup/
+backups/
+*.tar.gz
+*.zip.backup

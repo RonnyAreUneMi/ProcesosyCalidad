@@ -3,3 +3,16 @@ WARNING 2025-11-08 21:15:29,516 security 8440 23156 Patrón peligroso detectado e
 WARNING 2025-11-08 21:18:09,264 middleware 19900 13816 Rate limiting deshabilitado: Error 10061 connecting to 127.0.0.1:6379. No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
 WARNING 2025-11-08 21:24:58,171 log 9128 14444 Forbidden (CSRF token from the 'X-Csrftoken' HTTP header incorrect.): /chatbot/message/
 WARNING 2025-11-08 21:25:06,569 log 9128 14444 Forbidden (CSRF token from the 'X-Csrftoken' HTTP header incorrect.): /chatbot/message/
+ERROR 2025-11-13 23:29:51,510 middleware 20616 13052 Error en desencriptación de URL
+WARNING 2025-11-13 23:29:51,516 middleware 20616 13052 Intento de acceso con URL inválida
+ERROR 2025-11-13 23:29:51,520 middleware 20616 11568 Error en desencriptación de URL
+WARNING 2025-11-13 23:29:51,520 middleware 20616 11568 Intento de acceso con URL inválida
+ERROR 2025-11-13 23:29:51,526 middleware 20616 29384 Error en desencriptación de URL
+WARNING 2025-11-13 23:29:51,527 middleware 20616 29384 Intento de acceso con URL inválida
+WARNING 2025-11-13 23:42:10,897 middleware 21608 17284 Intento de acceso a ruta no válida
+WARNING 2025-11-13 23:42:10,898 middleware 21608 2364 Intento de acceso a ruta no válida
+WARNING 2025-11-13 23:42:11,049 middleware 21608 23976 Intento de acceso a ruta no válida
+WARNING 2025-11-13 23:42:41,439 middleware 21608 22356 Intento de acceso a ruta no válida
+WARNING 2025-11-13 23:43:11,439 middleware 21608 26188 Intento de acceso a ruta no válida
+WARNING 2025-11-13 23:43:11,439 middleware 21608 28276 Intento de acceso a ruta no válida
+WARNING 2025-11-13 23:43:11,443 middleware 21608 29104 Intento de acceso a ruta no válida

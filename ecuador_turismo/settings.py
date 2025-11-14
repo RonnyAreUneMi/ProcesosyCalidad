@@ -45,13 +45,17 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'ecuador_turismo.middleware.InputSanitizationMiddleware',  # ← NUEVO: Sanitización de inputs
+    'ecuador_turismo.middleware.URLValidationMiddleware',
+    'ecuador_turismo.middleware.RateLimitMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',  # <-- AÑADIDO: Esencial para la traducción
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'ecuador_turismo.middleware.SecurityHeadersMiddleware',
     'ecuador_turismo.middleware.URLEncryptionMiddleware',
+    'ecuador_turismo.middleware.AuditMiddleware',
     'ecuador_turismo.middleware.ConnectionHandlingMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
