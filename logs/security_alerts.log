@@ -16,3 +16,7 @@ WARNING 2025-11-13 23:42:41,439 middleware 21608 22356 Intento de acceso a ruta 
 WARNING 2025-11-13 23:43:11,439 middleware 21608 26188 Intento de acceso a ruta no válida
 WARNING 2025-11-13 23:43:11,439 middleware 21608 28276 Intento de acceso a ruta no válida
 WARNING 2025-11-13 23:43:11,443 middleware 21608 29104 Intento de acceso a ruta no válida
+WARNING 2025-11-13 23:43:41,442 middleware 21608 23372 Intento de acceso a ruta no válida
+WARNING 2025-11-13 23:44:11,444 middleware 21608 5436 Intento de acceso a ruta no válida
+WARNING 2025-11-13 23:44:11,445 middleware 21608 12272 Intento de acceso a ruta no válida
+WARNING 2025-11-13 23:44:11,445 middleware 21608 19724 Intento de acceso a ruta no válida
