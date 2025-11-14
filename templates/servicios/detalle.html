@@ -1,6 +1,11 @@
 
 {% extends 'base.html' %}
 {% load calificaciones_extra %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/mapa-3d-detalle.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -181,7 +186,7 @@
                         </div>
                         <h2 class="text-xl font-bold text-gray-900 dark:text-white">Descripción</h2>
                     </div>
-                    <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">{{ servicio.descripcion }}</p>
+                    <p class="text-gray-700 dark:text-gray-300 text-base leading-relaxed">{{ servicio.descripcion }}</p>
                 </div>
 
                 <!-- Horarios de Atención -->
@@ -268,9 +273,9 @@
                         {% endif %}
                     </div>
 
-                    <!-- Mapa -->
-                    <div id="mapContainer" class="rounded-xl overflow-hidden shadow-lg border-2 border-gray-200 dark:border-gray-700 mb-3" style="height: 350px;">
-                        <div id="map" style="height: 100%; width: 100%; z-index:0;"></div>
+                    <!-- Mapa 3D Mejorado -->
+                    <div data-lat="{{ coordenadas.lat|floatformat:8 }}" data-lng="{{ coordenadas.lng|floatformat:8 }}">
+                        {% include 'servicios/partials/_mapa_mapbox_readonly.html' %}
                     </div>
                     
                     <!-- Botones de Acción -->
@@ -393,26 +398,26 @@
                                 </div>
 
                                 <div class="flex-1 min-w-0">
-                                    <div class="flex items-start justify-between mb-1">
+                                    <div class="flex items-start justify-between mb-2">
                                         <div>
-                                            <h4 class="font-semibold text-gray-900 dark:text-white text-sm">{{ calificacion.usuario.nombre }}</h4>
-                                            <div class="flex items-center space-x-2 mt-0.5">
+                                            <h4 class="font-semibold text-gray-900 dark:text-white text-base">{{ calificacion.usuario.nombre }}</h4>
+                                            <div class="flex items-center space-x-2 mt-1">
                                                 <div class="flex items-center">
                                                     {% for i in "12345" %}
                                                         {% if forloop.counter <= calificacion.puntuacion %}
-                                                        <i class="fas fa-star text-yellow-500 dark:text-yellow-400 text-xs"></i>
+                                                        <i class="fas fa-star text-yellow-500 dark:text-yellow-400 text-sm"></i>
                                                         {% else %}
-                                                        <i class="far fa-star text-yellow-500 dark:text-yellow-400 text-xs"></i>
+                                                        <i class="far fa-star text-yellow-500 dark:text-yellow-400 text-sm"></i>
                                                         {% endif %}
                                                     {% endfor %}
                                                 </div>
-                                                <span class="text-xs text-gray-500 dark:text-gray-400">{{ calificacion.fecha_creacion|date:"d M Y" }}</span>
+                                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ calificacion.fecha_creacion|date:"d M Y" }}</span>
                                             </div>
                                         </div>
                                     </div>
 
                                     {% if calificacion.comentario %}
-                                    <p class="text-gray-700 dark:text-gray-300 text-xs leading-relaxed mb-2">{{ calificacion.comentario }}</p>
+                                    <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed mb-3">{{ calificacion.comentario }}</p>
                                     {% endif %}
 
                                     {% if calificacion.respuesta %}
@@ -461,27 +466,27 @@
             <div class="space-y-4">
                 <!-- Servicios Relacionados -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sticky top-4">
-                    <h3 class="text-base font-bold text-gray-900 dark:text-white mb-3">Servicios Relacionados</h3>
-                    <div class="space-y-2.5">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Servicios Relacionados</h3>
+                    <div class="space-y-3">
                         {% for relacionado in servicios_relacionados|slice:":3" %}
                         <a href="{% url 'servicios:detalle_servicio' relacionado.id %}" class="block group">
-                            <div class="flex items-center space-x-2.5 p-2 rounded-lg hover:bg-gray-50 dark:bg-gray-900 transition-colors">
+                            <div class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                 {% if relacionado.imagenes.first %}
                                 <img src="{{ relacionado.imagenes.first.imagen.url }}" 
-                                     class="w-12 h-12 rounded-lg object-cover flex-shrink-0">
+                                     class="w-14 h-14 rounded-lg object-cover flex-shrink-0">
                                 {% else %}
-                                <div class="w-12 h-12 bg-gradient-to-br from-sky-400 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-image text-white text-xs"></i>
+                                <div class="w-14 h-14 bg-gradient-to-br from-sky-400 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-image text-white text-sm"></i>
                                 </div>
                                 {% endif %}
                                 <div class="flex-1 min-w-0">
-                                    <h4 class="font-semibold text-gray-900 dark:text-white group-hover:text-sky-600 transition-colors text-xs truncate mb-0.5">
+                                    <h4 class="font-semibold text-gray-900 dark:text-white group-hover:text-sky-600 transition-colors text-sm truncate mb-1">
                                         {{ relacionado.nombre }}
                                     </h4>
                                     <div class="flex items-center justify-between">
-                                        <span class="text-xs font-bold text-gray-900 dark:text-white">${{ relacionado.precio|floatformat:0 }}</span>
-                                        <div class="flex items-center text-xs text-yellow-500">
-                                            <i class="fas fa-star mr-0.5 text-xs"></i>
+                                        <span class="text-sm font-bold text-gray-900 dark:text-white">${{ relacionado.precio|floatformat:0 }}</span>
+                                        <div class="flex items-center text-sm text-yellow-500">
+                                            <i class="fas fa-star mr-1 text-sm"></i>
                                             <span>{{ relacionado.calificacion_promedio|floatformat:1 }}</span>
                                         </div>
                                     </div>
@@ -489,64 +494,64 @@
                             </div>
                         </a>
                         {% empty %}
-                        <p class="text-gray-500 dark:text-gray-400 text-xs text-center py-3">No hay servicios relacionados</p>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm text-center py-4">No hay servicios relacionados</p>
                         {% endfor %}
                     </div>
                 </div>
 
-                <!-- Proveedor y Contacto - Unificado y Minimalista -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-                    <div class="flex items-center mb-3">
-                        <div class="w-10 h-10 bg-gradient-to-br from-sky-500 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                <!-- Información de Contacto -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-br from-sky-500 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
                             {{ servicio.proveedor.nombre|first|upper }}
                         </div>
-                        <div class="ml-2.5 flex-1 min-w-0">
-                            <h3 class="text-sm font-bold text-gray-900 dark:text-white truncate">{{ servicio.proveedor.nombre }}</h3>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Proveedor del servicio</p>
+                        <div class="ml-3 flex-1">
+                            <h3 class="text-base font-bold text-gray-900 dark:text-white">{{ servicio.proveedor.nombre }}</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Proveedor verificado</p>
                         </div>
                     </div>
                     
-                    <div class="pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
-                        <a href="tel:{{ servicio.telefono }}" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group">
-                            <div class="w-7 h-7 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center group-hover:bg-blue-500 transition-colors flex-shrink-0">
-                                <i class="fas fa-phone text-blue-600 group-hover:text-white text-xs"></i>
+                    <div class="space-y-3">
+                        <a href="tel:{{ servicio.telefono }}" class="flex items-center p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors border border-blue-100 dark:border-blue-800">
+                            <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-phone text-white text-sm"></i>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-xs text-gray-500 dark:text-gray-400">Teléfono</p>
-                                <p class="font-semibold text-gray-900 dark:text-white text-xs truncate">{{ servicio.telefono }}</p>
+                            <div class="ml-3 flex-1">
+                                <p class="text-xs font-medium text-blue-700 dark:text-blue-300">Teléfono</p>
+                                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ servicio.telefono }}</p>
                             </div>
                         </a>
 
                         {% if servicio.whatsapp %}
-                        <a href="https://wa.me/{{ servicio.whatsapp|cut:'+' }}" target="_blank" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 dark:bg-gray-900 transition-colors group">
-                            <div class="w-7 h-7 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center group-hover:bg-green-500 transition-colors flex-shrink-0">
-                                <i class="fab fa-whatsapp text-green-600 group-hover:text-white text-sm"></i>
+                        <a href="https://wa.me/{{ servicio.whatsapp|cut:'+' }}?text=Hola, estoy interesado en el servicio: {{ servicio.nombre }}" target="_blank" class="flex items-center p-3 rounded-lg bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors border border-green-100 dark:border-green-800">
+                            <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                                <i class="fab fa-whatsapp text-white text-sm"></i>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-xs text-gray-500 dark:text-gray-400">WhatsApp</p>
-                                <p class="font-semibold text-gray-900 dark:text-white text-xs truncate">{{ servicio.whatsapp }}</p>
+                            <div class="ml-3 flex-1">
+                                <p class="text-xs font-medium text-green-700 dark:text-green-300">WhatsApp</p>
+                                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ servicio.whatsapp }}</p>
                             </div>
                         </a>
                         {% endif %}
 
-                        <a href="mailto:{{ servicio.email_contacto }}" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 dark:bg-gray-900 transition-colors group">
-                            <div class="w-7 h-7 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center group-hover:bg-red-500 transition-colors flex-shrink-0">
-                                <i class="fas fa-envelope text-red-600 group-hover:text-white text-xs"></i>
+                        <a href="mailto:{{ servicio.email_contacto }}?subject=Consulta sobre {{ servicio.nombre }}" class="flex items-center p-3 rounded-lg bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors border border-red-100 dark:border-red-800">
+                            <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-envelope text-white text-sm"></i>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-xs text-gray-500 dark:text-gray-400">Email</p>
-                                <p class="font-semibold text-gray-900 dark:text-white text-xs truncate">{{ servicio.email_contacto }}</p>
+                            <div class="ml-3 flex-1">
+                                <p class="text-xs font-medium text-red-700 dark:text-red-300">Email</p>
+                                <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ servicio.email_contacto }}</p>
                             </div>
                         </a>
 
                         {% if servicio.sitio_web %}
-                        <a href="{{ servicio.sitio_web }}" target="_blank" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 dark:bg-gray-900 transition-colors group">
-                            <div class="w-7 h-7 bg-indigo-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-500 transition-colors flex-shrink-0">
-                                <i class="fas fa-globe text-indigo-600 group-hover:text-white text-xs"></i>
+                        <a href="{{ servicio.sitio_web }}" target="_blank" class="flex items-center p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors border border-purple-100 dark:border-purple-800">
+                            <div class="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-globe text-white text-sm"></i>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-xs text-gray-500 dark:text-gray-400">Sitio Web</p>
-                                <p class="font-semibold text-gray-900 dark:text-white text-xs truncate">Visitar</p>
+                            <div class="ml-3 flex-1">
+                                <p class="text-xs font-medium text-purple-700 dark:text-purple-300">Sitio web</p>
+                                <p class="text-sm font-semibold text-gray-900 dark:text-white">Visitar</p>
                             </div>
                         </a>
                         {% endif %}
@@ -583,7 +588,7 @@
 
 <!-- MODALES -->
 <!-- Modal Reserva Rápida -->
-<div id="modalReserva" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+<div id="modalReserva" class="modal-overlay hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
         <div class="flex items-center justify-between mb-6">
             <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
@@ -676,7 +681,7 @@
 </div>
 
 <!-- Modal Calificar -->
-<div id="modalCalificar" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+<div id="modalCalificar" class="modal-overlay hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-6">
         <div class="flex items-center justify-between mb-6">
             <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Calificar Servicio</h3>
@@ -737,7 +742,7 @@
 
 <!-- Modal Editar Calificación -->
 {% if calificacion_usuario %}
-<div id="modalEditarCalificacion" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+<div id="modalEditarCalificacion" class="modal-overlay hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-6">
         <div class="flex items-center justify-between mb-6">
             <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Editar Reseña</h3>
@@ -788,7 +793,7 @@
 {% endif %}
 
 <!-- Modal Confirmar Eliminación Calificación -->
-<div id="modalEliminarCalificacion" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+<div id="modalEliminarCalificacion" class="modal-overlay hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
         <div class="text-center mb-6">
             <div class="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -815,7 +820,7 @@
 </div>
 
 <!-- Modal Responder Calificación -->
-<div id="modalResponder" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+<div id="modalResponder" class="modal-overlay hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-6">
         <div class="flex items-center justify-between mb-6">
             <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
@@ -867,7 +872,7 @@
 </div>
 
 <!-- Modal Editar Respuesta -->
-<div id="modalEditarRespuesta" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+<div id="modalEditarRespuesta" class="modal-overlay hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-6">
         <div class="flex items-center justify-between mb-6">
             <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
@@ -913,11 +918,6 @@
 </div>
 
 
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
-      crossorigin=""/>
-
 <style>
 .star-btn, .star-btn-editar {
     transition: all 0.2s ease;
@@ -941,39 +941,7 @@ html {
 #imagenPrincipal {
     transition: opacity 0.3s ease-in-out;
 }
-
-#mapContainer {
-    position: relative;
-    display: block;
-    width: 100%;
-    min-height: 350px;
-}
-
-#map {
-    height: 100%;
-    width: 100%;
-}
-
-.leaflet-container {
-    background: #e5e7eb;
-    border-radius: 12px;
-}
-
-.leaflet-popup-content-wrapper {
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
-
-.custom-marker {
-    background: transparent !important;
-    border: none !important;
-}
 </style>
-
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin=""></script>
 
 <script>
 {% load l10n %}
@@ -984,8 +952,6 @@ let currentRating = 0;
 let currentRatingEditar = parseInt('{{ calificacion_usuario.puntuacion|default:0 }}');
 let calificacionActual = null;
 let respuestaActual = null;
-let map = null;
-let marker = null;
 
 const ratingTexts = {
     1: '⭐ Malo',
@@ -995,119 +961,31 @@ const ratingTexts = {
     5: '⭐⭐⭐⭐⭐ Excelente'
 };
 
-// ========== MAPA DE SOLO LECTURA PARA DETALLE ==========
-function initMap() {
-    if (typeof L === 'undefined') {
-        setTimeout(initMap, 500);
-        return;
+// El mapa ahora se maneja con el partial de Mapbox
+
+// === UTILIDADES ===
+function copiarUbicacion() {
+    const direccion = '{{ servicio.direccion }}';
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(direccion).then(() => {
+            mostrarNotificacion('Dirección copiada al portapapeles', 'success');
+        }).catch(() => {
+            mostrarNotificacion('Error al copiar la dirección', 'error');
+        });
+    } else {
+        // Fallback para navegadores antiguos
+        const textArea = document.createElement('textarea');
+        textArea.value = direccion;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            mostrarNotificacion('Dirección copiada al portapapeles', 'success');
+        } catch (err) {
+            mostrarNotificacion('Error al copiar la dirección', 'error');
+        }
+        document.body.removeChild(textArea);
     }
-
-    const mapElement = document.getElementById('map');
-    if (!mapElement || map) return;
-
-    // ✅ Coordenadas con decimales completos usando unlocalize
-    const lat = parseFloat('{{ servicio.latitud|unlocalize }}');
-    const lng = parseFloat('{{ servicio.longitud|unlocalize }}');
-
-    console.log('🗺️ Inicializando mapa de detalle:', { lat, lng });
-
-    // Validar coordenadas
-    if (isNaN(lat) || isNaN(lng)) {
-        console.error('❌ Coordenadas inválidas:', { lat, lng });
-        mapElement.innerHTML = `
-            <div class="flex items-center justify-center h-full bg-red-50">
-                <div class="text-center p-8">
-                    <i class="fas fa-exclamation-triangle text-red-600 text-5xl mb-4"></i>
-                    <p class="text-red-900 font-semibold text-lg">Coordenadas inválidas</p>
-                    <p class="text-red-700 dark:text-red-300 text-sm mt-2">Lat: ${lat}, Lng: ${lng}</p>
-                </div>
-            </div>
-        `;
-        return;
-    }
-
-    // Validar rango de Ecuador
-    if (lat < -5 || lat > 2 || lng < -92 || lng > -75) {
-        console.error('❌ Coordenadas fuera de rango de Ecuador:', { lat, lng });
-        mapElement.innerHTML = `
-            <div class="flex items-center justify-center h-full bg-yellow-50">
-                <div class="text-center p-8">
-                    <i class="fas fa-map-marked-alt text-yellow-600 text-5xl mb-4"></i>
-                    <p class="text-yellow-900 font-semibold text-lg">Ubicación fuera de Ecuador</p>
-                    <p class="text-yellow-700 dark:text-yellow-300 text-sm mt-2">Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}</p>
-                </div>
-            </div>
-        `;
-        return;
-    }
-
-    // Crear mapa
-    map = L.map('map', {
-        center: [lat, lng],
-        zoom: 15,
-        scrollWheelZoom: false,
-        dragging: true,
-        zoomControl: true,
-        attributionControl: true
-    });
-
-    // Agregar tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
-        maxZoom: 19,
-        minZoom: 5
-    }).addTo(map);
-
-    // Marcador personalizado
-    const iconHtml = `
-        <div style="position: relative;">
-            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); 
-                 border: 4px solid white; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); 
-                 box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);">
-                <div style="width: 12px; height: 12px; background: white; border-radius: 50%; 
-                     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(45deg);"></div>
-            </div>
-        </div>
-    `;
-
-    marker = L.marker([lat, lng], {
-        draggable: false,
-        icon: L.divIcon({
-            className: 'custom-marker',
-            html: iconHtml,
-            iconSize: [40, 40],
-            iconAnchor: [20, 40],
-            popupAnchor: [0, -40]
-        })
-    }).addTo(map);
-
-    // Popup
-    const popupContent = `
-        <div style="text-align: center; font-family: sans-serif; padding: 10px;">
-            <div style="font-size: 16px; font-weight: bold; color: #0ea5e9; margin-bottom: 8px;">
-                📍 {{ servicio.nombre }}
-            </div>
-            <div style="font-size: 13px; color: #64748b;">
-                <strong>Dirección:</strong><br>
-                {{ servicio.direccion }}
-            </div>
-            <div style="font-size: 12px; color: #94a3b8; margin-top: 6px;">
-                Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}
-            </div>
-        </div>
-    `;
-
-    marker.bindPopup(popupContent, {
-        maxWidth: 300,
-        className: 'custom-popup'
-    }).openPopup();
-
-    // Forzar re-render
-    setTimeout(() => {
-        if (map) map.invalidateSize(true);
-    }, 100);
-
-    console.log('✅ Mapa de detalle inicializado correctamente');
 }
 
 // === GALERÍA ===
@@ -1457,166 +1335,43 @@ function mostrarNotificacion(mensaje, tipo) {
     }, 3000);
 }
 
-// === EVENT LISTENERS ===
+// === EVENT LISTENERS OPTIMIZADOS ===
 document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(initMap, 250);
-
-    const modalReserva = document.getElementById('modalReserva');
-    if (modalReserva) {
-        modalReserva.addEventListener('click', function(e) {
-            if (e.target === this) cerrarModalReserva();
-        });
-    }
-    
-    const cantidadInput = document.getElementById('cantidadPersonas');
-    if (cantidadInput) cantidadInput.addEventListener('input', actualizarTotal);
-    
-    document.querySelectorAll('.star-btn').forEach((star, index) => {
-        star.addEventListener('mouseenter', () => {
-            for (let i = 0; i <= index; i++) {
-                const btn = document.querySelectorAll('.star-btn')[i];
-                if (btn) {
-                    btn.querySelector('i').classList.add('fas');
-                    btn.querySelector('i').classList.remove('far');
-                    btn.classList.add('text-yellow-400');
-                }
-            }
-        });
+    // Modales - Event delegation
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('modal-overlay')) {
+            e.target.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
     });
-
-    const ratingStars = document.getElementById('ratingStars');
-    if (ratingStars) {
-        ratingStars.addEventListener('mouseleave', () => {
-            if (currentRating > 0) {
-                setRating(currentRating);
-            } else {
-                document.querySelectorAll('.star-btn').forEach(star => {
-                    const icon = star.querySelector('i');
-                    if (icon) {
-                        icon.classList.remove('fas');
-                        icon.classList.add('far');
-                    }
-                    star.classList.remove('text-yellow-400');
-                    star.classList.add('text-gray-300');
-                });
-                const ratingText = document.getElementById('ratingText');
-                if (ratingText) ratingText.textContent = 'Selecciona una calificación';
-            }
-        });
-    }
     
-    const comentarioCalificacion = document.getElementById('comentarioCalificacion');
-    if (comentarioCalificacion) {
-        comentarioCalificacion.addEventListener('input', function() {
-            const charCount = document.getElementById('charCount');
-            if (charCount) charCount.textContent = this.value.length;
-        });
-    }
-    
-    const textoRespuesta = document.getElementById('textoRespuesta');
-    if (textoRespuesta) {
-        textoRespuesta.addEventListener('input', function() {
-            const charCount = document.getElementById('charCountRespuesta');
-            if (charCount) charCount.textContent = this.value.length;
-        });
-    }
-    
-    const textoEditarRespuesta = document.getElementById('textoEditarRespuesta');
-    if (textoEditarRespuesta) {
-        textoEditarRespuesta.addEventListener('input', function() {
-            const charCount = document.getElementById('charCountEditarRespuesta');
-            if (charCount) charCount.textContent = this.value.length;
-        });
-    }
-    
-    const modales = [
-        'modalCalificar', 
-        'modalEditarCalificacion', 
-        'modalEliminarCalificacion', 
-        'modalResponder', 
-        'modalEditarRespuesta'
-    ];
-    
-    modales.forEach(modalId => {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    this.classList.add('hidden');
-                    document.body.style.overflow = '';
-                }
+    // Escape key para cerrar modales
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay:not(.hidden)').forEach(modal => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
             });
         }
     });
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            cerrarModalReserva();
-            cerrarModalCalificar();
-            cerrarModalEditarCalificacion();
-            cerrarModalEliminarCalificacion();
-            cerrarModalResponder();
-            cerrarModalEditarRespuesta();
+    
+    // Contador de caracteres - Event delegation
+    document.addEventListener('input', function(e) {
+        if (e.target.matches('textarea[maxlength]')) {
+            const maxLength = e.target.getAttribute('maxlength');
+            const currentLength = e.target.value.length;
+            const counterId = e.target.id.replace(/[A-Z]/g, letter => `${letter.toLowerCase()}`).replace(/[a-z]+/, 'charCount');
+            const counter = document.getElementById(counterId) || document.getElementById('charCount');
+            if (counter) counter.textContent = currentLength;
+        }
+        
+        if (e.target.id === 'cantidadPersonas') {
+            actualizarTotal();
         }
     });
-    
-    const formResponder = document.getElementById('formResponder');
-    if (formResponder) {
-        formResponder.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            await enviarRespuesta();
-        });
-    }
-    
-    const formEditarRespuesta = document.getElementById('formEditarRespuesta');
-    if (formEditarRespuesta) {
-        formEditarRespuesta.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            await actualizarRespuesta();
-        });
-    }
-    
-    const forms = document.querySelectorAll('form');
-    forms.forEach(form => {
-        form.addEventListener('submit', function() {
-            const submitBtn = this.querySelector('button[type="submit"]');
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Enviando...';
-                
-                setTimeout(() => {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = submitBtn.dataset.originalText || 'Enviar';
-                }, 3000);
-            }
-        });
-    });
-    
-    document.querySelectorAll('button[type="submit"]').forEach(btn => {
-        btn.dataset.originalText = btn.innerHTML;
-    });
 });
 
-window.addEventListener('load', function() {
-    [100, 300, 600].forEach(delay => {
-        setTimeout(() => {
-            if (map) map.invalidateSize(true);
-        }, delay);
-    });
-});
-
-let resizeTimer;
-window.addEventListener('resize', function() {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-        if (map) map.invalidateSize(true);
-    }, 150);
-});
-
-console.log('✅ Scripts cargados correctamente');
-</script>
-<script>
-// Datos de horarios desde Django
+// Script de horarios
 const horariosData = {
     semana: {
         apertura: '{{ horario_semana.hora_apertura|time:"H:i"|default:"" }}',
@@ -1630,48 +1385,36 @@ const horariosData = {
 
 function verificarEstadoAhora() {
     const ahora = new Date();
-    const diaSemana = ahora.getDay(); // 0 = Domingo, 6 = Sábado
-    const horaActual = ahora.getHours() * 60 + ahora.getMinutes(); // Minutos desde medianoche
+    const diaSemana = ahora.getDay();
+    const horaActual = ahora.getHours() * 60 + ahora.getMinutes();
     
-    let horario;
-    
-    // Determinar qué horario usar
-    if (diaSemana >= 1 && diaSemana <= 5) {
-        // Lunes a Viernes
-        horario = horariosData.semana;
-    } else {
-        // Sábado y Domingo
-        horario = horariosData.finSemana;
-    }
-    
+    let horario = (diaSemana >= 1 && diaSemana <= 5) ? horariosData.semana : horariosData.finSemana;
     const estadoDiv = document.getElementById('estadoActual');
     
     if (!horario.apertura || !horario.cierre) {
-        estadoDiv.className = 'px-4 py-2 rounded-lg font-semibold text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300';
-        estadoDiv.innerHTML = '<i class="fas fa-question-circle mr-2"></i>Sin horario definido';
+        estadoDiv.className = 'px-3 py-1.5 rounded-lg font-semibold text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300';
+        estadoDiv.innerHTML = '<i class="fas fa-question-circle mr-1"></i>Sin horario';
         return;
     }
     
-    // Convertir horarios a minutos
     const [horaAp, minAp] = horario.apertura.split(':').map(Number);
     const [horaCi, minCi] = horario.cierre.split(':').map(Number);
     const apertura = horaAp * 60 + minAp;
     const cierre = horaCi * 60 + minCi;
-    
-    // Verificar si está abierto
     const estaAbierto = horaActual >= apertura && horaActual < cierre;
     
     if (estaAbierto) {
-        estadoDiv.className = 'px-4 py-2 rounded-lg font-semibold text-sm bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800';
-        estadoDiv.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Abierto ahora';
+        estadoDiv.className = 'px-3 py-1.5 rounded-lg font-semibold text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300';
+        estadoDiv.innerHTML = '<i class="fas fa-check-circle mr-1"></i>Abierto';
     } else {
-        estadoDiv.className = 'px-4 py-2 rounded-lg font-semibold text-sm bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800';
-        estadoDiv.innerHTML = '<i class="fas fa-times-circle mr-2"></i>Cerrado ahora';
+        estadoDiv.className = 'px-3 py-1.5 rounded-lg font-semibold text-xs bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300';
+        estadoDiv.innerHTML = '<i class="fas fa-times-circle mr-1"></i>Cerrado';
     }
 }
 
-// Ejecutar al cargar y actualizar cada minuto
 document.addEventListener('DOMContentLoaded', verificarEstadoAhora);
 setInterval(verificarEstadoAhora, 60000);
+
 </script>
+
 {% endblock %}

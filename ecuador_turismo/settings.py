@@ -72,6 +72,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
                 'django.template.context_processors.static',
+                'ecuador_turismo.context_processors.mapbox_context',
             ],
         },
     },
@@ -119,31 +120,35 @@ DATABASE_POOL_ARGS = {
 # ============================================
 OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
 
-# ============================================
-# ✅ GROQ CONFIGURATION (Alternativa GRATIS)
-# ============================================
 GROQ_API_KEY = config('GROQ_API_KEY', default='')
+HUGGINGFACE_API_KEY = config('HUGGINGFACE_API_KEY', default='')
 
-# Validar que al menos una key esté configurada
-if not GROQ_API_KEY and not OPENAI_API_KEY and DEBUG:
+# Validar que al menos una API key esté configurada
+if not any([HUGGINGFACE_API_KEY, GROQ_API_KEY, OPENAI_API_KEY]) and DEBUG:
     import warnings
     warnings.warn(
-        "⚠️  Ni GROQ_API_KEY ni OPENAI_API_KEY están configuradas. El chatbot no funcionará.\n"
-        "   Agrega tu API key en el archivo .env:\n"
-        "   GROQ_API_KEY=gsk_... (GRATIS) o\n"
-        "   OPENAI_API_KEY=sk-proj-...",
+        "No hay API keys configuradas. El chatbot no funcionara.\n"
+        "   Agrega al menos una API key en el archivo .env:\n"
+        "   HUGGINGFACE_API_KEY=hf_... (GRATIS - 30K tokens/mes)\n"
+        "   GROQ_API_KEY=gsk_... (GRATIS)\n"
+        "   OPENAI_API_KEY=sk-... (DE PAGO)",
         RuntimeWarning
     )
+elif GROQ_API_KEY and DEBUG:
+    print("Chatbot configurado con Groq Llama (GRATIS)")
+elif OPENAI_API_KEY and DEBUG:
+    print("Chatbot configurado con OpenAI (DE PAGO)")
 
-# Configuración opcional de modelo (puedes cambiarlo aquí)
 OPENAI_MODEL = config('OPENAI_MODEL', default='gpt-4-turbo-preview')
 GROQ_MODEL = config('GROQ_MODEL', default='llama-3.3-70b-versatile')
-# Opciones: 'gpt-4-turbo-preview', 'gpt-4o', 'gpt-4', 'gpt-3.5-turbo'
+HUGGINGFACE_MODEL = config('HUGGINGFACE_MODEL', default='meta-llama/Llama-3.1-70B-Instruct')
 
 # ============================================
-# ✅ GROQ CONFIGURATION (Alternativa a OpenAI)
+# 🗺️ MAPBOX CONFIGURATION
 # ============================================
-GROQ_API_KEY = config('GROQ_API_KEY', default='')
+MAPBOX_ACCESS_TOKEN = config('MAPBOX_ACCESS_TOKEN', default='')
+MAPBOX_STYLE = config('MAPBOX_STYLE', default='mapbox://styles/mapbox/streets-v12')
+# Estilos disponibles: streets-v12, outdoors-v12, light-v11, dark-v11, satellite-v9, satellite-streets-v12
 
 # ============================================
 
@@ -266,21 +271,19 @@ SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0  # 1 año
 SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
 
-# Content Security
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
-
-# Frame Protection
 X_FRAME_OPTIONS = 'DENY'
 
 # Content Security Policy
 CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net")
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://fonts.googleapis.com")
-CSP_IMG_SRC = ("'self'", "data:", "https:")
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://api.mapbox.com")
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://api.mapbox.com")
+CSP_IMG_SRC = ("'self'", "data:", "https:", "https://api.mapbox.com")
 CSP_FONT_SRC = ("'self'", "https://fonts.gstatic.com")
+CSP_CONNECT_SRC = ("'self'", "https://api.mapbox.com", "https://events.mapbox.com")
 
 # Permissions Policy
 PERMISSIONS_POLICY = {

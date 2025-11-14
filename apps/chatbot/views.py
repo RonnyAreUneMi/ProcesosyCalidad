@@ -161,27 +161,50 @@ class ContextManager:
 
 
 # ============================================
-# CLIENTE OPENAI
+# CLIENTES LLM
 # ============================================
 
-def get_openai_client():
-    """Inicializa cliente OpenAI/Groq con validación"""
+def get_huggingface_client():
+    """Inicializa cliente con Hugging Face (gratis - 30K tokens/mes)"""
     from openai import OpenAI
 
-    # Intentar usar Groq primero (es gratis)
+    hf_key = getattr(settings, 'HUGGINGFACE_API_KEY', None)
+    if not hf_key:
+        raise ValueError("HUGGINGFACE_API_KEY no configurada")
+    
+    return OpenAI(
+        api_key=hf_key,
+        base_url="https://api-inference.huggingface.co/v1/"
+    )
+
+def get_openai_client():
+    """Inicializa cliente con Groq (gratis y funcional)"""
+    from openai import OpenAI
+
+    groq_key = getattr(settings, 'GROQ_API_KEY', None)
+    if not groq_key:
+        raise ValueError("GROQ_API_KEY no configurada")
+    
+    return OpenAI(
+        api_key=groq_key,
+        base_url="https://api.groq.com/openai/v1"
+    )
+
+def get_llm_client():
+    """Obtiene el cliente LLM disponible (prioridad: Groq > OpenAI)"""
+    
+    # Prioridad 1: Groq (gratis)
     groq_key = getattr(settings, 'GROQ_API_KEY', None)
     if groq_key:
-        return OpenAI(
-            api_key=groq_key,
-            base_url="https://api.groq.com/openai/v1"
-        )
-
-    # Si no hay Groq, usar OpenAI
-    api_key = settings.OPENAI_API_KEY
-    if not api_key:
-        raise ValueError("Ni GROQ_API_KEY ni OPENAI_API_KEY están configuradas")
-
-    return OpenAI(api_key=api_key)
+        return get_openai_client(), settings.GROQ_MODEL
+    
+    # Prioridad 2: OpenAI (de pago)
+    openai_key = getattr(settings, 'OPENAI_API_KEY', None)
+    if openai_key:
+        from openai import OpenAI
+        return OpenAI(api_key=openai_key), settings.OPENAI_MODEL
+    
+    raise ValueError("No hay ninguna API key configurada (GROQ_API_KEY o OPENAI_API_KEY)")
 
 
 # ============================================
@@ -481,7 +504,7 @@ Tú respondes: "No encontré un hotel con ese nombre en mi base de datos 😔
 Usuario: "qué visitar en cuenca"
 Tú piensas: "Busca destino, no servicio"
 Tú llamas: buscar_destinos(q="cuenca")
-BD retorna: Cuenca (slug: cuenca)
+BD retorna: Cuenca (slug: cuenca, descripción: "Ciudad colonial patrimonio")
 Tú respondes: "¡Cuenca es hermosa! 🏛️ Es Patrimonio de la Humanidad con arquitectura colonial impresionante.
 [Descubre Cuenca](/destinos/cuenca/)
 ¿Te gustaría que te recomiende tours o dónde hospedarte en Cuenca?"
@@ -717,19 +740,16 @@ def chatbot_message(request):
         })
         
         # ========================================
-        # PRIMERA LLAMADA: GPT-4 DECIDE FUNCIONES
+        # PRIMERA LLAMADA: LLM DECIDE FUNCIONES
         # ========================================
-        client = get_openai_client()
+        client, model = get_llm_client()
         
-        # Determinar modelo según el cliente
-        modelo = "llama-3.3-70b-versatile" if hasattr(settings, 'GROQ_API_KEY') and settings.GROQ_API_KEY else "gpt-4-turbo-preview"
-
         respuesta_inicial = client.chat.completions.create(
-            model=modelo,
+            model=model,
             messages=mensajes,
             tools=TOOLS,
             tool_choice="auto",
-            temperature=0.6,  # Balance creatividad/precisión
+            temperature=0.6,
             max_tokens=800
         )
         
@@ -849,7 +869,7 @@ Genera ahora tu respuesta basándote SOLO en los datos reales."""
             
             # Generar respuesta final
             respuesta_final = client.chat.completions.create(
-                model=modelo,
+                model=model,
                 messages=mensajes_con_resultados,
                 temperature=0.7,
                 max_tokens=600
@@ -950,7 +970,7 @@ def estadisticas_chatbot(request):
         
         # Calcular tasas de éxito
         tasas_exito = {
-            func: round((funciones_exitosas.get(func, 0) / count) * 100, 1)
+            func: (funciones_exitosas.get(func, 0) / count) * 100
             for func, count in funciones_count.items()
         }
         
@@ -1036,13 +1056,33 @@ def validar_configuracion():
     """
     
     errores = []
+    advertencias = []
     
-    # Validar que al menos una API Key (OpenAI o Groq) esté configurada
-    has_openai_key = hasattr(settings, 'OPENAI_API_KEY') and settings.OPENAI_API_KEY
+    # Validar que al menos una API Key esté configurada
+    has_hf_key = hasattr(settings, 'HUGGINGFACE_API_KEY') and settings.HUGGINGFACE_API_KEY
     has_groq_key = hasattr(settings, 'GROQ_API_KEY') and settings.GROQ_API_KEY
+    has_openai_key = hasattr(settings, 'OPENAI_API_KEY') and settings.OPENAI_API_KEY
     
-    if not has_openai_key and not has_groq_key:
-        errores.append("No se ha configurado ni OPENAI_API_KEY ni GROQ_API_KEY en el archivo .env")
+    if not (has_hf_key or has_groq_key or has_openai_key):
+        errores.append("No hay ninguna API key configurada. Necesitas al menos una: HUGGINGFACE_API_KEY, GROQ_API_KEY, o OPENAI_API_KEY")
+    else:
+        # Mostrar qué APIs están disponibles
+        apis_disponibles = []
+        if has_hf_key:
+            apis_disponibles.append("Hugging Face (GRATIS - 30K tokens/mes)")
+        if has_groq_key:
+            apis_disponibles.append("Groq (GRATIS)")
+        if has_openai_key:
+            apis_disponibles.append("OpenAI (DE PAGO)")
+        
+        print(f"🤖 APIs LLM disponibles: {', '.join(apis_disponibles)}")
+        
+        if has_hf_key:
+            print("✅ Usando Hugging Face Llama 3.1 70B como modelo principal")
+        elif has_groq_key:
+            advertencias.append("Usando Groq como fallback. Considera configurar HUGGINGFACE_API_KEY para acceso gratuito")
+        else:
+            advertencias.append("Usando OpenAI (de pago). Considera configurar HUGGINGFACE_API_KEY para acceso gratuito")
     
     # Validar que las apps necesarias estén instaladas
     required_apps = ['apps.servicios', 'apps.destinos', 'apps.chatbot']
@@ -1054,11 +1094,17 @@ def validar_configuracion():
     if not hasattr(settings, 'CACHES'):
         errores.append("CACHES no configurado en settings.py")
     
+    # Mostrar resultados
     if errores:
-        print("⚠️ ERRORES DE CONFIGURACIÓN DEL CHATBOT:")
+        print("❌ ERRORES DE CONFIGURACIÓN DEL CHATBOT:")
         for error in errores:
             print(f"  - {error}")
         return False
+    
+    if advertencias:
+        print("⚠️ ADVERTENCIAS:")
+        for advertencia in advertencias:
+            print(f"  - {advertencia}")
     
     print("✅ Configuración del chatbot validada correctamente")
     return True

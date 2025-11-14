@@ -3,8 +3,6 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/crear_ruta.css' %}">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
 {% endblock %}
 
 {% block content %}
@@ -24,34 +22,39 @@
         </div>
 
         <!-- Sección del Mapa y Selección -->
-        <div class="bg-white/80 dark:bg-gray-800/30 dark:backdrop-blur-sm rounded-xl shadow-lg p-6 dark:border dark:border-gray-700/30 backdrop-blur-sm">
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
-                <div class="w-8 h-8 bg-sky-100 dark:bg-sky-900/30 rounded-lg flex items-center justify-center mr-3 backdrop-blur-sm">
-                    <i class="fas fa-route text-sky-600 dark:text-sky-400 mr-2"></i>
+        <div class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-gray-200/50 dark:border-gray-700/50">
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 bg-gradient-to-br from-sky-500 to-blue-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                    <i class="fas fa-route text-white text-lg"></i>
                 </div>
-                Selecciona un Destino
-            </h2>
-            <p class="text-gray-600 dark:text-gray-300 mb-4">Localiza tu posición y elige un destino para ver las opciones de rutas disponibles.</p>
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Selecciona un Destino</h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Encuentra la mejor ruta para tu viaje</p>
+                </div>
+            </div>
+
             
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <!-- Lista de Destinos -->
                 <div class="lg:col-span-1">
-                    <div class="bg-gray-50/30 dark:bg-gray-900/20 backdrop-blur-sm rounded-lg p-4 border border-gray-200/30 dark:border-gray-700/30">
-                        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3 flex items-center">
-                            <i class="fas fa-list mr-2 text-sky-600 dark:text-sky-400"></i>
-                            Destinos Disponibles
-                        </h3>
+                    <div class="bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+                        <div class="flex items-center mb-4">
+                            <div class="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-list text-white text-sm"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 dark:text-white">Destinos Disponibles</h3>
+                        </div>
                         
                         <div class="mb-3">
                             <input type="text" 
                                    id="buscar-destino" 
                                    placeholder="Buscar destino..."
-                                   class="text-gray-900 dark:text-white bg-white/50 dark:bg-gray-800/50 w-full px-3 py-2 text-sm border border-gray-300/50 dark:border-gray-600/50 rounded-lg focus:ring-2 focus:ring-sky-500 dark:focus:ring-sky-400 focus:border-sky-500 dark:focus:border-sky-400 outline-none placeholder-gray-500 dark:placeholder-gray-400">
+                                   class="text-gray-900 dark:text-white bg-white dark:bg-gray-800 w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-sky-500 dark:focus:ring-sky-400 focus:border-sky-500 dark:focus:border-sky-400 outline-none placeholder-gray-500 dark:placeholder-gray-400 shadow-sm">
                         </div>
 
                         <div class="mb-3">
                             <select id="filtro-region" 
-                                    class="text-gray-900 dark:text-white bg-white/50 dark:bg-gray-800/50 w-full px-3 py-2 text-sm border border-gray-300/50 dark:border-gray-600/50 rounded-lg focus:ring-2 focus:ring-sky-500 dark:focus:ring-sky-400 focus:border-sky-500 dark:focus:border-sky-400 outline-none">
+                                    class="text-gray-900 dark:text-white bg-white dark:bg-gray-800 w-full px-4 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-sky-500 dark:focus:ring-sky-400 focus:border-sky-500 dark:focus:border-sky-400 outline-none shadow-sm">
                                 <option value="" class="bg-white dark:bg-gray-800">Todas las regiones</option>
                                 <option value="costa" class="bg-white dark:bg-gray-800">Costa</option>
                                 <option value="sierra" class="bg-white dark:bg-gray-800">Sierra</option>
@@ -60,44 +63,64 @@
                             </select>
                         </div>
                         
-                        <div id="lista-destinos" class="destinos-scroll space-y-2 max-h-96 overflow-y-auto pr-2">
+                        <div id="lista-destinos" class="destinos-scroll space-y-3 max-h-96 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
                         </div>
                     </div>
                 </div>
                 
                 <!-- Mapa -->
                 <div class="lg:col-span-3">
-                    <div class="mb-2 flex justify-end">
-                        <button type="button" onclick="recargarMapa()" class="text-xs px-3 py-1 bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-400 rounded-lg hover:bg-sky-200 dark:hover:bg-sky-800/50 transition">
-                            <i class="fas fa-sync-alt mr-1"></i>
-                            Recargar mapa
-                        </button>
+                    <div class="mb-4 flex justify-between items-center">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Mapa 3D Interactivo</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button type="button" onclick="toggle3DView()" id="toggle3DBtn" class="inline-flex items-center px-3 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-purple-600 hover:to-indigo-700 transition-all duration-300 shadow-md hover:shadow-lg">
+                                <i class="fas fa-cube mr-2"></i>
+                                <span id="toggle3DText">Vista 2D</span>
+                            </button>
+                            <button type="button" onclick="recargarMapa()" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white text-sm font-medium rounded-xl hover:from-sky-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl">
+                                <i class="fas fa-sync-alt mr-2"></i>
+                                Recargar mapa
+                            </button>
+                        </div>
                     </div>
-                    <div id="map" style="height: 500px; width: 100%; border-radius: 0.5rem;"></div>
+                    <div id="map" class="rounded-2xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-700" style="height: 500px; width: 100%; position: relative;"></div>
                 </div>
             </div>
         </div>
 
         <!-- Sección de Opciones de Rutas -->
-        <div id="rutas-opciones" class="bg-white dark:bg-gray-800/90 dark:backdrop-blur-sm rounded-xl shadow-lg p-6 mt-6 dark:border dark:border-gray-700/50" style="display: none;">
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
-                <div class="w-8 h-8 bg-green-100 dark:bg-green-900/50 rounded-lg flex items-center justify-center mr-3">
-                    <i class="fas fa-route text-green-600 dark:text-green-400"></i>
+        <div id="rutas-opciones" class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl shadow-xl p-8 mt-8 border border-gray-200/50 dark:border-gray-700/50" style="display: none;">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+                        <i class="fas fa-route text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Opciones de Rutas</h2>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Selecciona la mejor opción para tu viaje</p>
+                    </div>
                 </div>
-                Opciones de Rutas Disponibles
-            </h2>
-            <p class="text-gray-600 dark:text-gray-300 mb-6">Selecciona la ruta que prefieras para llegar a tu destino</p>
+                <div class="hidden sm:flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span>Recomendada</span>
+                    <div class="w-3 h-3 bg-blue-500 rounded-full ml-4"></div>
+                    <span>Alternativa</span>
+                </div>
+            </div>
             
-            <div id="lista-rutas" class="space-y-4">
+            <div id="lista-rutas" class="space-y-6">
             </div>
         </div>
 
     </div>
 </div>
 
-<!-- Scripts externos -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+<!-- Mapbox GL JS -->
+<script src='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css' rel='stylesheet' />
 
 <!-- Variables de datos -->
 <script>
@@ -107,6 +130,8 @@
 </script>
 
 <!-- Scripts de la aplicación -->
-<script src="{% static 'js/servicios/crear_ruta_functions.js' %}"></script>
+<script src="{% static 'js/core/mapbox-config.js' %}"></script>
+<script src="{% static 'js/core/utils.js' %}"></script>
+<script src="{% static 'js/rutas/planificador-rutas.js' %}"></script>
 
 {% endblock %}

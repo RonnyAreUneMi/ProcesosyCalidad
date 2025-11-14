@@ -1,0 +1,72 @@
+/* Animations - Ecuador Turismo */
+
+/* Animaciones de entrada */
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); opacity: 1; }
+    50% { opacity: 0.8; }
+    100% { transform: rotate(360deg); opacity: 1; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.1); }
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+@keyframes vibrate {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    25% { transform: translate(-50%, -50%) rotate(1deg); }
+    75% { transform: translate(-50%, -50%) rotate(-1deg); }
+    100% { transform: translate(-50%, -50%) rotate(0deg); }
+}
+
+@keyframes borderPulse {
+    0%, 100% { 
+        border-color: #FFC400;
+        box-shadow: 0 4px 20px rgba(255, 196, 0, 0.4);
+    }
+    33% { 
+        border-color: #0052A3;
+        box-shadow: 0 4px 20px rgba(0, 82, 163, 0.4);
+    }
+    66% { 
+        border-color: #CE1126;
+        box-shadow: 0 4px 20px rgba(206, 17, 38, 0.4);
+    }
+}
+
+/* Clases de animación */
+.slide-down { 
+    animation: slideDown 0.3s ease-out; 
+}
+
+.fade-in { 
+    animation: fadeIn 0.4s ease-out; 
+}
+
+.slide-in-right { 
+    animation: slideInRight 0.3s ease-out; 
+}
+
+.mobile-menu-enter { 
+    animation: slideDown 0.3s ease-out; 
+}

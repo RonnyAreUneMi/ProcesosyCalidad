@@ -1,0 +1,106 @@
+/* Base Styles - Ecuador Turismo */
+
+:root {
+    --primary: #0052A3;
+    --primary-dark: #003875;
+    --primary-light: #4A90E2;
+    --accent-yellow: #FFC400;
+    --accent-red: #CE1126;
+    --dark: #1a2332;
+    --light: #f0f4f8;
+}
+
+.dark {
+    --primary: #4A90E2;
+    --primary-dark: #0052A3;
+    --primary-light: #81B4E0;
+    --dark: #0f172a;
+    --light: #1e293b;
+}
+
+/* Gradientes */
+.gradient-bg { 
+    background: linear-gradient(135deg, #0052A3 0%, #003875 100%); 
+}
+
+.gradient-ecuador { 
+    background: linear-gradient(135deg, #0052A3 0%, #FFC400 50%, #CE1126 100%); 
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Botones */
+.btn-primary {
+    background: linear-gradient(135deg, #0052A3 0%, #003875 100%);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #003875 0%, #0052A3 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 82, 163, 0.3);
+}
+
+.btn-ecuador {
+    background: linear-gradient(135deg, #FFC400 0%, #FFD700 100%);
+    color: #003875;
+    transition: all 0.3s ease;
+}
+
+.btn-ecuador:hover {
+    background: linear-gradient(135deg, #FFD700 0%, #FFC400 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(255, 196, 0, 0.4);
+}
+
+/* Efectos de hover */
+.card-hover { 
+    transition: all 0.3s ease; 
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 82, 163, 0.15);
+}
+
+/* Badges */
+.badge {
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+/* Mensajes */
+.message-success { 
+    background: linear-gradient(135deg, #059669 0%, #047857 100%); 
+}
+
+.message-error { 
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); 
+}
+
+.message-warning { 
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%); 
+}
+
+.message-info { 
+    background: linear-gradient(135deg, #0052A3 0%, #003875 100%); 
+}
+
+/* Footer spacing */
+footer {
+    padding-bottom: 70px !important;
+}
+
+@media (max-width: 640px) {
+    footer {
+        padding-bottom: 85px !important;
+    }
+}

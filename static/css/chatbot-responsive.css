@@ -1,0 +1,42 @@
+/* Chatbot Responsive Styles - Ecuador Turismo */
+
+.chatbot-window {
+    position: absolute !important;
+    bottom: 80px !important;
+    right: 0 !important;
+    width: min(420px, calc(100vw - 48px)) !important;
+    height: min(650px, calc(100vh - 120px)) !important;
+    max-width: 420px !important;
+    max-height: 650px !important;
+    z-index: 1001 !important;
+}
+
+/* Laptop específico */
+@media (min-width: 1024px) and (max-width: 1366px) {
+    .chatbot-window {
+        width: min(400px, calc(100vw - 60px)) !important;
+        height: min(620px, calc(100vh - 140px)) !important;
+        right: 0 !important;
+    }
+}
+
+/* Tablet */
+@media (min-width: 641px) and (max-width: 1023px) {
+    .chatbot-window {
+        width: min(390px, calc(100vw - 40px)) !important;
+        height: min(600px, calc(100vh - 120px)) !important;
+        right: 0 !important;
+    }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+    .chatbot-window {
+        width: calc(100vw - 32px) !important;
+        height: calc(100vh - 140px) !important;
+        bottom: 85px !important;
+        right: 16px !important;
+        left: 16px !important;
+        max-width: none !important;
+    }
+}

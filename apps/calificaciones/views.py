@@ -313,7 +313,7 @@ def mis_calificaciones(request):
     context = {
         'page_obj': page_obj,
         'total_calificaciones': total_calificaciones,
-        'promedio_calificaciones': round(promedio_calificaciones, 2),
+        'promedio_calificaciones': promedio_calificaciones,
         'distribucion': distribucion,
     }
     
@@ -385,7 +385,7 @@ def calificaciones_proveedor(request):
         'page_obj': page_obj,
         'servicios': servicios,
         'total_calificaciones': total_calificaciones,
-        'promedio_general': round(promedio_general, 2),
+        'promedio_general': promedio_general,
         'distribucion': distribucion,
         'sin_respuesta': sin_respuesta,
         'filtros': {
@@ -642,7 +642,7 @@ def estadisticas_calificaciones_ajax(request):
         return JsonResponse({
             'success': True,
             'total_calificaciones': total,
-            'promedio_general': round(promedio_general, 2),
+            'promedio_general': promedio_general,
             'distribucion': distribucion,
             'mejor_calificados': mejores,
             'peor_calificados': peores

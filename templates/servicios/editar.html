@@ -169,9 +169,9 @@
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Ubicación Geográfica</h2>
                 </div>
 
-                <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 mb-6">
+                <div class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-4 mb-6">
                     <div class="flex items-start space-x-3">
-                        <i class="fas fa-info-circle text-green-600 mt-1"></i>
+                        <i class="fas fa-info-circle text-green-600 dark:text-green-400 mt-1"></i>
                         <p class="text-sm text-gray-700 dark:text-gray-300">
                             <span class="font-semibold">Haz clic en el mapa</span> para actualizar la ubicación exacta de tu servicio, o ingresa las coordenadas manualmente.
                         </p>
@@ -234,7 +234,7 @@
                     </div>
 
                     <!-- Mapa -->
-                    {% include 'servicios/partials/_mapa_leaflet_editable.html' %}
+                    {% include 'servicios/partials/_mapa_mapbox_editable.html' %}
 
                     <!-- Zona de Referencia -->
                     <div class="lg:col-span-2">
@@ -338,10 +338,10 @@
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Horarios de Atención</h2>
                 </div>
 
-                <div class="bg-gradient-to-br from-blue-50 to-sky-50 rounded-xl p-6 mb-6">
+                <div class="bg-gradient-to-br from-blue-50 to-sky-50 dark:from-blue-900/20 dark:to-sky-900/20 rounded-xl p-6 mb-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white">
-                            <i class="fas fa-calendar-week text-blue-600 mr-2"></i>
+                            <i class="fas fa-calendar-week text-blue-600 dark:text-blue-400 mr-2"></i>
                             Lunes a Viernes
                         </h3>
                         <label class="flex items-center cursor-pointer">
@@ -388,10 +388,10 @@
                     </div>
                 </div>
 
-                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6">
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white">
-                            <i class="fas fa-calendar-day text-purple-600 mr-2"></i>
+                            <i class="fas fa-calendar-day text-purple-600 dark:text-purple-400 mr-2"></i>
                             Sábado y Domingo
                         </h3>
                         <label class="flex items-center cursor-pointer">
@@ -438,9 +438,9 @@
                     </div>
                 </div>
 
-                <div class="bg-yellow-50 border-2 border-yellow-200 dark:border-yellow-800 rounded-xl p-4 mt-6">
+                <div class="bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-200 dark:border-yellow-800 rounded-xl p-4 mt-6">
                     <div class="flex items-start space-x-3">
-                        <i class="fas fa-lightbulb text-yellow-600 mt-1"></i>
+                        <i class="fas fa-lightbulb text-yellow-600 dark:text-yellow-400 mt-1"></i>
                         <p class="text-sm text-gray-700 dark:text-gray-300">
                             <span class="font-semibold">Tip:</span> Los horarios visibles ayudan a los turistas a planificar mejor su visita.
                         </p>
@@ -484,9 +484,9 @@
                     {% endfor %}
                 </div>
 
-                <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-4 mt-6">
+                <div class="bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800 rounded-xl p-4 mt-6">
                     <div class="flex items-start space-x-3">
-                        <i class="fas fa-info-circle text-amber-600 mt-1"></i>
+                        <i class="fas fa-info-circle text-amber-600 dark:text-amber-400 mt-1"></i>
                         <p class="text-sm text-gray-700 dark:text-gray-300">
                             La primera imagen será la <span class="font-semibold">imagen principal</span> de tu servicio. Puedes eliminar imágenes haciendo clic en el icono de la papelera.
                         </p>
@@ -504,7 +504,7 @@
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Agregar Nuevas Imágenes</h2>
                 </div>
 
-                <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-sky-500 transition-colors cursor-pointer bg-gray-50 dark:bg-gray-900 hover:bg-sky-50" onclick="document.getElementById('imagenes').click()">
+                <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center hover:border-sky-500 dark:hover:border-sky-400 transition-colors cursor-pointer bg-gray-50 dark:bg-gray-900 hover:bg-sky-50 dark:hover:bg-sky-900/20" onclick="document.getElementById('imagenes').click()">
                     <i class="fas fa-cloud-upload-alt text-6xl text-gray-400 dark:text-gray-500 mb-4"></i>
                     <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Arrastra imágenes o haz clic para seleccionar</h3>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">PNG, JPG o WEBP (máx. 5MB por imagen)</p>

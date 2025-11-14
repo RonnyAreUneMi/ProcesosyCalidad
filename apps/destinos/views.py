@@ -226,7 +226,7 @@ class QueryHelper:
                             promedio = tipo_cals.aggregate(promedio=Avg('puntuacion'))['promedio']
                             result['por_tipo'][tipo_nombre] = {
                                 'count': count,
-                                'promedio': round(promedio, 1)
+                                'promedio': promedio
                             }
                 except Exception:
                     pass
@@ -632,8 +632,8 @@ def estadisticas_destinos_ajax(request):
                 )['promedio']
                 
                 precio_por_region[region_nombre] = {
-                    'minimo': round(float(promedio_min or 0), 2),
-                    'maximo': round(float(promedio_max or 0), 2)
+                    'minimo': float(promedio_min or 0),
+                    'maximo': float(promedio_max or 0)
                 }
         
         mejor_calificados = Destino.objects.filter(

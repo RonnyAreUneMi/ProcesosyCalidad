@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -113,297 +114,95 @@
         color: white;
     }
 
-    /* Estilos para Leaflet popups */
-    .leaflet-popup-content-wrapper {
+    /* Estilos para Mapbox popups */
+    .mapboxgl-popup-content {
         border-radius: 12px;
         padding: 0;
-    }
-
-    .leaflet-popup-content {
-        margin: 0;
         min-width: 250px;
     }
 </style>
 
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
-      crossorigin=""/>
+<!-- Mapbox GL JS -->
+<script src='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css' rel='stylesheet' />
 
-<!-- Leaflet JavaScript -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin=""></script>
+<!-- Ecuador Mapbox System -->
+<script src="{% static 'js/ecuador-mapbox.js' %}"></script>
+<script src="{% static 'js/map-controls.js' %}"></script>
 
 <script>
-    // ========================================
-    // VARIABLES GLOBALES
-    // ========================================
-    let map = null;
-    let markers = [];
-    let markerLayer = null;
-    let regionActual = 'todos';
-    let destinosData = [];
+let ecuadorMap, mapControls, destinosData = [];
 
-    // ========================================
-    // DATOS DE DESTINOS DESDE DJANGO
-    // ========================================
-    try {
-        // Los datos ya vienen como JSON string desde el backend
-        destinosData = JSON.parse('{{ destinos_json|safe }}');
-        console.log(`📊 ${destinosData.length} destinos cargados desde la base de datos`);
-        
-        // Validar que hay datos
-        if (!destinosData || destinosData.length === 0) {
-            console.warn('⚠️ No hay destinos en la base de datos');
-        }
-    } catch (error) {
-        console.error('❌ Error al parsear datos de destinos:', error);
-        destinosData = [];
-    }
+try {
+    destinosData = JSON.parse('{{ destinos_json|safe }}');
+    console.log(`📊 ${destinosData.length} destinos cargados desde la base de datos`);
+} catch (error) {
+    console.error('❌ Error al parsear datos de destinos:', error);
+    destinosData = [];
+}
 
-    // ========================================
-    // ÍCONOS PERSONALIZADOS POR REGIÓN
-    // ========================================
-    const regionIcons = {
-        'costa': L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        }),
-        'sierra': L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        }),
-        'oriente': L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        }),
-        'galapagos': L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        })
-    };
-
-    // ========================================
-    // INICIALIZAR MAPA
-    // ========================================
-    function initMap() {
-        try {
-            console.log('🗺️ Inicializando mapa...');
-            
-            // Centro de Ecuador
-            const ecuadorCenter = [-1.8312, -78.1834];
-
-            // Crear mapa
-            map = L.map('map').setView(ecuadorCenter, 7);
-            console.log('✅ Mapa creado');
-
-            // Añadir capa de tiles (OpenStreetMap)
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-                maxZoom: 19,
-                minZoom: 5
-            }).addTo(map);
-            console.log('✅ Tiles añadidos');
-
-            // Crear capa para los marcadores
-            markerLayer = L.layerGroup().addTo(map);
-
-            // Crear marcadores
-            crearMarcadores();
-
-            // Ocultar loading
-            setTimeout(() => {
-                document.getElementById('mapLoading').classList.add('hidden');
-                console.log('✅ Mapa completamente cargado');
-            }, 500);
-
-        } catch (error) {
-            console.error('❌ Error al inicializar el mapa:', error);
-            const loadingDiv = document.getElementById('mapLoading');
-            loadingDiv.innerHTML = `
-                <div class="text-center">
-                    <i class="fas fa-exclamation-triangle text-red-600 text-4xl mb-4"></i>
-                    <p class="text-gray-900 dark:text-white font-semibold mb-2">Error al cargar el mapa</p>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm">${error.message}</p>
-                    <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700">
-                        Recargar página
-                    </button>
-                </div>
-            `;
-        }
-    }
-
-
-// CREAR MARCADORES
-// ========================================
-function crearMarcadores() {
-    if (markerLayer) markerLayer.clearLayers();
-    markers = [];
-
-    const destinosFiltrados = regionActual === 'todos' 
-        ? destinosData 
-        : destinosData.filter(d => d.region === regionActual);
-
-    const bounds = [];
-
-    destinosFiltrados.forEach(destino => {
-        const lat = parseFloat(destino.latitud);
-        const lng = parseFloat(destino.longitud);
-        if (isNaN(lat) || isNaN(lng)) return;
-
-        const marker = L.marker([lat, lng], {
-            icon: regionIcons[destino.region] || regionIcons['costa'],
-            title: destino.nombre
-        });
-
-        // URL del mapa estático de Google Maps
-        const mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=15&size=120x80&maptype=roadmap&markers=color:red%7C${lat},${lng}&key=TU_API_KEY`;
-
-        const popupContent = `
-        <div style="padding: 12px; max-width: 250px;">
-            <div style="display: flex; gap: 8px; align-items: flex-start;">
-                <img src="${mapImageUrl}" 
-                     alt="${destino.nombre}" 
-                     style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;"/>
-                <div style="flex: 1;">
-                    <h4 style="font-weight: bold; font-size: 16px; margin-bottom: 4px; color: #1f2937;">
-                        ${destino.nombre}
-                    </h4>
-                    <p style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">
-                        ${destino.descripcion_corta || 'Sin descripción'}
-                    </p>
-                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
-                        <span style="color: #f59e0b; font-size: 12px;">
-                            ${'★'.repeat(Math.round(destino.calificacion_promedio || 0))}${'☆'.repeat(5 - Math.round(destino.calificacion_promedio || 0))}
-                        </span>
-                        <span style="font-size: 10px; color: #6b7280;">
-                            ${(destino.calificacion_promedio || 0).toFixed(1)}
-                        </span>
-                    </div>
-                    <a href="/destinos/${destino.slug}/" 
-                       style="display: inline-block; background-color: #0ea5e9; color: white; 
-                              padding: 4px 8px; border-radius: 6px; text-decoration: none; 
-                              font-size: 12px; font-weight: 600;">
-                        Ver detalles
-                    </a>
-                </div>
-            </div>
-        </div>
-        `;
-
-        marker.bindPopup(popupContent);
-
-        // Evento click para mostrar panel lateral
-        marker.on('click', () => mostrarInfoPanel(destino));
-
-        marker.addTo(markerLayer);
-        markers.push(marker);
-        bounds.push([lat, lng]);
-    });
-
-    document.getElementById('destinosCount').textContent = destinosFiltrados.length;
-
-    if (bounds.length > 0) {
-        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
+function filtrarPorRegion(region) {
+    if (mapControls) {
+        mapControls.filterByRegion(region);
     }
 }
 
-
-    // ========================================
-    // FILTRAR POR REGIÓN
-    // ========================================
-    function filtrarPorRegion(region) {
-        console.log(`🔍 Filtrando por región: ${region}`);
-        regionActual = region;
-
-        // Actualizar botones
-        document.querySelectorAll('.region-filter-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        const btnActivo = document.querySelector(`[data-region="${region}"]`);
-        if (btnActivo) {
-            btnActivo.classList.add('active');
-        }
-
-        // Recrear marcadores
-        crearMarcadores();
-
-        // Cerrar panel de info
-        cerrarInfoPanel();
-    }
-
-
-
-    // ========================================
-    // OBTENER NOMBRE DE REGIÓN
-    // ========================================
-    function getRegionName(region) {
-        const nombres = {
-            'costa': 'Costa',
-            'sierra': 'Sierra',
-            'oriente': 'Oriente',
-            'galapagos': 'Galápagos'
-        };
-        return nombres[region] || region;
-    }
-
-    // ========================================
-    // EVENTOS
-    // ========================================
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('🚀 Página cargada, inicializando mapa...');
     
-    // Inicializar mapa cuando se cargue la página
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 Página cargada, inicializando mapa...');
+    if (destinosData.length === 0) {
+        console.warn('⚠️ No hay destinos para mostrar');
+        const loadingDiv = document.getElementById('mapLoading');
+        loadingDiv.innerHTML = `
+            <div class="text-center">
+                <i class="fas fa-map-marked-alt text-gray-400 dark:text-gray-500 text-5xl mb-4"></i>
+                <p class="text-gray-900 dark:text-white font-semibold mb-2">No hay destinos disponibles</p>
+                <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">Crea tu primer destino turístico</p>
+                {% if user.is_authenticated and user.es_administrador %}
+                <a href="{% url 'destinos:crear_destino' %}" class="inline-block px-6 py-3 bg-sky-600 text-white rounded-lg hover:bg-sky-700 font-semibold">
+                    <i class="fas fa-plus mr-2"></i>
+                    Crear destino
+                </a>
+                {% endif %}
+            </div>
+        `;
+        return;
+    }
+    
+    try {
+        // Inicializar mapa
+        ecuadorMap = new EcuadorMapbox('map', {
+            enable3D: true
+        });
         
-        // Verificar que tenemos datos
-        if (destinosData.length === 0) {
-            console.warn('⚠️ No hay destinos para mostrar');
-            const loadingDiv = document.getElementById('mapLoading');
-            loadingDiv.innerHTML = `
-                <div class="text-center">
-                    <i class="fas fa-map-marked-alt text-gray-400 dark:text-gray-500 text-5xl mb-4"></i>
-                    <p class="text-gray-900 dark:text-white font-semibold mb-2">No hay destinos disponibles</p>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">Crea tu primer destino turístico</p>
-                    {% if user.is_authenticated and user.es_administrador %}
-                    <a href="{% url 'destinos:crear_destino' %}" class="inline-block px-6 py-3 bg-sky-600 text-white rounded-lg hover:bg-sky-700 font-semibold">
-                        <i class="fas fa-plus mr-2"></i>
-                        Crear destino
-                    </a>
-                    {% endif %}
-                </div>
-            `;
-            return;
-        }
+        await ecuadorMap.init();
         
-        initMap();
-    });
-
-    // Cerrar panel al hacer clic fuera
-    document.addEventListener('click', (e) => {
-        const panel = document.getElementById('infoPanel');
-        if (panel && !panel.contains(e.target) && !e.target.closest('.leaflet-container')) {
-            if (!e.target.closest('button[data-region]')) {
-                cerrarInfoPanel();
-            }
-        }
-    });
+        // Crear marcadores
+        ecuadorMap.createMarkersFromData(destinosData);
+        
+        // Actualizar contador
+        document.getElementById('destinosCount').textContent = destinosData.length;
+        
+        setTimeout(() => {
+            document.getElementById('mapLoading').classList.add('hidden');
+            console.log('✅ Mapa completamente cargado');
+        }, 500);
+        
+    } catch (error) {
+        console.error('❌ Error al inicializar el mapa:', error);
+        const loadingDiv = document.getElementById('mapLoading');
+        loadingDiv.innerHTML = `
+            <div class="text-center">
+                <i class="fas fa-exclamation-triangle text-red-600 text-4xl mb-4"></i>
+                <p class="text-gray-900 dark:text-white font-semibold mb-2">Error al cargar el mapa</p>
+                <p class="text-gray-600 dark:text-gray-300 text-sm">${error.message}</p>
+                <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700">
+                    Recargar página
+                </button>
+            </div>
+        `;
+    }
+});
 </script>
 
 {% endblock %}

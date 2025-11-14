@@ -198,7 +198,7 @@ def buscar_rutas_ajax(request):
             costo_total = sum(t.get('costo_aprox', 0) for t in ruta_combinada['tramos'])
             
             ruta_combinada['duracion_total'] = f"{duracion_total} horas"
-            ruta_combinada['costo_total'] = round(costo_total, 2)
+            ruta_combinada['costo_total'] = costo_total
             
             return JsonResponse({
                 'success': True,

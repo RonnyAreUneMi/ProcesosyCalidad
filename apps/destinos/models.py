@@ -261,6 +261,7 @@ class Destino(models.Model):
         """
         from django.db.models import Avg, Count
         from apps.calificaciones.models import Calificacion
+        from decimal import Decimal, ROUND_HALF_UP
         
         stats = Calificacion.objects.filter(
             servicio__destino=self,
@@ -270,7 +271,16 @@ class Destino(models.Model):
             total=Count('id')
         )
         
-        self.calificacion_promedio = round(stats['promedio'] or 0, 2)
+        # Usar Decimal para mantener precisión y evitar redondeo incorrecto
+        promedio = stats['promedio']
+        if promedio is not None:
+            # Convertir a Decimal y redondear correctamente a 2 decimales
+            self.calificacion_promedio = Decimal(str(promedio)).quantize(
+                Decimal('0.01'), rounding=ROUND_HALF_UP
+            )
+        else:
+            self.calificacion_promedio = Decimal('0.00')
+            
         self.total_calificaciones = stats['total'] or 0
         self.save(update_fields=['calificacion_promedio', 'total_calificaciones'])
     

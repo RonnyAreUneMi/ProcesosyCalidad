@@ -1,0 +1,486 @@
+<!-- Mapa 3D mejorado con Mapbox para vista de detalle -->
+<div id="mapContainer" class="rounded-xl overflow-hidden shadow-lg border-2 border-gray-200 dark:border-gray-700 mb-4" style="height: 450px;">
+    <div id="map" style="height: 100%; width: 100%;"></div>
+    
+    <!-- Controles personalizados -->
+    <div class="absolute top-4 right-4 z-10 flex flex-col gap-2">
+        <button id="toggle3D" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 p-2 rounded-lg shadow-md border border-gray-200 dark:border-gray-600 transition-all">
+            <i class="fas fa-cube text-sm"></i>
+        </button>
+        <button id="resetView" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 p-2 rounded-lg shadow-md border border-gray-200 dark:border-gray-600 transition-all">
+            <i class="fas fa-home text-sm"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Mapbox GL JS -->
+<script src='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css' rel='stylesheet' />
+
+<script>
+// Mapa de solo lectura para vista de detalle
+let mapaDetalle = null;
+let markerDetalle = null;
+
+// Configurar token de Mapbox
+mapboxgl.accessToken = 'pk.eyJ1IjoiaW5ncG9sbGl0byIsImEiOiJjbWh4cmVwcHYwNDF2MnJvcGc5N3VocDliIn0.FDbD09-VTzE7H-HAfee0yg';
+
+function initMapDetalle() {
+    if (typeof mapboxgl === 'undefined') {
+        setTimeout(initMapDetalle, 500);
+        return;
+    }
+
+    const mapElement = document.getElementById('map');
+    if (!mapElement || mapaDetalle) return;
+
+    // Coordenadas desde el contexto Django
+    console.log('🔍 Valores RAW del template:');
+    console.log('  - coordenadas.lat RAW:', '{{ coordenadas.lat }}');
+    console.log('  - coordenadas.lng RAW:', '{{ coordenadas.lng }}');
+    console.log('  - servicio.latitud RAW:', '{{ servicio.latitud }}');
+    console.log('  - servicio.longitud RAW:', '{{ servicio.longitud }}');
+    
+    const lat = parseFloat('{{ coordenadas.lat|floatformat:8 }}'.replace(',', '.'));
+    const lng = parseFloat('{{ coordenadas.lng|floatformat:8 }}'.replace(',', '.'));
+
+    console.log('🗺️ Inicializando mapa de detalle:');
+    console.log('  - lat procesado:', lat);
+    console.log('  - lng procesado:', lng);
+    console.log('  - lat tipo:', typeof lat);
+    console.log('  - lng tipo:', typeof lng);
+
+    // Validar coordenadas
+    if (isNaN(lat) || isNaN(lng)) {
+        console.error('❌ Coordenadas inválidas:', { lat, lng });
+        mapElement.innerHTML = `
+            <div class="flex items-center justify-center h-full bg-red-50">
+                <div class="text-center p-8">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-5xl mb-4"></i>
+                    <p class="text-red-900 font-semibold text-lg">Coordenadas inválidas</p>
+                    <p class="text-red-700 text-sm mt-2">Lat: ${lat}, Lng: ${lng}</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    // Validar rango de Ecuador
+    if (lat < -5 || lat > 2 || lng < -92 || lng > -75) {
+        console.error('❌ Coordenadas fuera de rango de Ecuador:', { lat, lng });
+        mapElement.innerHTML = `
+            <div class="flex items-center justify-center h-full bg-yellow-50">
+                <div class="text-center p-8">
+                    <i class="fas fa-map-marked-alt text-yellow-600 text-5xl mb-4"></i>
+                    <p class="text-yellow-900 font-semibold text-lg">Ubicación fuera de Ecuador</p>
+                    <p class="text-yellow-700 text-sm mt-2">Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    try {
+        // Crear mapa 3D
+        mapaDetalle = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/outdoors-v12',
+            center: [lng, lat],
+            zoom: 15,
+            pitch: 60,
+            bearing: -17.6,
+            scrollZoom: true,
+            dragPan: true
+        });
+
+        mapaDetalle.addControl(new mapboxgl.NavigationControl());
+        mapaDetalle.addControl(new mapboxgl.FullscreenControl());
+        
+        // Configurar terreno 3D mejorado
+        mapaDetalle.on('style.load', () => {
+            // Añadir fuente de elevación
+            mapaDetalle.addSource('mapbox-dem', {
+                'type': 'raster-dem',
+                'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+                'tileSize': 512,
+                'maxzoom': 14
+            });
+            
+            // Configurar terreno 3D con exageración
+            mapaDetalle.setTerrain({ 
+                'source': 'mapbox-dem', 
+                'exaggeration': 2.0 
+            });
+            
+            // Añadir capa de cielo atmosférico
+            mapaDetalle.addLayer({
+                'id': 'sky',
+                'type': 'sky',
+                'paint': {
+                    'sky-type': 'atmosphere',
+                    'sky-atmosphere-sun': [0.0, 90.0],
+                    'sky-atmosphere-sun-intensity': 15
+                }
+            });
+            
+            // Añadir edificios 3D
+            mapaDetalle.addLayer({
+                'id': 'add-3d-buildings',
+                'source': 'composite',
+                'source-layer': 'building',
+                'filter': ['==', 'extrude', 'true'],
+                'type': 'fill-extrusion',
+                'minzoom': 15,
+                'paint': {
+                    'fill-extrusion-color': '#aaa',
+                    'fill-extrusion-height': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        15,
+                        0,
+                        15.05,
+                        ['get', 'height']
+                    ],
+                    'fill-extrusion-base': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        15,
+                        0,
+                        15.05,
+                        ['get', 'min_height']
+                    ],
+                    'fill-extrusion-opacity': 0.6
+                }
+            });
+        });
+        
+        mapaDetalle.on('error', (e) => {
+            console.error('Error de Mapbox:', e);
+            mapElement.innerHTML = `
+                <div class="flex items-center justify-center h-full bg-red-50 dark:bg-red-900/20">
+                    <div class="text-center p-8">
+                        <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400 text-5xl mb-4"></i>
+                        <p class="text-red-900 dark:text-red-100 font-semibold text-lg">Error al cargar el mapa</p>
+                        <p class="text-red-700 dark:text-red-300 text-sm mt-2">Verifica la conexión a internet</p>
+                    </div>
+                </div>
+            `;
+        });
+        
+        // Cuando el mapa se carga completamente
+        mapaDetalle.on('load', () => {
+            // Crear marcador personalizado
+            const el = document.createElement('div');
+            el.style.cssText = `
+                background: linear-gradient(135deg, #ef4444, #dc2626);
+                border: 3px solid white;
+                border-radius: 50%;
+                width: 24px;
+                height: 24px;
+                box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-map-marker-alt';
+            icon.style.cssText = 'color: white; font-size: 12px;';
+            el.appendChild(icon);
+            
+            markerDetalle = new mapboxgl.Marker(el)
+                .setLngLat([lng, lat])
+                .addTo(mapaDetalle);
+
+            // Popup mejorado con Tailwind CSS
+            const isDark = document.documentElement.classList.contains('dark');
+            const popupContent = `
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-5 min-w-80 max-w-sm shadow-2xl border border-gray-200 dark:border-gray-700">
+                    <!-- Header -->
+                    <div class="flex items-start space-x-3 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                                <i class="fas fa-map-marker-alt text-white text-lg"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight mb-1">{{ servicio.nombre|escapejs }}</h3>
+                            <div class="flex items-center space-x-2">
+                                <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                    {{ servicio.get_tipo_display }}
+                                </span>
+                                {% if servicio.disponible %}
+                                <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                    Disponible
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Información de ubicación -->
+                    <div class="space-y-3 mb-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0 mt-0.5">
+                                <i class="fas fa-location-dot text-red-500 text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">Dirección</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{{ servicio.direccion|escapejs }}</p>
+                            </div>
+                        </div>
+                        
+                        {% if servicio.zona_referencia %}
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0 mt-0.5">
+                                <i class="fas fa-map-signs text-amber-500 text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">Referencia</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">{{ servicio.zona_referencia|escapejs }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Información adicional -->
+                    <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 mb-4">
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <p class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide mb-1">Precio</p>
+                                <p class="font-bold text-gray-900 dark:text-white">${{ servicio.precio|floatformat:0 }} USD</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide mb-1">Capacidad</p>
+                                <p class="font-bold text-gray-900 dark:text-white">{{ servicio.capacidad_maxima }} personas</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Coordenadas técnicas -->
+                    <div class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-lg p-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Coordenadas GPS</span>
+                            <button onclick="copyCoordinates('${lat.toFixed(6)}, ${lng.toFixed(6)}')" class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 font-medium">
+                                <i class="fas fa-copy mr-1"></i>Copiar
+                            </button>
+                        </div>
+                        <div class="mt-2 space-y-1">
+                            <div class="flex justify-between">
+                                <span class="text-xs text-gray-600 dark:text-gray-300">Latitud:</span>
+                                <span class="text-xs font-mono text-gray-900 dark:text-white">${lat.toFixed(6)}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-xs text-gray-600 dark:text-gray-300">Longitud:</span>
+                                <span class="text-xs font-mono text-gray-900 dark:text-white">${lng.toFixed(6)}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const popup = new mapboxgl.Popup({
+                maxWidth: '320px',
+                className: 'service-detail-popup',
+                closeButton: true,
+                closeOnClick: false,
+                offset: [0, -10]
+            }).setHTML(popupContent);
+            
+            markerDetalle.setPopup(popup);
+            
+            console.log('Mapa 3D de detalle inicializado correctamente');
+            
+            // Configurar controles personalizados
+            setupCustomControls();
+        });
+        
+    } catch (error) {
+        console.error('❌ Error al crear mapa:', error);
+        mapElement.innerHTML = `
+            <div class="flex items-center justify-center h-full bg-red-50">
+                <div class="text-center p-8">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-5xl mb-4"></i>
+                    <p class="text-red-900 font-semibold text-lg">Error al inicializar Mapbox</p>
+                    <p class="text-red-700 text-sm mt-2">${error.message}</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    // Forzar re-render del mapa
+    setTimeout(() => {
+        if (mapaDetalle) mapaDetalle.resize();
+    }, 100);
+}
+
+// Inicializar cuando el DOM esté listo
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(initMapDetalle, 250);
+    });
+} else {
+    setTimeout(initMapDetalle, 250);
+}
+
+// Re-renderizar en resize
+window.addEventListener('resize', function() {
+    if (mapaDetalle) {
+        clearTimeout(window.mapResizeTimer);
+        window.mapResizeTimer = setTimeout(() => {
+            mapaDetalle.resize();
+        }, 150);
+    }
+});
+
+// Re-renderizar después de cargar la página
+window.addEventListener('load', function() {
+    [100, 300, 600].forEach(delay => {
+        setTimeout(() => {
+            if (mapaDetalle) mapaDetalle.resize();
+        }, delay);
+    });
+});
+
+// Funciones auxiliares
+function copyCoordinates(coords) {
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(coords).then(() => {
+            showNotification('Coordenadas copiadas al portapapeles', 'success');
+        }).catch(() => {
+            showNotification('Error al copiar coordenadas', 'error');
+        });
+    }
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-white font-medium transition-all transform translate-x-full ${
+        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    }`;
+    notification.innerHTML = `
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+function setupCustomControls() {
+    const lat = parseFloat('{{ coordenadas.lat|floatformat:8 }}'.replace(',', '.'));
+    const lng = parseFloat('{{ coordenadas.lng|floatformat:8 }}'.replace(',', '.'));
+    
+    // Control de vista 3D
+    const toggle3D = document.getElementById('toggle3D');
+    let is3D = true;
+    
+    toggle3D.addEventListener('click', () => {
+        if (is3D) {
+            mapaDetalle.easeTo({
+                pitch: 0,
+                bearing: 0,
+                duration: 1000
+            });
+            toggle3D.innerHTML = '<i class="fas fa-mountain text-sm"></i>';
+            toggle3D.title = 'Vista 3D';
+        } else {
+            mapaDetalle.easeTo({
+                pitch: 60,
+                bearing: -17.6,
+                duration: 1000
+            });
+            toggle3D.innerHTML = '<i class="fas fa-cube text-sm"></i>';
+            toggle3D.title = 'Vista 2D';
+        }
+        is3D = !is3D;
+    });
+    
+    // Control de reset de vista
+    const resetView = document.getElementById('resetView');
+    resetView.addEventListener('click', () => {
+        mapaDetalle.flyTo({
+            center: [lng, lat],
+            zoom: 15,
+            pitch: 45,
+            bearing: 0,
+            duration: 2000
+        });
+    });
+    
+    resetView.title = 'Centrar vista';
+    toggle3D.title = 'Vista 2D';
+}
+</script>
+
+<style>
+#mapContainer {
+    position: relative;
+    display: block;
+    width: 100%;
+    min-height: 400px;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+}
+
+.mapboxgl-map {
+    background: #e5e7eb;
+    border-radius: 12px;
+    z-index: 1;
+}
+
+.mapboxgl-popup-content {
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    padding: 0;
+}
+
+.mapboxgl-ctrl-group {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.mapboxgl-popup-tip {
+    display: none;
+}
+
+.mapboxgl-popup-close-button {
+    color: #6b7280;
+    font-size: 18px;
+    padding: 8px;
+    right: 8px;
+    top: 8px;
+}
+
+.mapboxgl-popup-close-button:hover {
+    color: #374151;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+}
+
+.dark .mapboxgl-popup-close-button {
+    color: #9ca3af;
+}
+
+.dark .mapboxgl-popup-close-button:hover {
+    color: #d1d5db;
+    background: rgba(255, 255, 255, 0.1);
+}
+</style>

@@ -574,6 +574,17 @@ def detalle_servicio(request, servicio_id):
     # Fecha mínima para reservas
     fecha_minima = (date.today() + timedelta(days=1)).isoformat()
     
+    # Debug de coordenadas
+    coordenadas_debug = {
+        'lat': float(servicio.latitud) if servicio.latitud else 0.0,
+        'lng': float(servicio.longitud) if servicio.longitud else 0.0
+    }
+    
+    logger.info(f'DEBUG Servicio {servicio.id} ({servicio.nombre}):');
+    logger.info(f'  - latitud DB: {servicio.latitud}');
+    logger.info(f'  - longitud DB: {servicio.longitud}');
+    logger.info(f'  - coordenadas procesadas: {coordenadas_debug}');
+    
     context = {
         'servicio': servicio,
         'imagen_principal': imagen_principal,
@@ -581,7 +592,7 @@ def detalle_servicio(request, servicio_id):
         'horario_semana': horario_semana,
         'horario_fin_semana': horario_fin_semana,
         'esta_abierto': servicio.esta_abierto_ahora(),
-        'coordenadas': servicio.get_coordenadas(),
+        'coordenadas': coordenadas_debug,
         'url_google_maps': servicio.get_url_google_maps(),
         'calificaciones': datos_calificaciones['calificaciones_lista'],
         'stats_calificaciones': datos_calificaciones['stats_calificaciones'],
@@ -887,7 +898,7 @@ def mis_servicios(request):
         'page_obj': page_obj,
         'total_servicios': total_servicios,
         'servicios_activos': servicios_activos,
-        'promedio_calificacion': round(promedio_calificacion, 2),
+        'promedio_calificacion': promedio_calificacion,
     }
     
     return render(request, 'servicios/mis_servicios.html', context)
@@ -1066,7 +1077,7 @@ def estadisticas_servicios_ajax(request):
             promedio = servicios_activos.filter(tipo=tipo_code).aggregate(
                 promedio=Avg('precio')
             )['promedio']
-            precio_promedio_tipo[tipo_nombre] = round(float(promedio or 0), 2)
+            precio_promedio_tipo[tipo_nombre] = float(promedio or 0)
         
         # Servicios mejor calificados
         mejor_calificados = servicios_activos.order_by('-calificacion_promedio')[:5]
